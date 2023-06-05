@@ -12,7 +12,7 @@ export const metadata = {
 
 const themeDark = createTheme({
   palette: {
-    mode: "dark",
+    //mode: "dark",
     background: {
       default: "#0d1116",
     },
