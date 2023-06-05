@@ -22,8 +22,9 @@ function AppBarTabs() {
   return (
     <Box sx={{ mx: 2 }}>
       <Tabs value={value} onChange={handleChange}>
-        <Tab label="Instant Transfer" sx={{fontWeight: value == 0 ? 700 : "normal"}}/>
-        <Tab label="Transactions" sx={{fontWeight: value == 1 ? 700 : "normal"}}/>
+        <Tab label="Home" sx={{fontWeight: value == 0 ? 700 : "normal"}}/>
+        <Tab label="Instant Transfer" sx={{fontWeight: value == 1 ? 700 : "normal"}}/>
+        <Tab label="Transactions" sx={{fontWeight: value == 2 ? 700 : "normal"}}/>
       </Tabs>
     </Box>
   );
@@ -33,7 +34,7 @@ export default function XBPAppBar({ isProduct }: any) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" color="secondary">
-        <Container maxWidth={false}>
+        <Container maxWidth="xl">
           
             <Toolbar>
               <IconButton
