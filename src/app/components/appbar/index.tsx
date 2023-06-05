@@ -33,7 +33,7 @@ export default function XBPAppBar({ isProduct }: any) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" color="secondary">
-        <Container maxWidth="xl">
+        <Container maxWidth={false}>
           
             <Toolbar>
               <IconButton
