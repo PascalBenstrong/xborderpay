@@ -12,6 +12,7 @@ export default function ETransferPage() {
         sx={{
           bgcolor: "secondary.main",
           p: 2,
+          px: 4,
           pb: 4,
           borderRadius: 3,
           overflow: "auto",
