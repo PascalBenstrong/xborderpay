@@ -80,7 +80,9 @@ export default function VerticalLinearStepper() {
             ))}
           </Stepper>
         </Grid>
-        <Grid xs={12} md={12} lg={7}>
+
+        <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
+          {activeStep === steps.length - 1 && <ETransferSuccess />}
           {activeStep == 0 && <SelectAccountPayee />}
           {activeStep == 1 && <EnterAmount />}
           {activeStep <= steps.length - 2 && (
@@ -104,19 +106,16 @@ export default function VerticalLinearStepper() {
             </Box>
           )}
         </Grid>
-        <Grid xs={12} md={4} lg={3}>
-          <Typography variant="h6" mb={1}>
-            From
-          </Typography>
-          <UserInfoCard />
-          <Typography variant="h6" mt={3} mb={1}>
-            To
-          </Typography>
-          <UserInfoCard />
-        </Grid>
-        {activeStep === steps.length - 1 && (
-          <Grid xs={12} md={12} lg={10}>
-            <ETransferSuccess />
+        {activeStep < 2 && (
+          <Grid xs={12} md={4} lg={3}>
+            <Typography variant="h6" mb={1}>
+              From
+            </Typography>
+            <UserInfoCard />
+            <Typography variant="h6" mt={3} mb={1}>
+              To
+            </Typography>
+            <UserInfoCard />
           </Grid>
         )}
       </Grid>
