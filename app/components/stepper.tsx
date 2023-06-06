@@ -81,39 +81,39 @@ export default function VerticalLinearStepper() {
           </Stepper>
         </Grid>
         <Grid xs={12} md={12} lg={7}>
-              {activeStep == 0 && <SelectAccountPayee />}
-              {activeStep == 1 && <EnterAmount />}
-              {activeStep <= steps.length - 2 && (
-                <Box sx={{ mb: 2 }}>
-                  {activeStep > 0 && (
-                    <Button
-                      variant="outlined"
-                      onClick={handleBack}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    {activeStep === steps.length - 2 ? "Send Money" : "NEXT"}
-                  </Button>
-                </Box>
+          {activeStep == 0 && <SelectAccountPayee />}
+          {activeStep == 1 && <EnterAmount />}
+          {activeStep <= steps.length - 2 && (
+            <Box sx={{ mb: 2 }}>
+              {activeStep > 0 && (
+                <Button
+                  variant="outlined"
+                  onClick={handleBack}
+                  sx={{ mt: 1, mr: 1 }}
+                >
+                  Back
+                </Button>
               )}
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                sx={{ mt: 1, mr: 1, px: 10 }}
+              >
+                {activeStep === steps.length - 2 ? "Send Money" : "NEXT"}
+              </Button>
+            </Box>
+          )}
         </Grid>
-            <Grid xs={12} md={4} lg={3}>
-              <Typography variant="h6" mb={1}>
-                From
-              </Typography>
-              <UserInfoCard />
-              <Typography variant="h6" mt={3} mb={1}>
-                To
-              </Typography>
-              <UserInfoCard />
-            </Grid>
+        <Grid xs={12} md={4} lg={3}>
+          <Typography variant="h6" mb={1}>
+            From
+          </Typography>
+          <UserInfoCard />
+          <Typography variant="h6" mt={3} mb={1}>
+            To
+          </Typography>
+          <UserInfoCard />
+        </Grid>
         {activeStep === steps.length - 1 && (
           <Grid xs={12} md={12} lg={10}>
             <ETransferSuccess />
