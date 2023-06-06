@@ -17,7 +17,7 @@ import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
 import { Transaction, Wallet } from "../types";
 
-const currencyJson: Wallet[] = [
+const walletsJson: Wallet[] = [
   {
     name: "Euros",
     currency: "EUR",
@@ -39,61 +39,60 @@ const currencyJson: Wallet[] = [
 ];
 
 const transactionsJson: Transaction[] = [
-    {
-      type: "deposit",
-      to: "John Doe",
-      wallet: "USD Wallet",
-      currency: "USD",
-      amount: 1000,
-      timestamp: 1654328700,
-    },
-    {
-      type: "withdrawal",
-      to: "Jane Smith",
-      wallet: "EUR Wallet",
-      currency: "EUR",
-      amount: 500,
-      timestamp: 1654329000,
-    },
-    {
-      type: "transfer",
-      to: "Mark Johnson",
-      wallet: "GBP Wallet",
-      currency: "GBP",
-      amount: 250,
-      timestamp: 1654329300,
-    },
-    {
-      type: "withdrawal",
-      to: "Alice Johnson",
-      wallet: "BTC Wallet",
-      currency: "BTC",
-      amount: 0.5,
-      timestamp: 1654375200,
-    },
-    {
-      type: "transfer",
-      to: "Bob Smith",
-      wallet: "ETH Wallet",
-      currency: "ETH",
-      amount: 2.75,
-      timestamp: 1654375500,
-    },
-    {
-      type: "deposit",
-      to: "Charlie Brown",
-      wallet: "LTC Wallet",
-      currency: "LTC",
-      amount: 100,
-      timestamp: 1654375800,
-    },
-  ];
+  {
+    type: "deposit",
+    to: "John Doe",
+    wallet: "USD Wallet",
+    currency: "USD",
+    amount: 1000,
+    timestamp: 1654328700,
+  },
+  {
+    type: "withdrawal",
+    to: "Jane Smith",
+    wallet: "EUR Wallet",
+    currency: "EUR",
+    amount: 500,
+    timestamp: 1654329000,
+  },
+  {
+    type: "transfer",
+    to: "Mark Johnson",
+    wallet: "GBP Wallet",
+    currency: "GBP",
+    amount: 250,
+    timestamp: 1654329300,
+  },
+  {
+    type: "withdrawal",
+    to: "Alice Johnson",
+    wallet: "BTC Wallet",
+    currency: "BTC",
+    amount: 0.5,
+    timestamp: 1654375200,
+  },
+  {
+    type: "transfer",
+    to: "Bob Smith",
+    wallet: "ETH Wallet",
+    currency: "ETH",
+    amount: 2.75,
+    timestamp: 1654375500,
+  },
+  {
+    type: "deposit",
+    to: "Charlie Brown",
+    wallet: "LTC Wallet",
+    currency: "LTC",
+    amount: 100,
+    timestamp: 1654375800,
+  },
+];
 
 export default function HomePage() {
-  const [currencies, setCurrencies] = useState<Wallet[]>(currencyJson);
-  const [transactions, setTransactions] = useState<Transaction[]>(
-    transactionsJson
-  );
+  const [wallets, setwallets] = useState<Wallet[]>(walletsJson);
+  const [transactions, setTransactions] =
+    useState<Transaction[]>(transactionsJson);
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
@@ -105,8 +104,8 @@ export default function HomePage() {
         </Button>
       </Stack>
       <Grid container spacing={2} sx={{ mt: 4 }}>
-        {currencies &&
-          currencies.map((item: any, index: number) => (
+        {wallets &&
+          wallets.map((item: any, index: number) => (
             <Grid xs={6} lg={3} key={index}>
               <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
                 <Avatar sx={{ bgcolor: "primary.main" }} aria-label="currency">
@@ -122,21 +121,23 @@ export default function HomePage() {
               </Paper>
             </Grid>
           ))}
-        <Grid xs={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ border: "4px dashed white", height: "100%", p: 2 }}
-            >
-              <AddCircleIcon fontSize="large" />
-              <Typography variant="body2" my={2}>
-                Add a new currency wallet
-              </Typography>
-            </Stack>
-          </Paper>
-        </Grid>
+        {wallets.length < 4 && (
+          <Grid xs={6} lg={3}>
+            <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
+              <Stack
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                sx={{ border: "4px dashed white", height: "100%", p: 2 }}
+              >
+                <AddCircleIcon fontSize="large" />
+                <Typography variant="body2" my={2}>
+                  Add a new currency wallet
+                </Typography>
+              </Stack>
+            </Paper>
+          </Grid>
+        )}
       </Grid>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
