@@ -1,6 +1,6 @@
 # xborderpay
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+xBorderPay (Cross Border Payment) is a cross-border payment platform built on Hedera's trusted DLT technology. Our project aims to leverage the speed, efficiency, and reliability of Hedera's Hashgraph to revolutionize international payments, catering to the needs of individuals and businesses in the rapidly evolving fintech industry.
 
 ## Getting Started
 
