@@ -18,8 +18,8 @@ import TransactionCard from "../components/transaction_card";
 
 const currencyJson = [
   {
-    name: "Canadian dollar",
-    currency: "CAD",
+    name: "Euros",
+    currency: "EUR",
     balance: "115,741.55",
     logo: "",
   },
@@ -38,61 +38,63 @@ const currencyJson = [
 ];
 
 const transactionsJson = {
-    "transactions": [
-      {
-        "type": "deposit",
-        "to": "John Doe",
-        "wallet": "johndoe123",
-        "currency": "USD",
-        "amount": 1000,
-        "timestamp": 1654328700
-      },
-      {
-        "type": "withdrawal",
-        "to": "Jane Smith",
-        "wallet": "janesmith456",
-        "currency": "EUR",
-        "amount": 500,
-        "timestamp": 1654329000
-      },
-      {
-        "type": "transfer",
-        "to": "Mark Johnson",
-        "wallet": "markjohnson789",
-        "currency": "GBP",
-        "amount": 250,
-        "timestamp": 1654329300
-      },
-      {
-        "type": "withdrawal",
-        "to": "Alice Johnson",
-        "wallet": "alice123",
-        "currency": "BTC",
-        "amount": 0.5,
-        "timestamp": 1654375200
-      },
-      {
-        "type": "transfer",
-        "to": "Bob Smith",
-        "wallet": "bob456",
-        "currency": "ETH",
-        "amount": 2.75,
-        "timestamp": 1654375500
-      },
-      {
-        "type": "deposit",
-        "to": "Charlie Brown",
-        "wallet": "charlie789",
-        "currency": "LTC",
-        "amount": 100,
-        "timestamp": 1654375800
-      }
-    ]
-  }
+  transactions: [
+    {
+      type: "deposit",
+      to: "John Doe",
+      wallet: "USD Wallet",
+      currency: "USD",
+      amount: 1000,
+      timestamp: 1654328700,
+    },
+    {
+      type: "withdrawal",
+      to: "Jane Smith",
+      wallet: "EUR Wallet",
+      currency: "EUR",
+      amount: 500,
+      timestamp: 1654329000,
+    },
+    {
+      type: "transfer",
+      to: "Mark Johnson",
+      wallet: "GBP Wallet",
+      currency: "GBP",
+      amount: 250,
+      timestamp: 1654329300,
+    },
+    {
+      type: "withdrawal",
+      to: "Alice Johnson",
+      wallet: "BTC Wallet",
+      currency: "BTC",
+      amount: 0.5,
+      timestamp: 1654375200,
+    },
+    {
+      type: "transfer",
+      to: "Bob Smith",
+      wallet: "ETH Wallet",
+      currency: "ETH",
+      amount: 2.75,
+      timestamp: 1654375500,
+    },
+    {
+      type: "deposit",
+      to: "Charlie Brown",
+      wallet: "LTC Wallet",
+      currency: "LTC",
+      amount: 100,
+      timestamp: 1654375800,
+    },
+  ],
+};
 
 export default function HomePage() {
   const [currencies, setCurrencies] = useState(currencyJson);
-  const [transactions, setTransactions] = useState(transactionsJson.transactions);
+  const [transactions, setTransactions] = useState(
+    transactionsJson.transactions
+  );
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
@@ -140,8 +142,28 @@ export default function HomePage() {
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
           <Title title="Activities" />
-          <Paper sx={{ bgcolor: "secondary.main", p: 2,pb:4, maxHeight: 600, overflow: "auto" }}>
-            {transactions && transactions.map((item:any, index: number)=> <TransactionCard key={index}/>)}
+          <Paper
+            sx={{
+              bgcolor: "secondary.main",
+              p: 2,
+              pb: 4,
+              maxHeight: 600,
+              borderRadius: 3,
+              overflow: "auto",
+            }}
+          >
+            {transactions &&
+              transactions.map((item: any, index: number) => (
+                <TransactionCard
+                  key={index}
+                  to={item.to}
+                  type={item.type}
+                  currency={item.currency}
+                  amount={item.amount}
+                  wallet={item.wallet}
+                  timestamp={item.timestamp}
+                />
+              ))}
           </Paper>
         </Grid>
         <Grid xs={12} lg={3}>
