@@ -140,7 +140,7 @@ export default function HomePage() {
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
           <Title title="Activities" />
-          <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
+          <Paper sx={{ bgcolor: "secondary.main", p: 2,pb:4, maxHeight: 600, overflow: "auto" }}>
             {transactions && transactions.map((item:any, index: number)=> <TransactionCard key={index}/>)}
           </Paper>
         </Grid>
