@@ -16,6 +16,7 @@ import ReceivedIcon from "@mui/icons-material/East";
 import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
 import { Transaction, Wallet } from "../types";
+import { useFetcher } from "../utils";
 
 const walletsJson: Wallet[] = [
   {
@@ -38,61 +39,23 @@ const walletsJson: Wallet[] = [
   },
 ];
 
-const transactionsJson: Transaction[] = [
-  {
-    type: "deposit",
-    to: "John Doe",
-    wallet: "USD Wallet",
-    currency: "USD",
-    amount: 1000,
-    timestamp: 1654328700,
-  },
-  {
-    type: "withdrawal",
-    to: "Jane Smith",
-    wallet: "EUR Wallet",
-    currency: "EUR",
-    amount: 500,
-    timestamp: 1654329000,
-  },
-  {
-    type: "transfer",
-    to: "Mark Johnson",
-    wallet: "GBP Wallet",
-    currency: "GBP",
-    amount: 250,
-    timestamp: 1654329300,
-  },
-  {
-    type: "withdrawal",
-    to: "Alice Johnson",
-    wallet: "BTC Wallet",
-    currency: "BTC",
-    amount: 0.5,
-    timestamp: 1654375200,
-  },
-  {
-    type: "transfer",
-    to: "Bob Smith",
-    wallet: "ETH Wallet",
-    currency: "ETH",
-    amount: 2.75,
-    timestamp: 1654375500,
-  },
-  {
-    type: "deposit",
-    to: "Charlie Brown",
-    wallet: "LTC Wallet",
-    currency: "LTC",
-    amount: 100,
-    timestamp: 1654375800,
-  },
-];
+function GetData() {
+  const { data, isError, isLoading } = useFetcher(
+    `/api/transactions`
+  );
+
+  return {
+    transactions: data?.data,
+    isLoading,
+    isError,
+  };
+}
 
 export default function HomePage() {
   const [wallets, setwallets] = useState<Wallet[]>(walletsJson);
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(transactionsJson);
+  /* const [transactions, setTransactions] =
+    useState<Transaction[]>(transactionsJson); */
+    const { transactions, isError, isLoading } = GetData();
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
