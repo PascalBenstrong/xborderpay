@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   Unstable_Grid2 as Grid,
+  IconButton,
   Paper,
   Stack,
   Typography,
@@ -17,15 +18,16 @@ import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
 import { Transaction, Wallet } from "../types";
 import { useFetcher } from "../utils";
+import CurrencyRates from "../components/rates";
 
 function GetData() {
-  const { data: wallets, isError: isWError, isLoading: isWLoading } = useFetcher(
-    `/api/wallets`
-  );
+  const {
+    data: wallets,
+    isError: isWError,
+    isLoading: isWLoading,
+  } = useFetcher(`/api/wallets`);
 
-  const { data, isError, isLoading } = useFetcher(
-    `/api/transactions`
-  );
+  const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
   return {
     transactions: data?.data,
@@ -36,7 +38,7 @@ function GetData() {
 }
 
 export default function HomePage() {
-    const { transactions,wallets, isError, isLoading } = GetData();
+  const { transactions, wallets, isError, isLoading } = GetData();
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
@@ -110,21 +112,8 @@ export default function HomePage() {
               ))}
           </Paper>
         </Grid>
-        <Grid xs={12} lg={3}>
-          <Title title="Rates" />
-          <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ height: "100%", p: 2 }}
-            >
-              <AddCircleIcon fontSize="large" />
-              <Typography variant="body2" my={2}>
-                Add a new currency wallet
-              </Typography>
-            </Stack>
-          </Paper>
+        <Grid xs={12} md={6} lg={3}>
+          <CurrencyRates />
         </Grid>
       </Grid>
     </Container>
