@@ -11,6 +11,7 @@ import ETransferSuccess from "./e-transfer/success";
 import SelectAccountPayee from "./e-transfer/selectPayee";
 import EnterAmount from "./e-transfer/enterAmount";
 import UserInfoCard from "./e-transfer/userInfoCard";
+import Review from "./e-transfer/review";
 
 const steps = [
   {
@@ -39,7 +40,7 @@ const steps = [
 ];
 
 export default function VerticalLinearStepper() {
-  const [activeStep, setActiveStep] = React.useState(1);
+  const [activeStep, setActiveStep] = React.useState(2);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -85,6 +86,7 @@ export default function VerticalLinearStepper() {
           {activeStep === steps.length - 1 && <ETransferSuccess />}
           {activeStep == 0 && <SelectAccountPayee />}
           {activeStep == 1 && <EnterAmount />}
+          {activeStep == 2 && <Review />}
           {activeStep <= steps.length - 2 && (
             <Box sx={{ mb: 2 }}>
               {activeStep > 0 && (
