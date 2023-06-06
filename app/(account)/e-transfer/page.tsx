@@ -7,7 +7,7 @@ import VerticalLinearStepper from '../../components/stepper';
 
 export default function ETransferPage() {
   return (
-    <Container maxWidth="lg" sx={{ pt: 15, }}>
+    <Container maxWidth="xl" sx={{ pt: 15, }}>
       <Paper
         sx={{
           bgcolor: "secondary.main",
