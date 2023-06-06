@@ -20,6 +20,7 @@ import { Transaction, Wallet } from "../types";
 import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
 import WalletCard from "../components/wallet_card";
+import XButton from "../components/button";
 
 function GetData() {
   const {
@@ -46,9 +47,7 @@ export default function HomePage() {
         <Typography variant="h5" fontWeight={700}>
           Good morning, Pascal
         </Typography>
-        <Button variant="contained" sx={{ borderRadius: 15, px: 5 }}>
-          Send Money
-        </Button>
+        <XButton text="Send Money"/>
       </Stack>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         {wallets &&
