@@ -19,6 +19,7 @@ import TransactionCard from "../components/transaction_card";
 import { Transaction, Wallet } from "../types";
 import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
+import WalletCard from "../components/wallet_card";
 
 function GetData() {
   const {
@@ -53,18 +54,7 @@ export default function HomePage() {
         {wallets &&
           wallets.map((item: any, index: number) => (
             <Grid xs={6} lg={3} key={index}>
-              <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
-                <Avatar sx={{ bgcolor: "primary.main" }} aria-label="currency">
-                  {item.currency}
-                </Avatar>
-                <Typography variant="h6" fontWeight={700} mt={2}>
-                  {`${item.currency} ${item.balance}`}
-                </Typography>
-                <Typography variant="body2" my={2}>
-                  {item.name}
-                </Typography>
-                <Button startIcon={<AddCircleIcon />}>Add Funds</Button>
-              </Paper>
+              <WalletCard name={item.name} balance={item.balance} currency={item.currency}/>
             </Grid>
           ))}
         {wallets?.length < 4 && (
