@@ -18,44 +18,25 @@ import TransactionCard from "../components/transaction_card";
 import { Transaction, Wallet } from "../types";
 import { useFetcher } from "../utils";
 
-const walletsJson: Wallet[] = [
-  {
-    name: "Euros",
-    currency: "EUR",
-    balance: "115,741.55",
-    logo: "",
-  },
-  {
-    name: "US dollar",
-    currency: "USD",
-    balance: "1,005.00",
-    logo: "",
-  },
-  {
-    name: "South African Rand",
-    currency: "ZAR",
-    balance: "39,134.18",
-    logo: "",
-  },
-];
-
 function GetData() {
+  const { data: wallets, isError: isWError, isLoading: isWLoading } = useFetcher(
+    `/api/wallets`
+  );
+
   const { data, isError, isLoading } = useFetcher(
     `/api/transactions`
   );
 
   return {
     transactions: data?.data,
+    wallets: wallets?.data,
     isLoading,
     isError,
   };
 }
 
 export default function HomePage() {
-  const [wallets, setwallets] = useState<Wallet[]>(walletsJson);
-  /* const [transactions, setTransactions] =
-    useState<Transaction[]>(transactionsJson); */
-    const { transactions, isError, isLoading } = GetData();
+    const { transactions,wallets, isError, isLoading } = GetData();
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
@@ -84,7 +65,7 @@ export default function HomePage() {
               </Paper>
             </Grid>
           ))}
-        {wallets.length < 4 && (
+        {wallets?.length < 4 && (
           <Grid xs={6} lg={3}>
             <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
               <Stack
