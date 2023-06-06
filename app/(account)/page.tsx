@@ -15,8 +15,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ReceivedIcon from "@mui/icons-material/East";
 import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
+import { Transaction, Wallet } from "../types";
 
-const currencyJson = [
+const currencyJson: Wallet[] = [
   {
     name: "Euros",
     currency: "EUR",
@@ -37,8 +38,7 @@ const currencyJson = [
   },
 ];
 
-const transactionsJson = {
-  transactions: [
+const transactionsJson: Transaction[] = [
     {
       type: "deposit",
       to: "John Doe",
@@ -87,13 +87,12 @@ const transactionsJson = {
       amount: 100,
       timestamp: 1654375800,
     },
-  ],
-};
+  ];
 
 export default function HomePage() {
-  const [currencies, setCurrencies] = useState(currencyJson);
-  const [transactions, setTransactions] = useState(
-    transactionsJson.transactions
+  const [currencies, setCurrencies] = useState<Wallet[]>(currencyJson);
+  const [transactions, setTransactions] = useState<Transaction[]>(
+    transactionsJson
   );
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
