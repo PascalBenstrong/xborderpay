@@ -16,15 +16,13 @@ const customReturnFiltere = (arr:any[]) => {
   .map((finalResult:any) => {
       return {
         value: finalResult.id,
-        name: finalResult.name
+        name: `${finalResult.currency} Wallet xxxxxxx555 - ${finalResult.currency} ${finalResult.balance.toFixed(2)}`
       }
   });
 }
 
 export default function SelectAccountPayee({account,setAccount, wallets}:any) {
   const [accounts,setAccounts] = useState<any>();
-  console.log("MWallets: ", customReturnFiltere(wallets));
-
   useEffect(()=>{
 
     if(wallets != null)

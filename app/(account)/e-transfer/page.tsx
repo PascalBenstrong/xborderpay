@@ -54,8 +54,6 @@ function GetData() {
     isLoading
   } = useFetcher(`/api/wallets`);
 
-  console.log("wallets: ",wallets)
-
   //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
   return {
@@ -70,8 +68,6 @@ export default function ETransferPage() {
   const { wallets, isError, isLoading } = GetData();
   const [activeStep, setActiveStep] = React.useState(0);
   const [account, setAccount] = React.useState("");
-
-  console.log("E-Transfer: ", wallets)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
