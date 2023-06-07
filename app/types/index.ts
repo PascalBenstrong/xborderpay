@@ -24,5 +24,11 @@ export type User = {
     id: string,
     firstName: string,
     lastName: string,
-    email: string
+    email: string,
+    phone: string,
+    birthdate: string,
+    fiId: string,
+    accountNo: string,
+    bankName: string,
+    address: string,
 }
