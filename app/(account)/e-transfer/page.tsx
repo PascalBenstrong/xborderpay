@@ -54,11 +54,14 @@ function GetData() {
     isLoading
   } = useFetcher(`/api/wallets`);
 
-  //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
+  const { data } = useFetcher(`/api/e-transfer`);
+  console.log("E-transfer: ", data);
 
   return {
     //transactions: data?.data,
-    wallets: wallets?.data,
+    wallets: data?.accounts,
+    recentPayees: data?.recentPayees,
+    purposes: data?.purposes,
     isLoading,
     isError,
   };
