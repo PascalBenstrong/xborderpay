@@ -41,7 +41,7 @@ export default function EnterAmount() {
       />
       <Box sx={{ borderLeft: "1px solid lightGrey", pl: 2, py: 3, ml: 5 }}>
         <Typography>Fees: USD 5.00 (included)</Typography>
-        <Typography mt={1}>Rate: 52.01</Typography>
+        <Typography mt={1}>Rate: 19.32</Typography>
       </Box>
       <ValidationTextField
         id="toCurrency"
