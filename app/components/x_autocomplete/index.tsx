@@ -63,7 +63,6 @@ export default function XAutocomplete({
           }}
           inputProps={{
             ...params.inputProps,
-            autoComplete: "new-password", // disable autocomplete and autofill
           }}
         />
       )}
