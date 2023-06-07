@@ -5,17 +5,47 @@ import {
   FormGroup,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { ValidationTextField } from "../entry";
+import XSelect from "../x_select";
 
-export default function SelectAccountPayee() {
+const customReturnFiltere = (arr:any[]) => {
+  return arr?.filter((obj:any) => {
+    return obj.balance > 0;
+  })
+  .map((finalResult:any) => {
+      return {
+        value: finalResult.id,
+        name: finalResult.name
+      }
+  });
+}
+
+export default function SelectAccountPayee({account,setAccount, wallets}:any) {
+  const [accounts,setAccounts] = useState<any>();
+  console.log("MWallets: ", customReturnFiltere(wallets));
+
+  useEffect(()=>{
+
+    if(wallets != null)
+    {
+      const _accounts = customReturnFiltere(wallets);
+      setAccounts(_accounts);
+
+      if(account != null ||  account.length > 0)
+      setAccount(_accounts[0].value)
+
+    }
+
+  },[wallets])
+  
   return (
     <Box>
       <Typography variant="h6" mb={1}>
         Transfer from
       </Typography>
       <Typography my={2}>Account</Typography>
-      <ValidationTextField id="account" fullWidth color="info" />
+      <XSelect value={account} setValue={setAccount} data={accounts}/>
       <Typography variant="h6" mt={3}>
         To
       </Typography>
