@@ -51,7 +51,7 @@ export default function ETransferPage() {
     setActiveStep(0);
   };
   return (
-    <Container maxWidth="lg" sx={{ pt: 15 }}>
+    <Container maxWidth="lg" sx={{ pt: {xs: 10, md: 15} }}>
       <Paper
         sx={{
           bgcolor: "secondary.main",
