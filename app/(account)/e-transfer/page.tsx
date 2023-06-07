@@ -1,5 +1,15 @@
 "use client";
-import { Container, Paper,Unstable_Grid2 as Grid, Box, Button, Step, StepLabel, Stepper, Typography } from "@mui/material";
+import {
+  Container,
+  Paper,
+  Unstable_Grid2 as Grid,
+  Box,
+  Button,
+  Step,
+  StepLabel,
+  Stepper,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import TransactionCard from "../../components/transaction_card";
 import Title from "../../components/title";
@@ -9,6 +19,7 @@ import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
+import { useFetcher } from "../../utils";
 
 const steps = [
   {
@@ -36,8 +47,31 @@ const steps = [
   },
 ];
 
+function GetData() {
+  const {
+    data: wallets,
+    isError,
+    isLoading
+  } = useFetcher(`/api/wallets`);
+
+  console.log("wallets: ",wallets)
+
+  //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
+
+  return {
+    //transactions: data?.data,
+    wallets: wallets?.data,
+    isLoading,
+    isError,
+  };
+}
+
 export default function ETransferPage() {
-  const [activeStep, setActiveStep] = React.useState(2);
+  const { wallets, isError, isLoading } = GetData();
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [account, setAccount] = React.useState("");
+
+  console.log("E-Transfer: ", wallets)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -51,7 +85,7 @@ export default function ETransferPage() {
     setActiveStep(0);
   };
   return (
-    <Container maxWidth="lg" sx={{ pt: {xs: 10, md: 15} }}>
+    <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
       <Paper
         sx={{
           bgcolor: "secondary.main",
@@ -91,8 +125,12 @@ export default function ETransferPage() {
           </Grid>
 
           <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
-            {activeStep === steps.length - 1 && <ETransferSuccess handleReset={handleReset}/>}
-            {activeStep == 0 && <SelectAccountPayee />}
+            {activeStep === steps.length - 1 && (
+              <ETransferSuccess handleReset={handleReset} />
+            )}
+            {activeStep == 0 && (
+              <SelectAccountPayee account={account} setAccount={setAccount} wallets={wallets}/>
+            )}
             {activeStep == 1 && <EnterAmount />}
             {activeStep == 2 && <Review />}
             {activeStep <= steps.length - 2 && (
