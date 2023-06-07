@@ -39,7 +39,7 @@ export default function XSelect({ value, setValue, data }: any) {
                 },
               }}
             >
-              {item.name}
+              {item.label}
             </MenuItem>
           ))}
       </Select>

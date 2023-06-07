@@ -16,7 +16,7 @@ const customReturnFiltere = (arr:any[]) => {
   .map((finalResult:any) => {
       return {
         value: finalResult.id,
-        name: `${finalResult.currency} Wallet xxxxxxx555 - ${finalResult.currency} ${finalResult.balance.toFixed(2)}`
+        label: `${finalResult.currency} Wallet xxxxxxx555 - ${finalResult.currency} ${finalResult.balance.toFixed(2)}`
       }
   });
 }
