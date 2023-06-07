@@ -29,12 +29,13 @@ const customReturnPayees = (arr: any[]) => {
   return arr?.map((finalResult: any) => {
     return {
       value: finalResult.id,
-      label: `${finalResult.firstName} ${finalResult.firstName} (xxxx@xxx)`,
+      label: `${finalResult.firstName} ${finalResult.firstName} (${finalResult.email})`,
     };
   });
 };
 
-export default function SelectAccountPayee({
+export default function SelectAccountPayee(
+  {
   account,
   setAccount,
   wallets,
@@ -61,7 +62,7 @@ export default function SelectAccountPayee({
       const _payees = customReturnPayees(recentPayees);
       setPayees(_payees);
 
-      if(_payees != null) setPayee(_payees[0].value);
+      if(_payees != null) setPayee(_payees[0].label);
     }
   }, [wallets, recentPayees]);
 

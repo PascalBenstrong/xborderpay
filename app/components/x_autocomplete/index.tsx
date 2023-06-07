@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField } from "@mui/material";
+import { Autocomplete, Box, MenuItem, TextField } from "@mui/material";
 
 export default function XAutocomplete({
   value,
@@ -14,10 +14,11 @@ export default function XAutocomplete({
   id?: string;
 }) {
   const handleChange = (
-    event: React.SyntheticEvent,
+    event: any,
     value: string,
     reason: any
   ) => {
+    console.log("selected: ", value);
     setValue(value);
   };
 
@@ -42,16 +43,18 @@ export default function XAutocomplete({
         },
       }}
       renderOption={(props, option: any) => (
-        <Box
-          component="li"
+        <MenuItem
+          value={option?.value?.length > 0 ? option.value : option}
           sx={{
-            "& > img": { mr: 2, flexShrink: 0 },
-            bgcolor: "secondary.main",
+            color: "#0ca581",
+            "&:hover + .Mui-selected[selected='true']": {
+              backgroundColor: "#161c23",
+            },
           }}
           {...props}
         >
           {option?.label?.length > 0 ? option.label : option}
-        </Box>
+        </MenuItem>
       )}
       renderInput={(params) => (
         <TextField
