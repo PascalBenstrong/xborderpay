@@ -48,14 +48,8 @@ const steps = [
 ];
 
 function GetData() {
-  const {
-    data: wallets,
-    isError,
-    isLoading
-  } = useFetcher(`/api/wallets`);
-
-  const { data } = useFetcher(`/api/e-transfer`);
-  console.log("E-transfer: ", data);
+  const { data, isError, isLoading  } = useFetcher(`/api/e-transfer`);
+  //console.log("E-transfer: ", data);
 
   return {
     //transactions: data?.data,
@@ -68,9 +62,12 @@ function GetData() {
 }
 
 export default function ETransferPage() {
-  const { wallets, isError, isLoading } = GetData();
+  const { wallets, recentPayees, purposes, isError, isLoading } = GetData();
   const [activeStep, setActiveStep] = React.useState(0);
   const [account, setAccount] = React.useState("");
+  const [payee, setPayee] = React.useState("");
+  const [purpose, setPurpose] = React.useState("");
+  const [notes, setNotes] = React.useState("");
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -83,6 +80,7 @@ export default function ETransferPage() {
   const handleReset = () => {
     setActiveStep(0);
   };
+  
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
       <Paper
@@ -128,7 +126,19 @@ export default function ETransferPage() {
               <ETransferSuccess handleReset={handleReset} />
             )}
             {activeStep == 0 && (
-              <SelectAccountPayee account={account} setAccount={setAccount} wallets={wallets}/>
+              <SelectAccountPayee
+                account={account}
+                setAccount={setAccount}
+                wallets={wallets}
+                payee={payee}
+                setPayee={setPayee}
+                recentPayees={recentPayees}
+                purpose={purpose}
+                setPurpose={setPurpose}
+                purposes={purposes}
+                notes={notes}
+                setNotes={setNotes}
+              />
             )}
             {activeStep == 1 && <EnterAmount />}
             {activeStep == 2 && <Review />}
