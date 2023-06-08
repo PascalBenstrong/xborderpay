@@ -78,8 +78,14 @@ export default function ETransferPage() {
   const [payee, setPayee] = React.useState("");
   const [purpose, setPurpose] = React.useState("");
   const [notes, setNotes] = React.useState("");
-  const [fromAmount, setFromAmount] = React.useState<Amount>();
-  const [toAmount, setToAmount] = React.useState<Amount>();
+  const [fromAmount, setFromAmount] = React.useState<Amount>({
+    amount: 0,
+    currency: Currency.USD
+  });
+  const [toAmount, setToAmount] = React.useState<Amount>({
+    amount: 0,
+    currency: Currency.ZAR
+  });
   const [fees, setFees] = React.useState<Amount>({
     amount: 0.05,
     currency: Currency.USD

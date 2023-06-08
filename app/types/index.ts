@@ -1,5 +1,5 @@
 export enum Currency {
-    USD, EUR, GBP, BTC, ETH, ZAR,HBAR
+    USD = "USD", EUR = "EUR", GBP = "GBP", BTC = "BTC", ETH = "ETH", ZAR = "ZAR", HBAR = "HBAR"
 }
 
 export type Transaction = {

@@ -15,7 +15,16 @@ import { ValidationTextField } from "../entry";
 import UserInfoCard from "./userInfoCard";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
-export default function EnterAmount({fromAmount,setFromAmount,toAmount,setToAmount,fees,setFees,rate,setRate}:any) {
+export default function EnterAmount({
+  fromAmount,
+  setFromAmount,
+  toAmount,
+  setToAmount,
+  fees,
+  setFees,
+  rate,
+  setRate,
+}: any) {
   return (
     <Box width="100%">
       <Typography variant="h6" mb={1}>
@@ -23,7 +32,13 @@ export default function EnterAmount({fromAmount,setFromAmount,toAmount,setToAmou
       </Typography>
       <ValidationTextField
         id="fromCurrency"
-        value="200.00"
+        value={fromAmount.amount}
+        onChange={(e) =>
+          setFromAmount({
+            currency: fromAmount.currency,
+            amount: e.target.value,
+          })
+        }
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -32,20 +47,27 @@ export default function EnterAmount({fromAmount,setFromAmount,toAmount,setToAmou
                 width="20"
                 src={`https://flagcdn.com/w20/us.png`}
                 srcSet={`https://flagcdn.com/w40/us.png 2x`}
-                alt="USD"
+                alt={fromAmount.currency}
               />{" "}
-              <Typography color="lightgrey" px={2}>USD</Typography> 
+              <Typography color="lightgrey" px={2}>
+                {fromAmount.currency}
+              </Typography>
             </InputAdornment>
           ),
         }}
       />
       <Box sx={{ borderLeft: "1px solid lightGrey", pl: 2, py: 3, ml: 5 }}>
-        <Typography>Fees: USD 5.00 (included)</Typography>
-        <Typography mt={1}>Rate: 19.32</Typography>
+        <Typography>
+          Fees: {fees.currency} {fees.amount} (included)
+        </Typography>
+        <Typography mt={1}>Rate: {rate.toFixed(2)}</Typography>
       </Box>
       <ValidationTextField
         id="toCurrency"
-        value="1000.51"
+        value={toAmount.amount}
+        onChange={(e) =>
+          setToAmount({ currency: toAmount.currency, amount: e.target.value })
+        }
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -54,8 +76,11 @@ export default function EnterAmount({fromAmount,setFromAmount,toAmount,setToAmou
                 width="20"
                 src={`https://flagcdn.com/w20/za.png`}
                 srcSet={`https://flagcdn.com/w40/za.png 2x`}
-                alt="ZAR"
-              /><Typography color="lightgrey" px={2}>ZAR</Typography> 
+                alt={toAmount.currency}
+              />
+              <Typography color="lightgrey" px={2}>
+                {toAmount.currency}
+              </Typography>
             </InputAdornment>
           ),
         }}
