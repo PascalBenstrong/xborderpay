@@ -3,7 +3,8 @@ import { FormatMoney } from 'format-money-js';
 const convertCurrency = async (
     amount: number,
     fromCurrency: string,
-    toCurrency: string
+    toCurrency: string,
+    exchangeRates: any
 ): Promise<number> => {
     // Fetch the latest exchange rates
     var requestOptions: any = {
@@ -11,14 +12,14 @@ const convertCurrency = async (
         redirect: 'follow'
     };
 
-    const response: any = await fetch(`https://openexchangerates.org/api/latest.json?app_id=9a2e487fc0f04386b607eda70dd703cc&base=USD`, requestOptions)
+    /* const response: any = await fetch(`https://openexchangerates.org/api/latest.json?app_id=9a2e487fc0f04386b607eda70dd703cc&base=USD`, requestOptions)
         .then(response => response.json())
         .then(result => result)
         .catch(error => console.log('error', error));
 
-    console.log(response);
+    console.log(response); */
 
-    const exchangeRates = response.rates;
+    //const exchangeRates = response.rates;
 
     const convertedAmount = (amount / exchangeRates[fromCurrency]) * exchangeRates[toCurrency];
 
