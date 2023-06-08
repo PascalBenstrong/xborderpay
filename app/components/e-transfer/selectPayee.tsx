@@ -66,7 +66,7 @@ export default function SelectAccountPayee(
     }
   }, [wallets, recentPayees]);
 
-  console.log("payee: ", payee);
+  //console.log("payee: ", payee);
 
   return (
     <Box>

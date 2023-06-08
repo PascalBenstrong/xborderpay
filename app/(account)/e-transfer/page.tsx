@@ -20,6 +20,7 @@ import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
 import { useFetcher } from "../../utils";
+import { Currency } from "../../types";
 
 const steps = [
   {
@@ -48,7 +49,7 @@ const steps = [
 ];
 
 function GetData() {
-  const { data, isError, isLoading  } = useFetcher(`/api/e-transfer`);
+  const { data, isError, isLoading } = useFetcher(`/api/e-transfer`);
   //console.log("E-transfer: ", data);
 
   return {
@@ -61,13 +62,29 @@ function GetData() {
   };
 }
 
+function GetPayee(payee:string){
+
+}
+
+type Amount = {
+  amount: number,
+  currency: Currency
+}
+
 export default function ETransferPage() {
   const { wallets, recentPayees, purposes, isError, isLoading } = GetData();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(1);
   const [account, setAccount] = React.useState("");
   const [payee, setPayee] = React.useState("");
   const [purpose, setPurpose] = React.useState("");
   const [notes, setNotes] = React.useState("");
+  const [fromAmount, setFromAmount] = React.useState<Amount>();
+  const [toAmount, setToAmount] = React.useState<Amount>();
+  const [fees, setFees] = React.useState<Amount>({
+    amount: 0.05,
+    currency: Currency.USD
+  });
+  const [rate, setRate] = React.useState<Number>(19.08);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -80,7 +97,7 @@ export default function ETransferPage() {
   const handleReset = () => {
     setActiveStep(0);
   };
-  
+
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
       <Paper
@@ -140,7 +157,7 @@ export default function ETransferPage() {
                 setNotes={setNotes}
               />
             )}
-            {activeStep == 1 && <EnterAmount />}
+            {activeStep == 1 && <EnterAmount fromAmount={fromAmount} setFromAmount={setFromAmount} toAmount={toAmount} setToAmount={setToAmount} fees={fees} setFees={setFees} rate={rate} setRate={setRate}/>}
             {activeStep == 2 && <Review />}
             {activeStep <= steps.length - 2 && (
               <Box sx={{ mb: 2 }}>
@@ -164,15 +181,23 @@ export default function ETransferPage() {
             )}
           </Grid>
           {activeStep < 2 && (
-            <Grid xs={12} md={4} lg={3}>
-              <Typography variant="h6" mb={1}>
-                From
-              </Typography>
-              <UserInfoCard />
-              <Typography variant="h6" mt={3} mb={1}>
-                To
-              </Typography>
-              <UserInfoCard />
+            <Grid xs={12} md={12} lg={3}>
+              <Box>
+              <Grid container>
+                <Grid xs={12} sm={6} lg={12}>
+                  <Typography variant="h6" mb={1}>
+                    From
+                  </Typography>
+                  <UserInfoCard />
+                </Grid>
+                <Grid xs={12}  sm={6} lg={12}>
+                  <Typography variant="h6" mt={{xs: 3, md: 0,lg: 3}} mb={1}>
+                    To
+                  </Typography>
+                  {payee && <UserInfoCard data={payee}/>}
+                </Grid>
+              </Grid>
+              </Box>
             </Grid>
           )}
         </Grid>

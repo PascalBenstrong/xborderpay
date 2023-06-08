@@ -15,7 +15,7 @@ import { ValidationTextField } from "../entry";
 import UserInfoCard from "./userInfoCard";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
-export default function EnterAmount() {
+export default function EnterAmount({fromAmount,setFromAmount,toAmount,setToAmount,fees,setFees,rate,setRate}:any) {
   return (
     <Box width="100%">
       <Typography variant="h6" mb={1}>
