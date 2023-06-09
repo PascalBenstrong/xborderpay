@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { ValidationTextField } from "../entry";
 import UserInfoCard from "./userInfoCard";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import convertCurrency from "../../utils/currencyConverter";
+import convertCurrency, { getRate } from "../../utils/currencyConverter";
 import { Currency } from "../../types";
 import XSelect from "../x_select";
 
@@ -33,10 +33,10 @@ export default function EnterAmount({
 }: any) {
   const [convertedAmount, setConvertedAmount] = useState<any>();
 
-  console.log("exchangeRates: ", exchangeRates);
+  //console.log("exchangeRates: ", exchangeRates);
 
   const handleFromAmount = async (value: string) => {
-    let _amount = parseFloat(value)
+    let _amount = parseFloat(value);
     setFromAmount({
       currency: fromAmount.currency,
       amount: value,
@@ -96,6 +96,11 @@ export default function EnterAmount({
     setFromAmount({ currency: fromAmount.currency, amount: converted });
   };
 
+  if (fromAmount.currency != null && fromAmount.currency != null && exchangeRates != null) {
+    console.log(
+      getRate(fromAmount.currency, toAmount.currency, exchangeRates)
+    );
+  }
 
   return (
     <Box width="100%">
@@ -110,9 +115,7 @@ export default function EnterAmount({
       >
         <XSelect
           value={fromAmount.currency}
-          setValue={(value: string) =>
-            handleFromCurrency(value)
-          }
+          setValue={(value: string) => handleFromCurrency(value)}
           data={Object.values(Currency)}
           removeBorder={true}
           removeMargin={true}
@@ -129,7 +132,7 @@ export default function EnterAmount({
         <Typography>
           Fees: {fees.currency} {fees.amount} (included)
         </Typography>
-        <Typography mt={1}>Rate: {rate.toFixed(2)}</Typography>
+        <Typography mt={1}>Rate: {0}</Typography>
       </Box>
       <Stack
         direction="row"
@@ -139,9 +142,7 @@ export default function EnterAmount({
       >
         <XSelect
           value={toAmount.currency}
-          setValue={(value: string) =>
-            handleToCurrency(value)
-          }
+          setValue={(value: string) => handleToCurrency(value)}
           data={Object.values(Currency)}
           removeBorder={true}
           removeMargin={true}
