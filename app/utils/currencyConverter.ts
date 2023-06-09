@@ -12,14 +12,7 @@ const convertCurrency = async (
     const fm = new FormatMoney({
         decimals: 2
     });
-
-    /* console.log(fm.from(
-        convertedAmount,
-        { symbol: '$' },
-        true // Parse, return object
-    )
-    ); */
-
+    
     let converted: any = fm.from(
         convertedAmount,
         { symbol: '$' },
@@ -35,20 +28,18 @@ export const getRate = (
     exchangeRates: any) => {
 
     const zero = 0;
-    if (fromCurrency === toCurrency || exchangeRates === null)
+
+    if (fromCurrency === toCurrency)
         return zero.toFixed(2)
 
-    const convertedAmount = (1 / exchangeRates[fromCurrency]) * exchangeRates[toCurrency];
-
-
+    let convertedAmount = 0;
+    if (fromCurrency != null && toCurrency != null && exchangeRates != null) {
+        convertedAmount = (1 / exchangeRates[fromCurrency]) * exchangeRates[toCurrency];
+    }
 
     const fm = new FormatMoney({
         decimals: 2
     });
-
-    console.log("fromCurrency: ", exchangeRates[fromCurrency]);
-    console.log("toCurrency: ", exchangeRates[toCurrency]);
-    console.log("rate: ", convertedAmount);
 
     let converted: any = fm.from(
         convertedAmount,

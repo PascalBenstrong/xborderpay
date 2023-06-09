@@ -96,12 +96,6 @@ export default function EnterAmount({
     setFromAmount({ currency: fromAmount.currency, amount: converted });
   };
 
-  if (fromAmount.currency != null && fromAmount.currency != null && exchangeRates != null) {
-    console.log(
-      getRate(fromAmount.currency, toAmount.currency, exchangeRates)
-    );
-  }
-
   return (
     <Box width="100%">
       <Typography variant="h6" mb={1}>
@@ -132,7 +126,7 @@ export default function EnterAmount({
         <Typography>
           Fees: {fees.currency} {fees.amount} (included)
         </Typography>
-        <Typography mt={1}>Rate: {0}</Typography>
+        <Typography mt={1}>Rate: {getRate(fromAmount.currency, toAmount.currency, exchangeRates)}</Typography>
       </Box>
       <Stack
         direction="row"
