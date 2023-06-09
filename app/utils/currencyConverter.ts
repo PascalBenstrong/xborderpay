@@ -6,21 +6,6 @@ const convertCurrency = async (
     toCurrency: string,
     exchangeRates: any
 ): Promise<number> => {
-    // Fetch the latest exchange rates
-    var requestOptions: any = {
-        method: 'GET',
-        redirect: 'follow'
-    };
-
-    /* const response: any = await fetch(`https://openexchangerates.org/api/latest.json?app_id=9a2e487fc0f04386b607eda70dd703cc&base=USD`, requestOptions)
-        .then(response => response.json())
-        .then(result => result)
-        .catch(error => console.log('error', error));
-
-    console.log(response); */
-
-    //const exchangeRates = response.rates;
-
     const convertedAmount = (amount / exchangeRates[fromCurrency]) * exchangeRates[toCurrency];
 
     const fm = new FormatMoney({
@@ -37,7 +22,13 @@ const convertCurrency = async (
     )
     );
 
-    return 0;
+    let converted:any = fm.from(
+        convertedAmount,
+        { symbol: '$' },
+        true // Parse, return object
+    );
+
+    return converted?.fullAmount;
 };
 
 export default convertCurrency;

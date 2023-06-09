@@ -14,7 +14,7 @@ export function useFetcher(url: string, dataKey?: string, token?: string, onSucc
 
     const { data, error, isLoading } = useSWR(url, fetcher, {
         revalidateOnFocus: false,
-        revalidateOnMount: false,
+        revalidateOnMount: true,
         revalidateOnReconnect: false,
         refreshWhenOffline: false,
         refreshWhenHidden: false,

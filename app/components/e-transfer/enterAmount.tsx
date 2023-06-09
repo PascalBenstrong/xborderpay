@@ -6,14 +6,19 @@ import {
   FormGroup,
   Unstable_Grid2 as Grid,
   InputAdornment,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { ValidationTextField } from "../entry";
 import UserInfoCard from "./userInfoCard";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import convertCurrency from "../../utils/currencyConverter";
+import { Currency } from "../../types";
+import XSelect from "../x_select";
 
 export default function EnterAmount({
   fromAmount,
@@ -24,67 +29,131 @@ export default function EnterAmount({
   setFees,
   rate,
   setRate,
+  exchangeRates,
 }: any) {
+  const [convertedAmount, setConvertedAmount] = useState<any>();
+
+  console.log("exchangeRates: ", exchangeRates);
+
+  const handleFromAmount = async (value: string) => {
+    let _amount = parseFloat(value)
+    setFromAmount({
+      currency: fromAmount.currency,
+      amount: value,
+    });
+    const converted = await convertCurrency(
+      _amount,
+      fromAmount.currency,
+      toAmount.currency,
+      exchangeRates
+    );
+    console.log("converted: ", converted);
+    setToAmount({ currency: toAmount.currency, amount: converted });
+  };
+
+  const handleFromCurrency = async (value: string) => {
+    setFromAmount({
+      currency: value,
+      amount: fromAmount.amount,
+    });
+    const converted = await convertCurrency(
+      fromAmount.amount,
+      value,
+      toAmount.currency,
+      exchangeRates
+    );
+    console.log("from currency: ", converted);
+    setToAmount({ currency: toAmount.currency, amount: converted });
+  };
+
+  const handleToAmount = async (value: any) => {
+    setToAmount({
+      currency: toAmount.currency,
+      amount: value,
+    });
+    const converted = await convertCurrency(
+      value,
+      toAmount.currency,
+      fromAmount.currency,
+      exchangeRates
+    );
+    console.log("converted: ", converted);
+    setFromAmount({ currency: fromAmount.currency, amount: converted });
+  };
+
+  const handleToCurrency = async (value: string) => {
+    setToAmount({
+      currency: value,
+      amount: toAmount.amount,
+    });
+    const converted = await convertCurrency(
+      toAmount.amount,
+      value,
+      fromAmount.currency,
+      exchangeRates
+    );
+    console.log("To currency: ", converted);
+    setFromAmount({ currency: fromAmount.currency, amount: converted });
+  };
+
+
   return (
     <Box width="100%">
       <Typography variant="h6" mb={1}>
         Amount
       </Typography>
-      <ValidationTextField
-        id="fromCurrency"
-        value={fromAmount.amount}
-        onChange={(e) =>
-          setFromAmount({
-            currency: fromAmount.currency,
-            amount: e.target.value,
-          })
-        }
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <img
-                loading="lazy"
-                width="20"
-                src={`https://flagcdn.com/w20/us.png`}
-                srcSet={`https://flagcdn.com/w40/us.png 2x`}
-                alt={fromAmount.currency}
-              />{" "}
-              <Typography color="lightgrey" px={2}>
-                {fromAmount.currency}
-              </Typography>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Stack
+        direction="row"
+        justifyContent="start"
+        alignItems="center"
+        spacing={1}
+      >
+        <XSelect
+          value={fromAmount.currency}
+          setValue={(value: string) =>
+            handleFromCurrency(value)
+          }
+          data={Object.values(Currency)}
+          removeBorder={true}
+          removeMargin={true}
+        />
+        <ValidationTextField
+          id="fromCurrency"
+          type="number"
+          value={fromAmount.amount}
+          onChange={(e) => handleFromAmount(e.target.value)}
+          sx={{ p: 0, borderRadius: 0 }}
+        />
+      </Stack>
       <Box sx={{ borderLeft: "1px solid lightGrey", pl: 2, py: 3, ml: 5 }}>
         <Typography>
           Fees: {fees.currency} {fees.amount} (included)
         </Typography>
         <Typography mt={1}>Rate: {rate.toFixed(2)}</Typography>
       </Box>
-      <ValidationTextField
-        id="toCurrency"
-        value={toAmount.amount}
-        onChange={(e) =>
-          setToAmount({ currency: toAmount.currency, amount: e.target.value })
-        }
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <img
-                loading="lazy"
-                width="20"
-                src={`https://flagcdn.com/w20/za.png`}
-                srcSet={`https://flagcdn.com/w40/za.png 2x`}
-                alt={toAmount.currency}
-              />
-              <Typography color="lightgrey" px={2}>
-                {toAmount.currency}
-              </Typography>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Stack
+        direction="row"
+        justifyContent="start"
+        alignItems="center"
+        spacing={1}
+      >
+        <XSelect
+          value={toAmount.currency}
+          setValue={(value: string) =>
+            handleToCurrency(value)
+          }
+          data={Object.values(Currency)}
+          removeBorder={true}
+          removeMargin={true}
+        />
+        <ValidationTextField
+          id="fromCurrency"
+          type="number"
+          value={toAmount.amount}
+          onChange={(e) => handleToAmount(e.target.value)}
+          sx={{ p: 0, borderRadius: 0 }}
+        />
+      </Stack>
       <Typography mb={2} mt={4}>
         Estimated Delivery Date: Near Real Time(IMPS)
       </Typography>
