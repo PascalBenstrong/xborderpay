@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { Option } from "@/types";
 
 export const sha512 = crypto.createHash("sha512");
 
@@ -22,4 +23,13 @@ export const signJwt = (payload: Payload): SignJwtResult => {
   const decoded = jwt.decode(token) as JwtPayload;
 
   return { jwt: token, /* hash: tokenHash, */ exp: decoded.exp! };
+};
+
+export const verify = (token: string): Option<Payload> => {
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as Payload;
+    return Option.fromValue(payload);
+  } catch (error) {
+    return Option.fromErrorAndMessage(error, "Something went wrong!");
+  }
 };
