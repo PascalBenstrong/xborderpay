@@ -44,6 +44,6 @@ export const userValidation = (user: User): Option<boolean> => {
 
 const passwordString = zod
   .string()
-  .min(10, { message: "password must atleast have 10 characters!" });
+  .min(10, { message: "password must at least have 10 characters!" });
 
 export const validatePassword = transformValidation(passwordString);

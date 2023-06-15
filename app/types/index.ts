@@ -1,5 +1,3 @@
-import { constructor } from "@hashgraph/sdk/lib/EntityIdHelper";
-
 export enum Currency {
   USD,
   EUR,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Wallet } from "../../types";
 
-import * as accounts from "../accounts/register";
+import * as accounts from "../accounts/register/register";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
