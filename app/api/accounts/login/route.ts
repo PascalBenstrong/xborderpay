@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { login } from "./login";
 
 export async function POST(request: Request) {
@@ -6,7 +7,7 @@ export async function POST(request: Request) {
 
     const result = await login(email, password);
 
-    if (result.isSuccess) return result.value;
+    if (result.isSuccess) return NextResponse.json(result.value);
 
     let error: any = !result.message ? result.error : result.message;
 
