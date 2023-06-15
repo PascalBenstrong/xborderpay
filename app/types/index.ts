@@ -55,9 +55,9 @@ export class Option<T> {
     if (!value) {
       this.status = "Error";
       this.error = error;
+    } else {
+      this.status = "Success";
     }
-
-    this.status = "Success";
 
     this.message = message;
 
