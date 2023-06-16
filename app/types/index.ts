@@ -1,17 +1,29 @@
 import zod from "zod";
 
 export enum Currency {
-    USD = "USD", EUR = "EUR", GBP = "GBP", BTC = "BTC", ETH = "ETH", ZAR = "ZAR"
+  USD = "USD",
+  EUR = "EUR",
+  GBP = "GBP",
+  BTC = "BTC",
+  ETH = "ETH",
+  ZAR = "ZAR",
 }
 
+declare type TransactionWallet = {
+  name: string;
+  id: string;
+  currency: Currency;
+};
 export type Transaction = {
   id: string;
   type: string;
   to?: string;
-  wallet: string;
-  currency: string;
+  senderWallet: TransactionWallet;
+  receivingWallet: TransactionWallet;
+  exchangeRate: number;
   amount: number;
   timestamp: number;
+  transactionId: string;
 };
 
 export type AccountType = "hedera";
@@ -26,16 +38,16 @@ export type Wallet = {
 };
 
 export type User = {
-    id: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    phone: string,
-    birthdate: string,
-    fiId: string,
-    accountNo: string,
-    bankName: string,
-    address: string,
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  birthdate: string;
+  fiId: string;
+  accountNo: string;
+  bankName: string;
+  address: string;
 };
 
 export const IntSchema = zod
@@ -47,6 +59,8 @@ export type TransactionsRequest = {
   accountId: string;
   order: Order;
   limit: Int;
+  after: string;
+  before: string;
 };
 
 declare type Transfer = {
@@ -55,8 +69,9 @@ declare type Transfer = {
   is_approval: boolean;
 };
 
-declare type TransactionResponse = {
+declare type HederaTransactionResponse = {
   charged_tx_fee: number;
+  consensus_timestamp: string;
   entity_id: string;
   max_fee: number;
   name: string;
@@ -64,9 +79,14 @@ declare type TransactionResponse = {
   transaction_id: string;
   transfers: Transfer[];
 };
-export type TransactionsResponse = {
+export type HederaTransactionsResponse = {
   links: { next?: string };
-  transactions: TransactionResponse[];
+  transactions: HederaTransactionResponse[];
+};
+
+export type TransactionsResponse = {
+  next?: string;
+  transactions: Transaction[];
 };
 
 export class Option<T> {
