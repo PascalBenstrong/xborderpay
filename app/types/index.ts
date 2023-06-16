@@ -1,3 +1,5 @@
+import zod from "zod";
+
 export enum Currency {
   USD,
   EUR,
@@ -33,6 +35,37 @@ export type User = {
   firstName: string;
   lastName: string;
   email: string;
+};
+
+export const IntSchema = zod
+  .number()
+  .transform((x) => Math.max(1, Math.ceil(x)));
+export type Int = zod.infer<typeof IntSchema>;
+export type Order = "asc" | "desc";
+export type TransactionsRequest = {
+  accountId: string;
+  order: Order;
+  limit: Int;
+};
+
+declare type Transfer = {
+  account: string;
+  amount: number;
+  is_approval: boolean;
+};
+
+declare type TransactionResponse = {
+  charged_tx_fee: number;
+  entity_id: string;
+  max_fee: number;
+  name: string;
+  result: string;
+  transaction_id: string;
+  transfers: Transfer[];
+};
+export type TransactionsResponse = {
+  links: { next?: string };
+  transactions: TransactionResponse[];
 };
 
 export class Option<T> {

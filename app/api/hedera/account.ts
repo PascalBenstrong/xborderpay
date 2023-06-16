@@ -1,6 +1,5 @@
 import client from "./client";
 import {
-  Client,
   PrivateKey,
   AccountCreateTransaction,
   AccountBalanceQuery,
@@ -8,7 +7,13 @@ import {
   TransferTransaction,
   Status,
 } from "@hashgraph/sdk";
-import { Option } from "@/types";
+import {
+  Currency,
+  Option,
+  TransactionsResponse,
+  TransactionsRequest,
+  IntSchema,
+} from "@/types";
 
 declare type AccountCreateResponse = {
   privateKey: string;
@@ -67,19 +72,22 @@ export const createAccount = wrapInTryCatchVoid<AccountCreateResponse>(
   }
 );
 
-export const getBalanceHbar = wrapInTryCatch<Hbar, string>(async (accountId) => {
-  const accountBalance = await new AccountBalanceQuery()
-    .setAccountId(accountId)
-    .execute(client);
+export const getBalanceHbar = wrapInTryCatch<Hbar, string>(
+  async (accountId) => {
+    const accountBalance = await new AccountBalanceQuery()
+      .setAccountId(accountId)
+      .execute(client);
 
-  return Option.fromValue(accountBalance.hbars);
-});
+    return Option.fromValue(accountBalance.hbars);
+  }
+);
 
 declare type TransferHbarRequest = {
   amount: Hbar;
   fromAccountId: string;
   fromAccountPrivateKey: string;
   toAccountId: string;
+  currency: Currency;
 };
 
 declare type TransferHBarRequestResponse = { id: string };
@@ -115,4 +123,17 @@ export const transferHbar = wrapInTryCatch<
     );
 
   return Option.fromError(new Error("Something went wrong!"));
+});
+
+const testnetUrl = "https://testnet.mirrornode.hedera.com/api/v1/transactions";
+export const getTransactionsHbar = wrapInTryCatch<
+  TransactionsResponse,
+  TransactionsRequest
+>(async (request) => {
+  let limit = IntSchema.parse(request.limit);
+  let query = `${testnetUrl}?limit=${limit}&order=${request.order}&account.id=${request.accountId}`;
+
+  const response = await fetch(query).then((x) => x.json());
+
+  return Option.fromValue(response as TransactionsResponse);
 });
