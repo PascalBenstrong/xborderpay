@@ -1,6 +1,6 @@
 "use client";
 
-//import { signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import {
@@ -11,7 +11,6 @@ import {
   Button,
   Box,
 } from "@mui/material";
-//import BootstrapInput from "../../../components/BootstrapInput";
 import Link from "next/link";
 import BootstrapInput from "@/components/entry/bootstrapInput";
 import { ValidationTextField } from "@/components/entry";
@@ -26,14 +25,14 @@ export const LoginForm = () => {
   const [error, setError] = useState("");
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/portal/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
 
-      /* const res = await signIn("credentials", {
+      const res = await signIn("credentials", {
         redirect: false,
         email: formValues.email,
         password: formValues.password,
@@ -48,7 +47,7 @@ export const LoginForm = () => {
         router.push(callbackUrl);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
-      } */
+      }
     } catch (error: any) {
       setLoading(false);
       setError(error);
@@ -103,7 +102,7 @@ export const LoginForm = () => {
       </FormControl>
       <Grid container>
         <Grid xs>
-         {/*  <Link href="/portal/forgot-password">Forgot password?</Link> */}
+          <Link href="/portal/forgot-password">Create new acoount</Link>
         </Grid>
         <Grid>
           <Button
@@ -113,6 +112,7 @@ export const LoginForm = () => {
             fullWidth
             variant="contained"
             disabled={loading}
+            sx={{width:"100%"}}
           >
             {loading ? "loading..." : "Sign In"}
           </Button>

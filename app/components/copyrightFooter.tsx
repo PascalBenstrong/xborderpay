@@ -12,6 +12,7 @@ export default function Copyright(props: any) {
             justifyContent: { xs: "center", md: "space-between" },
             alignItems: "center",
             px: 5,
+            py: 1,
             position: "absolute",
             bottom: 0,
             color: "lightGrey"
