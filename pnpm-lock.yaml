@@ -2226,8 +2226,11 @@ packages:
       is-callable: 1.2.7
     dev: false
 
+<<<<<<< HEAD
   /format-money-js@1.6.3:
     resolution: {integrity: sha512-neeYRPJ5zeepUooQaYmQQLmISmA4d8SbhyMGbr+dCXoQG0eVDYItWMK8HcMbBJTAn15l5Xf76pqJGoAtu+e8Vg==}
+=======
+>>>>>>> 58c0f01ad7a8887208cee8bd408de26052c88be8
   /form-data@4.0.0:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
     engines: {node: '>= 6'}
