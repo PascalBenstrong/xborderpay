@@ -38,16 +38,16 @@ export type Wallet = {
 };
 
 export type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  birthdate: string;
-  fiId: string;
-  accountNo: string;
-  bankName: string;
-  address: string;
+    id?: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone?: string,
+    birthdate?: string,
+    fiId?: string,
+    accountNo?: string,
+    bankName?: string,
+    address?: string,
 };
 
 export const IntSchema = zod
