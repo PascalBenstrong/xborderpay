@@ -29,7 +29,7 @@ export const register = async (
 
   const id = new ObjectId();
 
-  const token = signJwt({ subject: id.toString() });
+  const token = signJwt({ sub: id.toString() });
 
   const userInsertResult = await db.insertOne({
     ...user,

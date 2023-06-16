@@ -27,7 +27,7 @@ export const login = async (
   if (!passwordValidationResult.isSuccess)
     return Option.fromError(passwordValidationResult.error);
 
-  const token = signJwt({ subject: found._id.toString() });
+  const token = signJwt({ sub: found._id.toString() });
 
   return Option.fromValue({ jwt: token.jwt, exp: token.exp });
 };

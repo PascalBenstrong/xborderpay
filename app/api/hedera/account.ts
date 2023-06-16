@@ -20,14 +20,13 @@ import {
 import transactions from "../transactions/transactions.db";
 import { ObjectId } from "mongodb";
 
-import {wrapInTryCatchVoid, wrapInTryCatch} from "@/utils/errorHandling"
+import { wrapInTryCatchVoid, wrapInTryCatch } from "@/utils/errorHandling";
 
 declare type AccountCreateResponse = {
   privateKey: string;
   publicKey: string;
   accountId: string;
 };
-
 
 export const createAccount = wrapInTryCatchVoid<AccountCreateResponse>(
   async () => {
@@ -114,7 +113,7 @@ export const getTransactionsHbar = wrapInTryCatch<
   TransactionsResponse,
   TransactionsRequest
 >(async (request) => {
-  let limit = IntSchema.parse(request.limit);
+  let limit = IntSchema.parse(request.limit || 20);
 
   //let query = `${testnetUrl}?limit=${limit}&order=${request.order}&account.id=${request.accountId}`;
 
@@ -135,7 +134,7 @@ export const getTransactionsHbar = wrapInTryCatch<
   const transQuery = transactions
     .find(findQuery)
     .limit(Math.min(limit, 101))
-    .sort({ _id: request.order })
+    .sort({ _id: request.order || "asc" })
     .map((doc) => ({ ...doc, id: doc._id.toString() } as any as Transaction))
     .toArray();
 
