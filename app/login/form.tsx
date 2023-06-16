@@ -42,7 +42,7 @@ export const LoginForm = () => {
 
       setLoading(false);
 
-      console.log("Data: ",res);
+      //console.log("Data: ",res);
       if (!res?.error) {
         setFormValues({ email: "", password: "" });
         router.push(callbackUrl);
@@ -52,7 +52,7 @@ export const LoginForm = () => {
     } catch (error: any) {
       setLoading(false);
       setError(error);
-      console.log("error: ", error);
+      //console.log("error: ", error);
     }
   };
 

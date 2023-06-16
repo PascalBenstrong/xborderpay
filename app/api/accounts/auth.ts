@@ -52,12 +52,12 @@ export const authOptions: NextAuthOptions = {
                 },
                 password: { label: "Password", type: "password" },
             },
-            async authorize(credentials, req) {
+            async authorize(credentials) {
                 try {
 
                     let result;
 
-                    console.log("raw: ", req.body)
+                    //console.log("raw: ", req.body)
                     if(credentials?.authType == "login"){
                         if (( !credentials?.email || !credentials.password)) {
                             throw new Error('email and password are required!');
@@ -77,6 +77,8 @@ export const authOptions: NextAuthOptions = {
                         }
 
                         result = await register(_user, credentials!.password);
+                    }else{
+                        throw new Error('Invalid request!');
                     }
 
                     if (result?.isSuccess) {
