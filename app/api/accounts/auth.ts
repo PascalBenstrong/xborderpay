@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
                         throw new Error('Invalid request!');
                     }
 
-                    if (result?.isSuccess) {
+                    if (result.isSuccess) {
                         // Return the user object and token to be stored in the session
                         // Return the user object without the token
                         const token = result.value
@@ -100,7 +100,7 @@ export const authOptions: NextAuthOptions = {
                     throw new Error(error);
 
                 } catch (error: any) {
-                    throw new Error(error?.message ? error.message : 'Authentication failed');
+                    throw new Error(error.message ? error.message : 'Authentication failed');
                 }
             },
         }),
