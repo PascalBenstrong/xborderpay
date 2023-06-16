@@ -20,7 +20,7 @@ function AppBarTabs() {
   };
 
   return (
-    <Box sx={{ mx: 2 }}>
+    <Box sx={{ mx: 2, display: {xs: "none", md: "flex"} }}>
       <Tabs value={value} onChange={handleChange}>
         <Tab label="Home" sx={{fontWeight: value == 0 ? 700 : "normal"}}/>
         <Tab label="Instant Transfer" sx={{fontWeight: value == 1 ? 700 : "normal"}}/>

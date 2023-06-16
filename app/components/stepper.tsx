@@ -70,6 +70,7 @@ export default function VerticalLinearStepper() {
             ))}
           </Stepper>
           <Stepper
+          alternativeLabel
             activeStep={activeStep}
             orientation="horizontal"
             sx={{ display: { xs: "flex", lg: "none" }, mb: 3 }}

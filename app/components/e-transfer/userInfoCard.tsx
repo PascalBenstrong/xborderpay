@@ -1,9 +1,9 @@
 import { Box, Typography, Stack } from "@mui/material";
 import React from "react";
 
-export default function UserInfoCard() {
+export default function UserInfoCard({data}:any) {
   return (
-    <Box sx={{ border: "1px solid lightGrey", p: 2 }}>
+    <Box sx={{ border: "1px solid lightGrey", p: 2, color: "lightGrey" }}>
       <Typography variant="h6" mb={2}>
         Mark Woods
       </Typography>

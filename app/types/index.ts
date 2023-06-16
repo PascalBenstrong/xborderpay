@@ -1,13 +1,7 @@
 import zod from "zod";
 
 export enum Currency {
-  USD,
-  EUR,
-  GBP,
-  BTC,
-  ETH,
-  ZAR,
-  HBAR,
+    USD = "USD", EUR = "EUR", GBP = "GBP", BTC = "BTC", ETH = "ETH", ZAR = "ZAR"
 }
 
 export type Transaction = {
@@ -32,9 +26,16 @@ export type Wallet = {
 };
 
 export type User = {
-  firstName: string;
-  lastName: string;
-  email: string;
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    birthdate: string,
+    fiId: string,
+    accountNo: string,
+    bankName: string,
+    address: string,
 };
 
 export const IntSchema = zod

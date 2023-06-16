@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import Verificationcheck from "./verificationcheck";
 
-export default function ETransferSuccess() {
+export default function ETransferSuccess({handleReset}:any) {
   return (
     <>
       <Typography variant="h6" mb={1}>
@@ -23,7 +23,7 @@ export default function ETransferSuccess() {
       <Button variant="outlined" LinkComponent={Link} href="/" sx={{ mt: 3, mr: 1 }}>
         Back To Home
       </Button>
-      <Button variant="contained" onClick={()=>{}} sx={{ mt: 3, mr: 1 }}>
+      <Button variant="contained" LinkComponent={Link} href="/e-transfer" onClick={handleReset} sx={{ mt: 3, mr: 1 }}>
         Make Another Transfer
       </Button>
     </>
