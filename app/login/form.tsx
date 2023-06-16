@@ -33,6 +33,7 @@ export const LoginForm = () => {
       setLoading(true);
 
       const res = await signIn("credentials", {
+        authType: "login",
         redirect: false,
         email: formValues.email,
         password: formValues.password,

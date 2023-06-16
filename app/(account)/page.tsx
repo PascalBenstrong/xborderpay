@@ -41,6 +41,7 @@ function GetData() {
 
 export default function HomePage() {
   const { transactions, wallets, isError, isLoading } = GetData();
+
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
