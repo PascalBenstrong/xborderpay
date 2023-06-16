@@ -5,6 +5,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth from "next-auth/next";
 import { NextResponse } from "next/server";
 import { login } from "./login/login";
+import { register } from "./register/register";
+import {User as MyUser} from "@/types"
 
 export const jwt = async ({ token, user }: { token: JWT; user?: any }) => {
 
@@ -33,6 +35,16 @@ export const authOptions: NextAuthOptions = {
             id: 'credentials',
             credentials: {
                 authType: { label: "Auth"},
+                firstName: {
+                    label: "First Name",
+                    type: "text",
+                    placeholder: "John",
+                },
+                lastName: {
+                    label: "Last Name",
+                    type: "text",
+                    placeholder: "Doe",
+                },
                 email: {
                     label: "Email",
                     type: "email",
@@ -53,9 +65,19 @@ export const authOptions: NextAuthOptions = {
 
                         result = await login(credentials!.email, credentials!.password);
                         //console.log("result: ", result.value)
+                    }else if(credentials?.authType == "register"){
+                        if (( !credentials?.email || !credentials.password)) {
+                            throw new Error('email and password are required!');
+                        }
+
+                        let _user: MyUser = {
+                            firstName: credentials!.firstName,
+                            lastName: credentials!.lastName,
+                            email: credentials!.email
+                        }
+
+                        result = await register(_user, credentials!.password);
                     }
-
-
 
                     if (result?.isSuccess) {
                         // Return the user object and token to be stored in the session
