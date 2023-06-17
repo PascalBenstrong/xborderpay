@@ -21,6 +21,7 @@ import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
 import WalletCard from "../components/wallet_card";
 import XButton from "../components/button";
+import EmptyList from "@/components/empty";
 
 function GetData() {
   const {
@@ -86,12 +87,13 @@ export default function HomePage() {
               bgcolor: "secondary.main",
               p: 2,
               pb: 4,
+              height: 400,
               maxHeight: 600,
               borderRadius: 3,
               overflow: "auto",
             }}
           >
-            {transactions &&
+            {transactions ?
               transactions.map((item: any, index: number) => (
                 <TransactionCard
                   key={index}
@@ -102,7 +104,7 @@ export default function HomePage() {
                   wallet={item.wallet}
                   timestamp={item.timestamp}
                 />
-              ))}
+              )) : <EmptyList title="No Transactions" subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"/>}
           </Paper>
         </Grid>
         <Grid xs={12} md={6} lg={3}>

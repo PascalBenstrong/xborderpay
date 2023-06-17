@@ -11,7 +11,7 @@ const fetcher = (url: string) => {
     return fetch(url,requestOptions).then((res) => res.json());
 }
 
-function authHeader() {
+export function authHeader() {
 
     const { data: session }: {data:any} = useSession();
     
