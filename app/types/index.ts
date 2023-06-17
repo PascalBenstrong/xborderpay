@@ -28,13 +28,20 @@ export type Transaction = {
 
 export type AccountType = "hedera";
 
+export type WalletAccount = {
+  id: string;
+  publicKey: string;
+  type: AccountType;
+};
+
 export type Wallet = {
   id: string;
   name: string;
-  currency: string;
+  currency: Currency;
   balance: number;
-  logo: string;
-  account: { id: string; publicKey: string; type: AccountType };
+  logo?: string;
+  userId: string;
+  account: WalletAccount;
 };
 
 export type User = {

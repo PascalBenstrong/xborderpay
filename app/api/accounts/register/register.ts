@@ -1,9 +1,11 @@
 import db from "../accounts.db";
-import { User, Option } from "@/types";
+import { User, Option, Currency } from "@/types";
 import { ObjectId } from "mongodb";
 import { userValidation } from "../validation";
 import { createHash } from "../password";
 import { signJwt } from "../jwt";
+import { WalletCreateRequest, createWallet } from "../../wallets/createWallet";
+import { createAccount } from "../../hedera/account";
 
 declare type RegisterResponse = {
   jwt: string;
@@ -42,6 +44,14 @@ export const register = async (
       new Error("Failed to create user! Try again later.")
     );
   }
+
+  const walletCreateRequest: WalletCreateRequest = {
+    userId: id.toString(),
+    currency: Currency.USD,
+    name: Currency.USD,
+  };
+
+  await createWallet(walletCreateRequest);
 
   return Option.fromValue({ jwt: token.jwt, exp: token.exp });
 };
