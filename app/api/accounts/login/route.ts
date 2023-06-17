@@ -9,8 +9,7 @@ export async function POST(request: Request) {
 
     if (result.isSuccess) return NextResponse.json(result.value);
 
-    let error: any = result.getErrorOrMessage();
-    console.log("error: ", error);
+    let error = result.getErrorOrMessage();
 
     return new Response(error, { status: 400 });
   } catch (error) {
