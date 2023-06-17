@@ -28,13 +28,20 @@ export type Transaction = {
 
 export type AccountType = "hedera";
 
+export type WalletAccount = {
+  id: string;
+  publicKey: string;
+  type: AccountType;
+};
+
 export type Wallet = {
   id: string;
   name: string;
-  currency: string;
+  currency: Currency;
   balance: number;
-  logo: string;
-  account: { id: string; publicKey: string; type: AccountType };
+  logo?: string;
+  userId: string;
+  account: WalletAccount;
 };
 
 export type User = {
@@ -91,7 +98,7 @@ export type TransactionsResponse = {
 
 export class Option<T> {
   public readonly value?: T;
-  public readonly error?: Error | any;
+  public readonly error?: Error | zod.ZodError | any;
   public readonly message?: string;
 
   public readonly status: "Error" | "Success";
@@ -102,7 +109,7 @@ export class Option<T> {
 
   private constructor(
     value: T | undefined,
-    error: Error | any | undefined,
+    error: Error | zod.ZodError | any | undefined,
     message: string | undefined
   ) {
     this.value = value;
@@ -119,6 +126,14 @@ export class Option<T> {
     Object.freeze(this);
   }
 
+  getErrorOrMessage() {
+    if (this.message) return this.message;
+
+    if (this.error?.message) return this.error?.message;
+
+    return this.error;
+  }
+
   static fromValue<T>(value: T) {
     return new Option<T>(value, undefined, undefined);
   }
@@ -126,10 +141,13 @@ export class Option<T> {
   static fromValueAndMessage<T>(value: T, message: string) {
     return new Option<T>(value, undefined, message);
   }
-  static fromError<T>(error: Error | any) {
+  static fromError<T>(error: Error | zod.ZodError | any) {
     return new Option<T>(undefined, error, undefined);
   }
-  static fromErrorAndMessage<T>(error: Error | any, message: string) {
+  static fromErrorAndMessage<T>(
+    error: Error | zod.ZodError | any,
+    message: string
+  ) {
     return new Option<T>(undefined, error, message);
   }
 }

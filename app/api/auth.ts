@@ -30,7 +30,7 @@ export default function (
     const authresult = await auth(request);
 
     if (!authresult.isSuccess)
-      return new Response("Unauthorized!", { status: 401 });
+      return new Response(authresult.getErrorOrMessage(), { status: 401 });
     return await func(request, authresult.value!);
   };
 }

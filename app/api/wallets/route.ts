@@ -1,36 +1,13 @@
 import { NextResponse } from "next/server";
-import { Wallet } from "../../types";
+import auth from "../auth";
+import { getWallets } from "./getWallets";
+import { JwtPayload } from "jsonwebtoken";
 
-import * as accounts from "../accounts/register/register";
+export const GET = auth(async (request, tokenPayload) => {
+  const { sub } = tokenPayload as JwtPayload;
+  const data = await getWallets({ userId: sub! });
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  if (data.isSuccess) return NextResponse.json(data.value);
 
-  const r = accounts.register;
-
-  const data: Wallet[] = [
-    {
-      id: "1",
-      name: "Euros",
-      currency: "EUR",
-      balance: 115741,
-      logo: "",
-    },
-    {
-      id: "2",
-      name: "US dollar",
-      currency: "USD",
-      balance: 1005,
-      logo: "",
-    },
-    {
-      id: "3",
-      name: "South African Rand",
-      currency: "ZAR",
-      balance: 39134,
-      logo: "",
-    },
-  ];
-
-  return NextResponse.json({ data });
-}
+  return new Response(data.getErrorOrMessage(), { status: 500 });
+});

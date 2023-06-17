@@ -20,5 +20,8 @@ export const GET = auth(async (request, tokenPayload) => {
     after,
     before,
   });
-  return NextResponse.json(data);
+
+  if (data.isSuccess) return NextResponse.json(data.value);
+
+  return new Response(data.getErrorOrMessage(), { status: 500 });
 });

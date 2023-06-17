@@ -26,7 +26,7 @@ export const verifyHash = async (
 
     if (matched) return Option.fromValue(true);
 
-    return Option.fromError(new Error("Password does not match!"));
+    return Option.fromError(new Error("Invalid credentials!"));
   } catch (error) {
     return Option.fromErrorAndMessage(error, "Something went wrong!");
   }
