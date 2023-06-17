@@ -6,7 +6,7 @@ import NextAuth from "next-auth/next";
 import { NextResponse } from "next/server";
 import { login } from "./login/login";
 import { register } from "./register/register";
-import {User as MyUser} from "@/types"
+import { User as MyUser } from "@/types"
 
 export const jwt = async ({ token, user }: { token: JWT; user?: any }) => {
 
@@ -29,12 +29,13 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
     },
+    secret: process.env.JWT_SECRET,
     providers: [
         CredentialsProvider({
             name: "credentials",
             id: 'credentials',
             credentials: {
-                authType: { label: "Auth"},
+                authType: { label: "Auth" },
                 firstName: {
                     label: "First Name",
                     type: "text",
@@ -58,15 +59,15 @@ export const authOptions: NextAuthOptions = {
                     let result;
 
                     //console.log("raw: ", req.body)
-                    if(credentials?.authType == "login"){
-                        if (( !credentials?.email || !credentials.password)) {
+                    if (credentials?.authType == "login") {
+                        if ((!credentials?.email || !credentials.password)) {
                             throw new Error('email and password are required!');
                         }
 
                         result = await login(credentials!.email, credentials!.password);
                         //console.log("result: ", result.value)
-                    }else if(credentials?.authType == "register"){
-                        if (( !credentials?.email || !credentials.password)) {
+                    } else if (credentials?.authType == "register") {
+                        if ((!credentials?.email || !credentials.password)) {
                             throw new Error('email and password are required!');
                         }
 
@@ -77,27 +78,28 @@ export const authOptions: NextAuthOptions = {
                         }
 
                         result = await register(_user, credentials!.password);
-                    }else{
+                    } else {
                         throw new Error('Invalid request!');
                     }
 
-                    if (result.isSuccess) {
-                        // Return the user object and token to be stored in the session
-                        // Return the user object without the token
-                        const token = result.value
-                        const user = {
-                            email: credentials!.email,
-                            ...token
-                        };
+                    if (!result.isSuccess) {
 
-                        //console.log("Data: ", response)
-                        return token;
+                        let error: any = !result?.message ? result?.error : result.message;
+                        //console.log("error: ", error)
+
+                        throw new Error(error);
                     }
 
-                    let error: any = !result?.message ? result?.error : result.message;
-                    //console.log("error: ", error)
+                    // Return the user object and token to be stored in the session
+                    // Return the user object without the token
+                    const token = result.value
+                    const user = {
+                        email: credentials!.email,
+                        ...token
+                    };
 
-                    throw new Error(error);
+                    //console.log("Data: ", response)
+                    return Promise.resolve(token);
 
                 } catch (error: any) {
                     throw new Error(error.message ? error.message : 'Authentication failed');
