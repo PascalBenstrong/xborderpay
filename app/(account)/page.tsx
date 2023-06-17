@@ -31,6 +31,9 @@ function GetData() {
 
   const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
+  console.log("wallets: ",wallets)
+  console.log("transactions: ",data)
+
   return {
     transactions: data?.data,
     wallets: wallets?.data,

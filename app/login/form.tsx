@@ -42,9 +42,10 @@ export const LoginForm = () => {
 
       setLoading(false);
 
-      //console.log("Data: ",res);
+      console.log("Data: ",res);
       if (!res?.error) {
         setFormValues({ email: "", password: "" });
+        //localStorage.setItem('token', JSON.stringify(res.data)); 
         router.push(callbackUrl);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
