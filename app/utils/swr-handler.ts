@@ -22,7 +22,7 @@ export function authHeader() {
     }
 }
 
-export function useFetcher(url: string, dataKey?: string, token?: string, onSuccess?: (data: any) => void) {
+export function useFetcher(url: string, dataKey?: string, onSuccess?: (data: any) => void) {
 
     const { data, error, isLoading } = useSWR(url, fetcher, {
         revalidateOnFocus: false,
@@ -34,6 +34,8 @@ export function useFetcher(url: string, dataKey?: string, token?: string, onSucc
             onSuccess != null && onSuccess(data?.data);
         }
     });
+
+    console.log("SWRData: ", data)
 
     return {
         data,

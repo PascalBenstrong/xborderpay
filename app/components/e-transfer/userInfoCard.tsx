@@ -13,7 +13,7 @@ export default function UserInfoCard({data}:any) {
         22 Bree Street, Cape Town, Western Cape, South Africa
       </Typography>
       <Typography>Born 1966 Aug 22 in South Africa</Typography>
-      <Stack direction="row" mt={2} spacing={2}>
+      {/* <Stack direction="row" mt={2} spacing={2}>
         <Box>
           <Typography fontWeight="bold">FI Id</Typography>
           <Typography fontWeight="bold">Account No.</Typography>
@@ -24,7 +24,7 @@ export default function UserInfoCard({data}:any) {
           <Typography>123456789012</Typography>
           <Typography>ABSA Bank</Typography>
         </Box>
-      </Stack>
+      </Stack> */}
     </Box>
   );
 }

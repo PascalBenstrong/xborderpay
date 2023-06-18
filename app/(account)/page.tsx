@@ -22,6 +22,7 @@ import CurrencyRates from "../components/rates";
 import WalletCard from "../components/wallet_card";
 import XButton from "../components/button";
 import EmptyList from "@/components/empty";
+import SimpleDialogDemo from "@/components/dialog";
 
 function GetData() {
   const {
@@ -45,6 +46,8 @@ function GetData() {
 
 export default function HomePage() {
   const { transactions, wallets, isError, isLoading } = GetData();
+  
+  //console.log("isError: ",isError)
 
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
@@ -61,7 +64,7 @@ export default function HomePage() {
               <WalletCard name={item.name} balance={item.balance} currency={item.currency}/>
             </Grid>
           ))}
-        {wallets?.length < 4 && (
+        {/* {wallets?.length < 4 && ( */}
           <Grid xs={6} lg={3}>
             <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
               <Stack
@@ -77,7 +80,8 @@ export default function HomePage() {
               </Stack>
             </Paper>
           </Grid>
-        )}
+        {/* )} */}
+        <SimpleDialogDemo/>
       </Grid>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>

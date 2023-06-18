@@ -51,9 +51,6 @@ export type User = {
   email: string;
   phone?: string;
   birthdate?: string;
-  fiId?: string;
-  accountNo?: string;
-  bankName?: string;
   address?: string;
 };
 
