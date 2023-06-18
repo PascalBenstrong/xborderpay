@@ -24,13 +24,17 @@ const auth = wrapInTryCatch<TokenPayload, Request>(async (request) => {
   return payload;
 });
 export default function (
-  func: (request: Request, tokenPayload: TokenPayload) => Promise<Response>
+  func: (
+    request: Request,
+    tokenPayload: TokenPayload,
+    ...rest: any
+  ) => Promise<Response>
 ): (request: Request) => Promise<Response> {
-  return async (request: Request) => {
+  return async (request: Request, ...rest) => {
     const authresult = await auth(request);
 
     if (!authresult.isSuccess)
       return new Response(authresult.getErrorOrMessage(), { status: 401 });
-    return await func(request, authresult.value!);
+    return await func(request, authresult.value!, ...rest);
   };
 }

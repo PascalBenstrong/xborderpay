@@ -24,6 +24,7 @@ export type Transaction = {
   amount: number;
   timestamp: number;
   transactionId: string;
+  userId: string;
 };
 
 export type AccountType = "hedera";
@@ -63,7 +64,7 @@ export const IntSchema = zod
 export type Int = zod.infer<typeof IntSchema>;
 export type Order = "asc" | "desc";
 export type TransactionsRequest = {
-  accountId: string;
+  userId: string;
   order?: Order | null;
   limit?: Int | null;
   after?: string | null;

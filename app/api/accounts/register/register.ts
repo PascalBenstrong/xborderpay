@@ -5,7 +5,6 @@ import { userValidation } from "../validation";
 import { createHash } from "../password";
 import { signJwt } from "../jwt";
 import { WalletCreateRequest, createWallet } from "../../wallets/createWallet";
-import { createAccount } from "../../hedera/account";
 
 declare type RegisterResponse = {
   jwt: string;

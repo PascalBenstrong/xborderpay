@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Order, Transaction } from "../../types";
 import auth from "../auth";
-import { getTransactionsHbar } from "../hedera/account";
+import { getTransactionsHbar } from "../hedera/getTransactionsHbar";
 import { JwtPayload } from "jsonwebtoken";
 
 export const GET = auth(async (request, tokenPayload) => {
@@ -14,7 +14,7 @@ export const GET = auth(async (request, tokenPayload) => {
   const before = searchParams.get("before");
 
   const data = await getTransactionsHbar({
-    accountId: sub!,
+    userId: sub!,
     order,
     limit,
     after,

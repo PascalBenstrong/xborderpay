@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import auth from "../auth";
 import { getWallets } from "./getWallets";
-import { WalletCreateRequest, createWallet } from "./createWallet";
-import { validate, currencyValues } from "./validations";
+import createWallet, { WalletCreateRequest } from "./createWallet";
+import { validate } from "./validations";
 import { JwtPayload } from "jsonwebtoken";
-import { Currency, Option } from "@/types";
 
 export const GET = auth(async (request, tokenPayload) => {
   const { sub } = tokenPayload as JwtPayload;
