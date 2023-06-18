@@ -15,33 +15,58 @@ import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
 import WalletCard from "../components/wallet_card";
 import EmptyList from "@/components/empty";
-import SimpleDialogDemo from "@/components/dialog";
-import Link from "next/link"
+import WalletsSection from "@/components/walletsSection";
+import Link from "next/link";
+import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
-function GetData() {
-  const {
-    data: wallets,
-    isError: isWError,
-    isLoading: isWLoading,
-  } = useFetcher(`/api/wallets`);
+function GetData(headers:any) {
 
-  const { data, isError, isLoading } = useFetcher(`/api/transactions`);
+  var requestOptions: any = {
+    method: "GET",
+    headers: headers ?? {},
+    redirect: "follow",
+  };
 
-  console.log("wallets: ", wallets);
-  console.log("transactions: ", data);
+  const fetcher = (url: string) =>
+    fetch(url, requestOptions).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable(
+    "/api/transactions",
+    fetcher,
+    /* { refreshInterval: 60000 } */
+  );
+
+  //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
+
+  //console.log("data: ", data);
 
   return {
-    transactions: data?.data,
-    wallets: wallets?.data,
-    isLoading,
-    isError,
+    transactions: data?.transactions,
+    wallets: [],
+    isLoading: true,
+    isError: false,
   };
 }
 
 export default function HomePage() {
-  const { transactions, wallets, isError, isLoading } = GetData();
+  
+  const { data: session }: { data: any } = useSession({
+    required: true,
+    onUnauthenticated: () => {
+      redirect("/login")
+    },
+  });
+  const _myHeaders = {
+    authorization:
+      `Bearer ${session?.token}`,
+  };
+  const { transactions, wallets, isError } = GetData(_myHeaders);
+  //const { data, error, isLoading } = useSWRImmutable("https://my-json-server.typicode.com/typicode/demo/posts", fetcher, {refreshInterval: 60000,});
 
-  //console.log("isError: ",isError)
+  //console.log("data: ", wallets);
 
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
@@ -49,40 +74,16 @@ export default function HomePage() {
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
         </Typography>
-        <Button LinkComponent={Link} href="/e-transfer" variant="contained" sx={{ borderRadius: 15, px: 5 }}>
+        <Button
+          LinkComponent={Link}
+          href="/e-transfer"
+          variant="contained"
+          sx={{ borderRadius: 15, px: 5 }}
+        >
           Send Money
         </Button>
       </Stack>
-      <Grid container spacing={2} sx={{ mt: 4 }}>
-        {wallets &&
-          wallets.map((item: any, index: number) => (
-            <Grid xs={6} lg={3} key={index}>
-              <WalletCard
-                name={item.name}
-                balance={item.balance}
-                currency={item.currency}
-              />
-            </Grid>
-          ))}
-        {/* {wallets?.length < 4 && ( */}
-        <Grid xs={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ border: "4px dashed white", height: "100%", p: 2 }}
-            >
-              <AddCircleIcon fontSize="large" />
-              <Typography variant="body2" my={2}>
-                Add a new currency wallet
-              </Typography>
-            </Stack>
-          </Paper>
-        </Grid>
-        {/* )} */}
-        <SimpleDialogDemo />
-      </Grid>
+        <WalletsSection headers={_myHeaders}/>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
           <Title title="Activities" />
@@ -97,7 +98,7 @@ export default function HomePage() {
               overflow: "auto",
             }}
           >
-            {transactions ? (
+            {transactions?.length > 0 ? (
               transactions.map((item: any, index: number) => (
                 <TransactionCard
                   key={index}

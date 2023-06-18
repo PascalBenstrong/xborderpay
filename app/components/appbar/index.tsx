@@ -32,9 +32,7 @@ function AppBarTabs() {
     setValue(newValue);
   };
 
-  console.log("pathname: ",pathname)
-
-  
+  //console.log("pathname: ",pathname)
 
   return (
     <Box sx={{ mx: 2, display: { xs: "none", md: "flex" } }}>

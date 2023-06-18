@@ -17,7 +17,7 @@ export default function AccountLayout({
     },
   });
 
-  //if (!session) return null;
+  if (!session) return null;
 
   return (
     <div>

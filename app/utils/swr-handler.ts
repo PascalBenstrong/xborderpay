@@ -2,19 +2,21 @@
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 
-const fetcher = (url: string) => {
+import useSWRImmutable from "swr/immutable"
+
+export const fetcher = (url: string) => {
     const requestOptions: any = {
         method: 'Get',
         headers: authHeader(),
     };
 
-    return fetch(url,requestOptions).then((res) => res.json());
+    return fetch(url, requestOptions).then((res) => res.json());
 }
 
 export function authHeader() {
 
-    const { data: session }: {data:any} = useSession();
-    
+    const { data: session }: { data: any } = useSession();
+
     if (session && session.token) {
         return { Authorization: `Bearer ${session.token}` };
     } else {
@@ -24,14 +26,10 @@ export function authHeader() {
 
 export function useFetcher(url: string, dataKey?: string, onSuccess?: (data: any) => void) {
 
-    const { data, error, isLoading } = useSWR(url, fetcher, {
-        revalidateOnFocus: false,
-        revalidateOnMount: false,
-        revalidateOnReconnect: true,
-        refreshWhenOffline: false,
-        refreshWhenHidden: false,
-        refreshInterval: 0, onSuccess: (data, key, config) => {
-            onSuccess != null && onSuccess(data?.data);
+    //const { data, error, isLoading } = useSWR(url, fetcher);
+    const { data, error, isLoading } = useSWRImmutable(url, fetcher, {
+        onSuccess: (data, key, config) => {
+            onSuccess != null && onSuccess(data);
         }
     });
 
