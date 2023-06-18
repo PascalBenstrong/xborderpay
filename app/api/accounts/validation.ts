@@ -1,17 +1,6 @@
 import { User, Option } from "@/types";
 import zod from "zod";
-
-function transformValidation<T>(
-  schema: zod.ZodType<T>
-): (value: T, message?: string) => Option<T> {
-  return (value: T, message?: string): Option<T> => {
-    const result = schema.safeParse(value);
-
-    if (!result.success) return Option.fromError(message || result.error);
-
-    return Option.fromValue(result.data);
-  };
-}
+import { transformValidation } from "@/utils/errorHandling";
 
 const emailString = zod.string().email();
 
