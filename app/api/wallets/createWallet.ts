@@ -2,6 +2,7 @@ import wallets from "./wallets.db";
 import { Currency, Option, Wallet, WalletAccount } from "@/types";
 import { wrapInTryCatch } from "@/utils/errorHandling";
 import createAccount from "../hedera/createAccount";
+import { ObjectId } from "mongodb";
 
 export declare type WalletCreateRequest = {
   userId: string;
@@ -42,12 +43,12 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
         new Error("Wallet for this currency already exists!")
       );
 
-    const id = new Object();
+    const id = new ObjectId();
     wallet = {
       ...request,
       account: walletAccount,
       balance: 0,
-      _id: id.toString(),
+      _id: id,
     };
 
     const inserted = await wallets.insertOne(wallet);
@@ -57,7 +58,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
         new Error("Failed to create wallet. Try again later!")
       );
 
-    wallet.id = wallet._id;
+    wallet.id = id.toString();
 
     delete wallet._id;
 

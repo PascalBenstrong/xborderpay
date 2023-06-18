@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { userValidation } from "../validation";
 import { createHash } from "../password";
 import { signJwt } from "../jwt";
-import { WalletCreateRequest, createWallet } from "../../wallets/createWallet";
+import createWallet, { WalletCreateRequest } from "../../wallets/createWallet";
 
 declare type RegisterResponse = {
   jwt: string;
@@ -50,7 +50,13 @@ export const register = async (
     name: Currency.USD,
   };
 
-  await createWallet(walletCreateRequest);
+  const walletResponse = await createWallet(walletCreateRequest);
 
-  return Option.fromValue({ jwt: token.jwt, exp: token.exp });
+  let response: any = { jwt: token.jwt, exp: token.exp };
+
+  if (walletResponse.isSuccess) {
+    response.walletDetails = walletResponse.value;
+  }
+
+  return Option.fromValue(response);
 };
