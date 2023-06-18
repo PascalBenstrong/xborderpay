@@ -5,19 +5,48 @@ import { useFetcher } from "../../utils";
 import TransactionCard from "../../components/transaction_card";
 import Title from "../../components/title";
 import EmptyList from "@/components/empty";
+import useSWRImmutable from "swr/immutable";
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-function GetData() {
-  const { data, isError, isLoading } = useFetcher(`/api/transactions`);
+function GetData(headers:any) {
+
+  var requestOptions: any = {
+    method: "GET",
+    headers: headers ?? {},
+    redirect: "follow",
+  };
+
+  const fetcher = (url: string) =>
+    fetch(url, requestOptions).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable(
+    "/api/transactions",
+    fetcher,
+    /* { refreshInterval: 60000 } */
+  );
+
+  //console.log("data: ", data);
 
   return {
-    transactions: data?.data,
+    transactions: data?.transactions,
     isLoading,
-    isError,
+    isError: error,
   };
 }
 
 export default function TransactionsPage() {
-  const { transactions, isError, isLoading } = GetData();
+  const { data: session }: { data: any } = useSession({
+    required: true,
+    onUnauthenticated: () => {
+      redirect("/login")
+    },
+  });
+  const _myHeaders = {
+    authorization:
+      `Bearer ${session?.token}`,
+  };
+  const { transactions, isError, isLoading } = GetData(_myHeaders);
 
   return (
     <Container maxWidth="lg" sx={{ pt: 15, px: 200 }}>
