@@ -14,7 +14,7 @@ const deleteWallet = wrapInTryCatch<boolean, WalletDeleteRequest>(
   async (request) => {
     // get wallet from db
 
-    if (ObjectId.isValid(request.id))
+    if (!ObjectId.isValid(request.id))
       return Option.fromError(new Error("Wallet id is not valid!"));
 
     const walletId = new ObjectId(request.id);
