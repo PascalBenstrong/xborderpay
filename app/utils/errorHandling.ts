@@ -1,4 +1,5 @@
 import { Option } from "../types";
+import zod from "zod";
 
 export function wrapInTryCatch<Tout, Tin>(
   func: (data: Tin) => Promise<Option<Tout>>
@@ -21,5 +22,17 @@ export function wrapInTryCatchVoid<Tout>(
     } catch (error) {
       return Option.fromErrorAndMessage(error, "Something went wrong!");
     }
+  };
+}
+
+export function transformValidation<T>(
+  schema: zod.ZodType<T>
+): (value: T, message?: string) => Option<T> {
+  return (value: T, message?: string): Option<T> => {
+    const result = schema.safeParse(value);
+
+    if (!result.success) return Option.fromError(message || result.error);
+
+    return Option.fromValue(result.data);
   };
 }
