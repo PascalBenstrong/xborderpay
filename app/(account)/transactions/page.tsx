@@ -4,6 +4,7 @@ import React from "react";
 import { useFetcher } from "../../utils";
 import TransactionCard from "../../components/transaction_card";
 import Title from "../../components/title";
+import EmptyList from "@/components/empty";
 
 function GetData() {
   const { data, isError, isLoading } = useFetcher(`/api/transactions`);
@@ -31,7 +32,7 @@ export default function TransactionsPage() {
           overflow: "auto",
         }}
       >
-        {transactions &&
+        {transactions ?
           transactions.map((item: any, index: number) => (
             <TransactionCard
               key={index}
@@ -42,7 +43,7 @@ export default function TransactionsPage() {
               wallet={item.wallet}
               timestamp={item.timestamp}
             />
-          ))}
+          )) : <EmptyList title="No Transactions" subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"/>}
       </Paper>
     </Container>
   );

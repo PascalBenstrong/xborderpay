@@ -36,15 +36,15 @@ function SimpleDialog(props: SimpleDialogProps) {
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle sx={{bgcolor: "secondary.main"}}>Choose currency for new wallet</DialogTitle>
       <List sx={{ pt: 0 ,bgcolor: "background.default"}}>
-        {emails.map((email) => (
-          <ListItem disableGutters>
-            <ListItemButton onClick={() => handleListItemClick(email)} key={email}>
+        {emails.map((wallet,index) => (
+          <ListItem key={index} disableGutters>
+            <ListItemButton onClick={() => handleListItemClick(wallet)} key={wallet}>
               <ListItemAvatar>
                 <Avatar sx={{ bgcolor:  "primary.main" }}>
                   ZAR
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={email} />
+              <ListItemText primary={wallet} />
             </ListItemButton>
           </ListItem>
         ))}
