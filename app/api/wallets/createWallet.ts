@@ -47,7 +47,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
       ...request,
       account: walletAccount,
       balance: 0,
-      _id: id.toString(),
+      _id: id,
     };
 
     const inserted = await wallets.insertOne(wallet);
