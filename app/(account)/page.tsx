@@ -1,28 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
-  Avatar,
-  Box,
   Button,
   Container,
   Unstable_Grid2 as Grid,
-  IconButton,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ReceivedIcon from "@mui/icons-material/East";
 import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
-import { Transaction, Wallet } from "../types";
 import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
 import WalletCard from "../components/wallet_card";
-import XButton from "../components/button";
 import EmptyList from "@/components/empty";
 import SimpleDialogDemo from "@/components/dialog";
+import Link from "next/link"
 
 function GetData() {
   const {
@@ -33,8 +27,8 @@ function GetData() {
 
   const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
-  console.log("wallets: ",wallets)
-  console.log("transactions: ",data)
+  console.log("wallets: ", wallets);
+  console.log("transactions: ", data);
 
   return {
     transactions: data?.data,
@@ -46,42 +40,48 @@ function GetData() {
 
 export default function HomePage() {
   const { transactions, wallets, isError, isLoading } = GetData();
-  
+
   //console.log("isError: ",isError)
 
   return (
     <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
-          Good morning, Pascal
+          Welcome to the unbank
         </Typography>
-        <XButton text="Send Money"/>
+        <Button LinkComponent={Link} href="/e-transfer" variant="contained" sx={{ borderRadius: 15, px: 5 }}>
+          Send Money
+        </Button>
       </Stack>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         {wallets &&
           wallets.map((item: any, index: number) => (
             <Grid xs={6} lg={3} key={index}>
-              <WalletCard name={item.name} balance={item.balance} currency={item.currency}/>
+              <WalletCard
+                name={item.name}
+                balance={item.balance}
+                currency={item.currency}
+              />
             </Grid>
           ))}
         {/* {wallets?.length < 4 && ( */}
-          <Grid xs={6} lg={3}>
-            <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
-              <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                sx={{ border: "4px dashed white", height: "100%", p: 2 }}
-              >
-                <AddCircleIcon fontSize="large" />
-                <Typography variant="body2" my={2}>
-                  Add a new currency wallet
-                </Typography>
-              </Stack>
-            </Paper>
-          </Grid>
+        <Grid xs={6} lg={3}>
+          <Paper sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}>
+            <Stack
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ border: "4px dashed white", height: "100%", p: 2 }}
+            >
+              <AddCircleIcon fontSize="large" />
+              <Typography variant="body2" my={2}>
+                Add a new currency wallet
+              </Typography>
+            </Stack>
+          </Paper>
+        </Grid>
         {/* )} */}
-        <SimpleDialogDemo/>
+        <SimpleDialogDemo />
       </Grid>
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
@@ -97,7 +97,7 @@ export default function HomePage() {
               overflow: "auto",
             }}
           >
-            {transactions ?
+            {transactions ? (
               transactions.map((item: any, index: number) => (
                 <TransactionCard
                   key={index}
@@ -108,7 +108,13 @@ export default function HomePage() {
                   wallet={item.wallet}
                   timestamp={item.timestamp}
                 />
-              )) : <EmptyList title="No Transactions" subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"/>}
+              ))
+            ) : (
+              <EmptyList
+                title="No Transactions"
+                subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
+              />
+            )}
           </Paper>
         </Grid>
         <Grid xs={12} md={6} lg={3}>
