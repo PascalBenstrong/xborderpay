@@ -8,7 +8,7 @@ export default function AccountDetails({ accountHolder,wallet }: {accountHolder:
   
   return (
     <div>
-      <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
+      <Paper sx={{ bgcolor: "secondary.main", p: 2, width: {xs: 320,md: 400} }}>
         <Stack direction="row" spacing={2} alignItems="center" mb={4}>
           <Avatar sx={{ bgcolor: "primary.main" }} aria-label="currency">
             {wallet?.currency}
