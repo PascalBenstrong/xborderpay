@@ -26,7 +26,6 @@ export default function WalletCard({
         <Typography variant="body2" my={2}>
           {name}
         </Typography>
-        <Button startIcon={<AddCircleIcon />}>Add Funds</Button>
       </Paper>
     </CardActionArea>
   );
