@@ -4,8 +4,6 @@ export enum Currency {
   USD = "USD",
   EUR = "EUR",
   GBP = "GBP",
-  BTC = "BTC",
-  ETH = "ETH",
   ZAR = "ZAR",
 }
 
@@ -34,6 +32,11 @@ export type WalletAccount = {
   publicKey: string;
   type: AccountType;
 };
+
+export interface iWallet{
+  name: string,
+  currency: Currency,
+}
 
 export type Wallet = {
   id: string;
