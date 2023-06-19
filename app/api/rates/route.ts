@@ -1,17 +1,91 @@
 import { NextResponse } from "next/server";
-import { User, Wallet } from "../../types";
+import { Currency, Option, User, Wallet } from "../../types";
+import rates from "./rates.db";
+import { validateCurrency } from "../wallets/validations";
+import { Timestamp, WithId } from "mongodb";
+import { wrapInTryCatch, wrapInTryCatchVoid } from "@/utils/errorHandling";
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    var requestOptions: any = {
-        method: 'GET',
-        redirect: 'follow'
+const ratesUrl = `https://openexchangerates.org/api/latest.json?app_id=${process.env.RATES_API_KEY}&base=USD`;
+
+declare type OpenExchangeRatesResponse = {
+  timestamp: number;
+  base: string;
+  rates: { [currency: string]: number };
+};
+
+const newRates = wrapInTryCatchVoid<OpenExchangeRatesResponse>(async () => {
+  let data = await fetch(ratesUrl).then((x) => x.json());
+
+  delete data.disclaimer;
+
+  return Option.fromValue(data as OpenExchangeRatesResponse);
+});
+
+const getRates = wrapInTryCatch<OpenExchangeRatesResponse, Currency>(
+  async (baseCurrency) => {
+    let currencyValidationResult = validateCurrency(baseCurrency);
+    if (!currencyValidationResult.isSuccess)
+      return Option.fromErrorAndMessage(
+        currencyValidationResult.error,
+        currencyValidationResult.message!
+      );
+
+    const twoHourAgo = Date.now() - 1000 * 60 * 60 * 2;
+    const records = await rates
+      .find({})
+      .sort({ _id: "desc" })
+      .limit(1)
+      .toArray();
+
+    let record: any;
+
+    const isStaleRecord = () => {
+      if (!records || records.length == 0) return true;
+
+      record = records.pop() as WithId<OpenExchangeRatesResponse>;
+
+      return record._id.getTimestamp().getTime() < twoHourAgo;
     };
 
-    const response = fetch(`https://openexchangerates.org/api/latest.json?app_id=9a2e487fc0f04386b607eda70dd703cc&base=USD`, requestOptions)
+    const convertToBaseCurrency = (rates: OpenExchangeRatesResponse) => {
+      const newRates = Object.assign({}, rates);
+      newRates.base = baseCurrency;
+      const baseValue = rates.rates[baseCurrency];
+      Object.keys(rates.rates).forEach(
+        (x) => (newRates.rates[x] = newRates.rates[x] / baseValue)
+      );
 
-    let data = await response.then(result => result.json());
-    //console.log("Data: ", data);
-    return NextResponse.json(data);
+      return Object.freeze(newRates) as OpenExchangeRatesResponse;
+    };
 
+    if (isStaleRecord()) {
+      let ratesResult = await newRates();
+
+      if (!ratesResult.isSuccess)
+        return Option.fromError(
+          new Error("Error getting echange rates! Try again later.")
+        );
+
+      await rates.insertOne(ratesResult.value!);
+
+      record = ratesResult.value;
+    }
+
+    delete record._id;
+    return Option.fromValue(
+      convertToBaseCurrency(record as OpenExchangeRatesResponse)
+    );
+  }
+);
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  const base = searchParams.get("base") || Currency.USD;
+
+  const response = await getRates(base as Currency);
+
+  if (!response.isSuccess)
+    return new Response(response.getErrorOrMessage(), { status: 400 });
+  return NextResponse.json(response.value);
 }
