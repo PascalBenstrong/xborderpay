@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   CardActionArea,
+  Box,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
@@ -21,7 +22,10 @@ export default function WalletCard({
           {currency}
         </Avatar>
         <Typography variant="h6" fontWeight={700} mt={2}>
-          {`${currency} ${balance}`}
+          <Box component="span" sx={{ fontSize: 12 }}>
+            {currency}
+          </Box>{" "}
+          {balance.toFixed(2)}
         </Typography>
         <Typography variant="body2" my={2}>
           {name}

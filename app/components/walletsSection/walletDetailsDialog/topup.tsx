@@ -53,7 +53,7 @@ export default function AccountTopup({
           autoFocus
           required
         />
-        <Typography sx={{ color: "lightGrey", fontSize: 10, mb: 2 }}>
+        <Typography sx={{ color: "lightGrey", fontSize: 10, mt: 1 }}>
           You have {wallet.balance} {wallet.currency} in your balance.
         </Typography>
       </FormControl>
@@ -62,16 +62,15 @@ export default function AccountTopup({
           Paying with
         </Typography>
 
-        <div>
           <XSelect
             value={selectedCurrency}
             setValue={(value: string) => setCurrecy(value as Currency)}
             data={Object.values(Currency)}
             removeMargin={true}
             fullWidth
+            disabled={true}
             
           />
-        </div>
       </FormControl>
       <Button
         variant="contained"
