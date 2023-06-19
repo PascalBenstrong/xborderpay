@@ -55,12 +55,16 @@ export default function WalletsSection({ headers }: any) {
   const { wallets, isError, isLoading } = GetData(headers);
   const [open, setOpen] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
-  const [selectedWallet, setSelectedWallet] = React.useState<Wallet | null>(null);
-  const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(null);
+  const [selectedWallet, setSelectedWallet] = React.useState<Wallet | null>(
+    null
+  );
+  const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(
+    null
+  );
 
   //console.log("wallets: ",data)
 
-  const _wallets = useMemo(() => {
+  const _wallets: Wallet[] = useMemo(() => {
     let myWallets = wallets;
 
     if (selectedValue !== null) {
@@ -82,7 +86,7 @@ export default function WalletsSection({ headers }: any) {
     }
 
     return myWallets;
-  }, [wallets,selectedValue]);
+  }, [wallets, selectedValue]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -104,43 +108,50 @@ export default function WalletsSection({ headers }: any) {
     setOpenDetail(false);
   };
 
+  const handleUpdate = (value: Wallet) => {
+    _wallets.filter((x) => {
+      if (x.id === value.id) x.balance = value.balance;
+      return x;
+    });
+  };
+
   return (
     <div>
-      <Box sx={{ mt: 4,mb:5,}}>
-      <Grid container spacing={2}>
-        {_wallets &&
-          _wallets.map((item: Wallet, index: number) => (
-            <Grid xs={6} sm={3} key={index} >
-              <WalletCard
-                name={item.name}
-                balance={item.balance}
-                currency={item.currency}
-                handlePreview={()=>handleDetailsPreview(item)}
-              />
+      <Box sx={{ mt: 4, mb: 5 }}>
+        <Grid container spacing={2}>
+          {_wallets &&
+            _wallets.map((item: Wallet, index: number) => (
+              <Grid xs={6} sm={3} key={index}>
+                <WalletCard
+                  name={item.name}
+                  balance={item.balance}
+                  currency={item.currency}
+                  handlePreview={() => handleDetailsPreview(item)}
+                />
+              </Grid>
+            ))}
+          {_wallets?.length < 4 && (
+            <Grid xs={3}>
+              <Paper
+                component={Button}
+                sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}
+                onClick={handleClickOpen}
+              >
+                <Stack
+                  direction="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ border: "4px dashed white", height: "100%", p: 2 }}
+                >
+                  <AddCircleIcon fontSize="large" />
+                  <Typography variant="body2" my={2}>
+                    Add a new currency wallet
+                  </Typography>
+                </Stack>
+              </Paper>
             </Grid>
-          ))}
-          {_wallets?.length < 4 && <Grid xs={3}>
-          <Paper
-            component={Button}
-            sx={{ bgcolor: "secondary.main", p: 2, height: "100%" }}
-            onClick={handleClickOpen}
-          >
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ border: "4px dashed white", height: "100%", p: 2 }}
-            >
-              <AddCircleIcon fontSize="large" />
-              <Typography variant="body2" my={2}>
-                Add a new currency wallet
-              </Typography>
-            </Stack>
-          </Paper>
-        </Grid>}
-        
-      </Grid>
-        
+          )}
+        </Grid>
       </Box>
       <CreateWallet
         selectedValue={selectedValue}
@@ -148,8 +159,13 @@ export default function WalletsSection({ headers }: any) {
         wallets={_wallets}
         onClose={handleClose}
       />
-      
-      <WalletDetailsDialog open={openDetail} wallet={selectedWallet} onClose={handleWalletDetailsClose}/>
+
+      <WalletDetailsDialog
+        open={openDetail}
+        wallet={selectedWallet}
+        onClose={handleWalletDetailsClose}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }

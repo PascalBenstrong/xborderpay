@@ -30,48 +30,59 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ConvertIcon from "@mui/icons-material/CompareArrows";
 import SendIcon from "@mui/icons-material/ArrowUpward";
 import AccountDetails from "./details";
+import AccountTopup from "./topup";
 
 export interface SimpleDialogProps {
   open: boolean;
   wallet: Wallet | null;
   onClose: (value: string) => void;
+  onUpdate?: (value: Wallet) => void;
 }
 
 enum AccountState {
   balance,
   details,
   topup,
+  convert,
 }
 
 export default function WalletDetailsDialog({
   onClose,
   open,
   wallet,
+  onUpdate
 }: SimpleDialogProps) {
   const router = useRouter();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [accountView, setAccountView] = useState(AccountState.balance);
+  const [accountView, setAccountView] = useState(AccountState.topup);
 
   const handleClose = () => {
-    if(accountView === AccountState.balance)
-      onClose("close");
-      
-    setAccountView(AccountState.balance)
+    if (accountView === AccountState.balance) onClose("close");
+
+    setAccountView(AccountState.balance);
   };
 
   const handleListItemClick = (value: string) => {
     onClose(value);
   };
 
-  const handleTopup = () => {};
+  const handleTopup = () => {
+    setAccountView(AccountState.topup);
+  };
 
   const handleCovertion = () => {};
 
   const handleSend = () => {
     router.push("/e-transfer");
   };
+
+  const handleTopupUpdate = (value: Wallet) => {
+    //wallet = value;
+    onUpdate && onUpdate(value);
+    handleClose();
+  }
 
   return (
     <BootstrapDialog
@@ -81,16 +92,13 @@ export default function WalletDetailsDialog({
       keepMounted
       fullScreen={fullScreen}
     >
-      <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
+      <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} hasBackButton={accountView !== AccountState.balance}>
         {wallet?.currency} Balance
       </BootstrapDialogTitle>
       <DialogContent
         dividers
         sx={{ bgcolor: "background.default", p: 2, height: "100%" }}
       >
-        {accountView == AccountState.details && wallet && (
-          <AccountDetails accountHolder="Benoit Tshiawu" wallet={wallet} />
-        )}
         {accountView == AccountState.balance && (
           <Box>
             <Paper sx={{ bgcolor: "secondary.main", p: 2 }}>
@@ -105,7 +113,12 @@ export default function WalletDetailsDialog({
               </Typography>
               <Stack direction="row" py={2} spacing={2} alignItems="center">
                 <AccountBalanceIcon fontSize="inherit" />
-                <Button size="small" onClick={()=> setAccountView(AccountState.details)}>Show account details</Button>
+                <Button
+                  size="small"
+                  onClick={() => setAccountView(AccountState.details)}
+                >
+                  Show account details
+                </Button>
               </Stack>
               <Stack
                 direction="row"
@@ -171,6 +184,13 @@ export default function WalletDetailsDialog({
               text="We follow strict regulations,everywhere we work"
             />
           </Box>
+        )}
+        {accountView == AccountState.details && wallet && (
+          <AccountDetails accountHolder="Benoit Tshiawu" wallet={wallet} />
+        )}
+
+        {accountView == AccountState.topup && wallet && (
+          <AccountTopup wallet={wallet} updateChange={handleTopupUpdate}/>
         )}
       </DialogContent>
     </BootstrapDialog>
