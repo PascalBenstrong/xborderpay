@@ -31,6 +31,7 @@ import ConvertIcon from "@mui/icons-material/CompareArrows";
 import SendIcon from "@mui/icons-material/ArrowUpward";
 import AccountDetails from "./details";
 import AccountTopup from "./topup";
+import AlertDialog from "@/components/alertDialog";
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -50,22 +51,23 @@ export default function WalletDetailsDialog({
   onClose,
   open,
   wallet,
-  onUpdate
+  onUpdate,
 }: SimpleDialogProps) {
   const router = useRouter();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [accountView, setAccountView] = useState(AccountState.topup);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [isError, setIsError] = useState({
+    title: "",
+    description: "",
+  });
 
   const handleClose = () => {
     if (accountView === AccountState.balance) onClose("close");
 
     setAccountView(AccountState.balance);
-  };
-
-  const handleListItemClick = (value: string) => {
-    onClose(value);
   };
 
   const handleTopup = () => {
@@ -75,14 +77,23 @@ export default function WalletDetailsDialog({
   const handleCovertion = () => {};
 
   const handleSend = () => {
+    if (wallet && wallet?.balance <= 0) {
+      setIsError({
+        title: "Add money",
+        description: `You will need to add money to your \n${wallet.currency} balance before you can send ${wallet.currency}.`,
+      });
+      setOpenAlert(true);
+
+      return;
+    }
+
     router.push("/e-transfer");
   };
 
   const handleTopupUpdate = (value: Wallet) => {
-    //wallet = value;
     onUpdate && onUpdate(value);
     handleClose();
-  }
+  };
 
   return (
     <BootstrapDialog
@@ -92,7 +103,11 @@ export default function WalletDetailsDialog({
       keepMounted
       fullScreen={fullScreen}
     >
-      <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} hasBackButton={accountView !== AccountState.balance}>
+      <BootstrapDialogTitle
+        id="customized-dialog-title"
+        onClose={handleClose}
+        hasBackButton={accountView !== AccountState.balance}
+      >
         {wallet?.currency} Balance
       </BootstrapDialogTitle>
       <DialogContent
@@ -190,8 +205,14 @@ export default function WalletDetailsDialog({
         )}
 
         {accountView == AccountState.topup && wallet && (
-          <AccountTopup wallet={wallet} updateChange={handleTopupUpdate}/>
+          <AccountTopup wallet={wallet} updateChange={handleTopupUpdate} />
         )}
+        <AlertDialog
+          title={isError.title}
+          description={isError.description}
+          open={openAlert}
+          onClose={()=>setOpenAlert(false)}
+        />
       </DialogContent>
     </BootstrapDialog>
   );

@@ -16,7 +16,7 @@ export default function XSelect({ value, setValue, data, removeBorder, fullWidth
         id="demo-select-small"
         value={value}
         onChange={handleChange}
-        sx={{ border: removeBorder ? "none" : "1px solid lightGrey", bgcolor: "white", py: 0 }}
+        sx={{ border: removeBorder ? "none" : "1px solid lightGrey", bgcolor: "white", color: "black", py: 0 }}
         disabled={disabled}
         inputProps={{
             MenuProps: {
