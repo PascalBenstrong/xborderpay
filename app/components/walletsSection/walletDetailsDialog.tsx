@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import AddIcon from '@mui/icons-material/Add';
-import { BootstrapDialog, BootstrapDialogTitle } from "../dialog";
+import { BootstrapDialog, BootstrapDialogTitle, DialogTransition } from "../dialog";
 import TextIcon from "../textIcon";
 import XIconButton from "../button/iconButton";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -25,15 +25,6 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ConvertIcon from '@mui/icons-material/CompareArrows';
 import SendIcon from '@mui/icons-material/ArrowUpward';
-
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -74,7 +65,7 @@ export default function WalletDetailsDialog({
     <BootstrapDialog
       onClose={handleClose}
       open={open}
-      TransitionComponent={Transition}
+      TransitionComponent={DialogTransition}
       keepMounted
       fullScreen={fullScreen}
     >

@@ -8,6 +8,17 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import { Slide } from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
+
+export const DialogTransition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -28,7 +39,7 @@ export function BootstrapDialogTitle(props: DialogTitleProps) {
   const { children, onClose, ...other } = props;
 
   return (
-    <DialogTitle sx={{ m: 0, p: 2,bgcolor: "secondary.main"  }} {...other}>
+    <DialogTitle sx={{ m: 0, p: 2,bgcolor: "background.default"  }} {...other}>
       {children}
       {onClose ? (
         <IconButton
