@@ -10,17 +10,20 @@ import { User as MyUser } from "@/types"
 
 export const jwt = async ({ token, user }: { token: JWT; user?: any }) => {
 
-    // Check if the token has expired
-    if (token && token.exp && Date.now > token.exp) {
-        return null; // Return null to force the user to log in again
-    }
-
     if (!user) return token;
 
     return { ...token, ...user };
 };
 
 export const session = ({ session, token }: { session: any; token: any }): Promise<Session> => {
+    
+    
+    // Check if the token has expired
+    if (token && token?.exp && Date.now() / 1000 > token.exp) {
+        session = null;
+        return Promise.resolve(session); // Return null to force the user to log in again
+    }
+    
     session.token = token?.jwt;
 
     console.log("token: ", token)
