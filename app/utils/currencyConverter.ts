@@ -1,5 +1,5 @@
 import { FormatMoney } from 'format-money-js';
-import { Currency } from '../types';
+import { Currency, iWallet } from '../types';
 
 const convertCurrency = async (
     amount: number,
@@ -50,4 +50,10 @@ export const getRate = (
     return converted?.fullAmount;
 
 }
+
+// Array of all available currencies
+export const allCurrencies: iWallet[] = Object.values(Currency).map((item) => {
+    return { name: `${item} Wallet`, currency: item };
+  });
+  
 export default convertCurrency;
