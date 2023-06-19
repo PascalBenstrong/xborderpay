@@ -10,8 +10,11 @@ import { User as MyUser } from "@/types"
 
 export const jwt = async ({ token, user }: { token: JWT; user?: any }) => {
 
-    //console.log("user: ", user)
-    //console.log("jwtToken: ", token)
+    // Check if the token has expired
+    if (token && token.exp && Date.now > token.exp) {
+        return null; // Return null to force the user to log in again
+    }
+
     if (!user) return token;
 
     return { ...token, ...user };
@@ -28,6 +31,8 @@ export const session = ({ session, token }: { session: any; token: any }): Promi
 export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
+        //set a maxAge for the session
+        maxAge: 1 * 60 * 60, // 24 hours
     },
     secret: process.env.JWT_SECRET,
     providers: [
