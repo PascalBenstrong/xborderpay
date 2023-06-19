@@ -23,6 +23,7 @@ import { type } from "os";
 import { allCurrencies } from "@/utils";
 import CreateWallet from "./createWalletDialog";
 import WalletDetailsDialog from "./walletDetailsDialog";
+import SecurityAlert from "../securityAlert";
 
 function GetData(headers: any) {
   var requestOptions: any = {
@@ -55,14 +56,14 @@ export default function WalletsSection({ headers }: any) {
   const { wallets, isError, isLoading } = GetData(headers);
   const [open, setOpen] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
+  const [securityAlert, setSecurityAlert] = React.useState(false);
+  const [valueToCopy, setValueToCopy] = React.useState("");
   const [selectedWallet, setSelectedWallet] = React.useState<Wallet | null>(
     null
   );
   const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(
     null
   );
-
-  //console.log("wallets: ",data)
 
   const _wallets: Wallet[] = useMemo(() => {
     let myWallets = wallets;
@@ -113,6 +114,10 @@ export default function WalletsSection({ headers }: any) {
       if (x.id === value.id) x.balance = value.balance;
       return x;
     });
+  };
+
+  const handleSecurityAlertClose = () => {
+    setSecurityAlert(false);
   };
 
   return (
@@ -166,6 +171,14 @@ export default function WalletsSection({ headers }: any) {
         onClose={handleWalletDetailsClose}
         onUpdate={handleUpdate}
       />
+
+      {valueToCopy && (
+        <SecurityAlert
+          valueToCopy={valueToCopy}
+          open={securityAlert}
+          onClose={handleSecurityAlertClose}
+        />
+      )}
     </div>
   );
 }

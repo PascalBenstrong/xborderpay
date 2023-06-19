@@ -12,6 +12,8 @@ export default function AlertDialog({
   description,
   open,
   onClose,
+  okText,
+  onOk,
 }: any) {
   return (
     <div>
@@ -25,13 +27,13 @@ export default function AlertDialog({
           {title}
         </DialogTitle>
         <DialogContent dividers sx={{ color: "grey", whiteSpace: "pre-line" }}>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id="alert-dialog-description" color="secondary">
             {description}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          {/* <Button onClick={onClose}>Disagree</Button> */}
-          <Button onClick={onClose}>Ok</Button>
+          <Button onClick={onClose} color="secondary">{onOk ? "Cancel" : "OK"}</Button>
+          {onOk && <Button onClick={onOk}>{okText ? okText : "OK"}</Button>}
         </DialogActions>
       </BootstrapDialog>
     </div>
