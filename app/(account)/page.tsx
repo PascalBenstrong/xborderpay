@@ -21,6 +21,7 @@ import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
 
 function GetData(headers:any) {
 

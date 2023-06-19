@@ -17,11 +17,12 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import useSWRImmutable from "swr/immutable";
 import { Paper, Stack } from "@mui/material";
 import WalletCard from "../wallet_card";
-import { Currency, iWallet } from "@/types";
+import { Currency, Wallet, iWallet } from "@/types";
 import { useMemo } from "react";
 import { type } from "os";
 import { allCurrencies } from "@/utils";
-import CreateWallet from "./createWallet";
+import CreateWallet from "./createWalletDialog";
+import WalletDetailsDialog from "./walletDetailsDialog";
 
 function GetData(headers: any) {
   var requestOptions: any = {
@@ -53,6 +54,8 @@ function GetData(headers: any) {
 export default function WalletsSection({ headers }: any) {
   const { wallets, isError, isLoading } = GetData(headers);
   const [open, setOpen] = React.useState(false);
+  const [openDetail, setOpenDetail] = React.useState(false);
+  const [selectedWallet, setSelectedWallet] = React.useState<Wallet | null>(null);
   const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(null);
 
   //console.log("wallets: ",data)
@@ -92,17 +95,27 @@ export default function WalletsSection({ headers }: any) {
     }
   };
 
+  const handleDetailsPreview = (value: Wallet) => {
+    setSelectedWallet(value);
+    setOpenDetail(true);
+  };
+
+  const handleWalletDetailsClose = (value: string) => {
+    setOpenDetail(false);
+  };
+
   return (
     <div>
       <Box sx={{ mt: 4,mb:5,}}>
       <Grid container spacing={2}>
         {_wallets &&
-          _wallets.map((item: any, index: number) => (
-            <Grid xs={6} sm={3} key={index}>
+          _wallets.map((item: Wallet, index: number) => (
+            <Grid xs={6} sm={3} key={index} >
               <WalletCard
                 name={item.name}
                 balance={item.balance}
                 currency={item.currency}
+                handlePreview={()=>handleDetailsPreview(item)}
               />
             </Grid>
           ))}
@@ -135,6 +148,8 @@ export default function WalletsSection({ headers }: any) {
         wallets={_wallets}
         onClose={handleClose}
       />
+      
+      <WalletDetailsDialog open={openDetail} wallet={selectedWallet} onClose={handleWalletDetailsClose}/>
     </div>
   );
 }
