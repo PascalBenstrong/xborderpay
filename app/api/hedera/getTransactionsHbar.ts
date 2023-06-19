@@ -37,7 +37,7 @@ export const getTransactionsHbar = wrapInTryCatch<
   const transQuery = transactions
     .find(findQuery)
     .limit(Math.min(limit, 101))
-    .sort({ _id: request.order || "asc" })
+    .sort({ _id: request.order || "desc" })
     .map((doc) => ({ ...doc, id: doc._id.toString() } as any as Transaction))
     .toArray();
 
