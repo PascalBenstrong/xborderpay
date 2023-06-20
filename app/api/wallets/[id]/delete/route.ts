@@ -1,10 +1,6 @@
-import { NextResponse } from "next/server";
 import auth from "../../../auth";
-import { getWallets } from "../../getWallets";
-import deleteWallet, { WalletDeleteRequest } from "../../deleteWallet";
-import { validate, currencyValues } from "../../validations";
+import deleteWallet from "../../deleteWallet";
 import { JwtPayload } from "jsonwebtoken";
-import { Currency, Option } from "@/types";
 
 import zod from "zod";
 

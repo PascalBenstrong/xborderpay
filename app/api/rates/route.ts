@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { Currency, Option, User, Wallet } from "../../types";
+import { Currency, Option } from "../../types";
 import rates from "./rates.db";
 import { validateCurrency } from "../wallets/validations";
-import { Timestamp, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import { wrapInTryCatch, wrapInTryCatchVoid } from "@/utils/errorHandling";
 
 const ratesUrl = `https://openexchangerates.org/api/latest.json?app_id=${process.env.RATES_API_KEY}&base=USD`;
@@ -21,7 +21,7 @@ const newRates = wrapInTryCatchVoid<OpenExchangeRatesResponse>(async () => {
   return Option.fromValue(data as OpenExchangeRatesResponse);
 });
 
-const getRates = wrapInTryCatch<OpenExchangeRatesResponse, Currency>(
+export const getRates = wrapInTryCatch<OpenExchangeRatesResponse, Currency>(
   async (baseCurrency) => {
     let currencyValidationResult = validateCurrency(baseCurrency);
     if (!currencyValidationResult.isSuccess)
