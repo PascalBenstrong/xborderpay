@@ -6,12 +6,14 @@ export default function XAutocomplete({
   mt,
   data,
   id,
+  freeSolo
 }: {
   value?: any;
   setValue?: any;
   mt?: number;
   data: any;
   id?: string;
+  freeSolo?: boolean;
 }) {
   const handleChange = (
     event: any,
@@ -25,14 +27,15 @@ export default function XAutocomplete({
   return (
     <Autocomplete
       id={id}
+      freeSolo={freeSolo}
       fullWidth
       sx={{
         mt: mt ? mt : 3,
       }}
       options={data}
       size="medium"
-      clearOnBlur
       inputValue={value}
+      defaultValue={value}
       onInputChange={handleChange}
       getOptionLabel={(option: any) =>
         option?.label?.length > 0 ? option.label : option

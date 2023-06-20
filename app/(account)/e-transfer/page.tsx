@@ -21,6 +21,9 @@ import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
 import { useFetcher } from "../../utils";
 import { Currency } from "../../types";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import useSWRImmutable from "swr/immutable";
 
 const steps = [
   {
@@ -48,9 +51,21 @@ const steps = [
   },
 ];
 
-function GetData() {
-  const { data, isError, isLoading } = useFetcher(`/api/e-transfer`);
-  //console.log("E-transfer: ", data);
+function GetData(headers: any) {
+  var requestOptions: any = {
+    method: "GET",
+    headers: headers ?? {},
+    redirect: "follow",
+  };
+
+  const fetcher = (url: string) =>
+    fetch(url, requestOptions).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable("/api/e-transfer", fetcher, {
+    refreshInterval: 60000,
+  });
+
+  //console.log("data: ", data);
 
   return {
     //transactions: data?.data,
@@ -58,7 +73,7 @@ function GetData() {
     recentPayees: data?.recentPayees,
     purposes: data?.purposes,
     isLoading,
-    isError,
+    isError: error,
   };
 }
 
@@ -78,9 +93,19 @@ type Amount = {
 };
 
 export default function ETransferPage() {
-  const { wallets, recentPayees, purposes, isError, isLoading } = GetData();
+  const { data: session }: { data: any } = useSession({
+    required: true,
+    onUnauthenticated: () => {
+      redirect("/login")
+    },
+  });
+  const _myHeaders = {
+    authorization:
+      `Bearer ${session?.token}`,
+  };
+  const { wallets, recentPayees, purposes, isError, isLoading } = GetData(_myHeaders);
   const { exchangeRates } = GetRates();
-  const [activeStep, setActiveStep] = React.useState(1);
+  const [activeStep, setActiveStep] = React.useState(0);
   const [account, setAccount] = React.useState("");
   const [payee, setPayee] = React.useState("");
   const [purpose, setPurpose] = React.useState("");
