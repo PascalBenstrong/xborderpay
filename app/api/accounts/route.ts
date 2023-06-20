@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import auth from "../auth";
-import wallets from "../wallets/wallets.db";
 import accounts from "./accounts.db";
 
-import zod from "zod";
-
-const privateKeySchema = zod.string().min(1);
-
-export const GET = auth(async (request, tokenPayload) => {
+export const GET = auth(async (request) => {
   try {
     const { searchParams } = new URL(request.url);
     if (!searchParams.get("email"))
@@ -63,7 +58,6 @@ export const GET = auth(async (request, tokenPayload) => {
     });
     return NextResponse.json(userWallets);
   } catch (error) {
-    console.log(error);
     return new Response("Something went wrong!", { status: 500 });
   }
 });

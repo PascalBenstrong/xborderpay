@@ -28,7 +28,6 @@ export const POST = auth(
 
       return new Response(error, { status: 400 });
     } catch (error) {
-      console.log(error);
       return new Response("Something went wrong!", { status: 500 });
     }
   }
