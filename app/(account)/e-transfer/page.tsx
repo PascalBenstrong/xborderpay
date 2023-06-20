@@ -61,9 +61,13 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable("/api/e-transfer", fetcher, {
-    refreshInterval: 60000,
-  });
+  const { data, error, isLoading } = useSWRImmutable(
+    "/api/e-transfer",
+    fetcher,
+    {
+      refreshInterval: 60000,
+    }
+  );
 
   //console.log("data: ", data);
 
@@ -96,14 +100,14 @@ export default function ETransferPage() {
   const { data: session }: { data: any } = useSession({
     required: true,
     onUnauthenticated: () => {
-      redirect("/login")
+      redirect("/login");
     },
   });
   const _myHeaders = {
-    authorization:
-      `Bearer ${session?.token}`,
+    authorization: `Bearer ${session?.token}`,
   };
-  const { wallets, recentPayees, purposes, isError, isLoading } = GetData(_myHeaders);
+  const { wallets, recentPayees, purposes, isError, isLoading } =
+    GetData(_myHeaders);
   const { exchangeRates } = GetRates();
   const [activeStep, setActiveStep] = React.useState(0);
   const [account, setAccount] = React.useState("");
@@ -135,6 +139,8 @@ export default function ETransferPage() {
   const handleReset = () => {
     setActiveStep(0);
   };
+
+  const handleSubmit = () => {};
 
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
@@ -182,6 +188,7 @@ export default function ETransferPage() {
             )}
             {activeStep == 0 && (
               <SelectAccountPayee
+                headers={_myHeaders}
                 account={account}
                 setAccount={setAccount}
                 wallets={wallets}

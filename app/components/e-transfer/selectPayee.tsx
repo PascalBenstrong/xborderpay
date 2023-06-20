@@ -12,6 +12,7 @@ import { ValidationTextField } from "../entry";
 import XSelect from "../x_select";
 import XAutocomplete from "../x_autocomplete";
 import BootstrapInput from "../entry/bootstrapInput";
+import { isValidEmail } from "@/utils";
 
 const customReturnAccounts = (arr: any[]) => {
   return arr
@@ -32,7 +33,7 @@ const customReturnPayees = (arr: any[]) => {
   return arr?.map((finalResult: any) => {
     return {
       value: finalResult.id,
-      label: `${finalResult.firstName} ${finalResult.firstName} (${finalResult.email})`,
+      label: `${finalResult.currency} Account (${finalResult.account.id})`,
     };
   });
 };
@@ -49,10 +50,44 @@ export default function SelectAccountPayee({
   setPurpose,
   notes,
   setNotes,
+  headers,
 }: any) {
   const [accounts, setAccounts] = useState<any>();
   const [payees, setPayees] = useState<any>();
   const [payeeEmail, setPayeeEmail] = useState("");
+
+  const handleEmailLookup = (value:string) => {
+    setPayeeEmail(value);
+    console.log(payeeEmail);
+    if (!isValidEmail(value)) {
+      return;
+    }
+
+    console.log("Email is valid.");
+
+    var requestOptions: any = {
+      method: "GET",
+      headers: headers,
+      redirect: "follow",
+    };
+
+    fetch(`/api/accounts?email=${value}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        if (result !== null) {
+          console.log("walles",result[0].wallets)
+          const _payees = customReturnPayees(result[0].wallets);
+          console.log("walles",_payees)
+          setPayees(_payees);
+          //setPayee(result[0]);
+    
+          if (_payees != null) setPayee(_payees[0].label);
+        }
+        console.log("result",result)
+      })
+      .catch((error) => console.log("error", error));
+  };
+
   useEffect(() => {
     if (wallets != null) {
       const _accounts = customReturnAccounts(wallets);
@@ -61,13 +96,13 @@ export default function SelectAccountPayee({
       if (account != null || account.length > 0) setAccount(_accounts[0].label);
     }
 
-    if (recentPayees != null) {
+    /* if (recentPayees != null) {
       const _payees = customReturnPayees(recentPayees);
       setPayees(_payees);
 
       if (_payees != null) setPayee(_payees[0].label);
-    }
-  }, [wallets, recentPayees]);
+    } */
+  }, [wallets]);
 
   //console.log("payee: ", payee);
 
@@ -101,9 +136,9 @@ export default function SelectAccountPayee({
           type="email"
           autoComplete="email"
           value={payeeEmail}
-          onChange={(e) => setPayeeEmail(e.target.value)}
+          onChange={(e) => handleEmailLookup(e.target.value)}
           sx={{
-            color: "black",
+            color: "white",
             "& .MuiInputBase-input": { backgroundColor: "tranparent" },
           }}
           autoFocus
@@ -113,7 +148,7 @@ export default function SelectAccountPayee({
           Look up the payee you wish to pay
         </Typography>
       </FormControl>
-      {payees && (
+      {payees && payees.length > 0 && (
         <XAutocomplete
           id="payees"
           value={payee}
