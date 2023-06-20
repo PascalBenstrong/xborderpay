@@ -76,14 +76,11 @@ export type ETransferRequest = {
   fromAmount: string;
   toWalletId: string;
   toCurrency: string;
-  toAmount: string;
-  purpose: string;
-  note?: string;
+  reference: string;
 }
 
 export type WalletTopupRequest = {
   id: string;
-  privateKey: string;
   fromCurrency: string;
   amount: string;
 }
