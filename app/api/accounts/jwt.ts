@@ -4,7 +4,7 @@ import { Option } from "@/types";
 
 export const sha512 = crypto.createHash("sha512");
 
-const expiresInSeconds = 60 * 60;
+const expiresInSeconds = 60 * 60 * 12;
 
 declare type SignJwtResult = { jwt: string; /* hash: string; */ exp: number };
 
