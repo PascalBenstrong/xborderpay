@@ -33,15 +33,13 @@ export type WalletAccount = {
   type: AccountType;
 };
 
-export interface iWallet{
-  name: string,
-  currency: Currency,
-}
-
-export type Wallet = {
-  id: string;
+export type iWallet ={
   name: string;
   currency: Currency;
+}
+
+export type Wallet = iWallet & {
+  id: string;
   balance: number;
   logo?: string;
   userId: string;
@@ -70,6 +68,25 @@ export type TransactionsRequest = {
   after?: string | null;
   before?: string | null;
 };
+
+export type ETransferRequest = {
+  id: string;
+  privateKey: string;
+  fromCurrency: string;
+  fromAmount: string;
+  toWalletId: string;
+  toCurrency: string;
+  toAmount: string;
+  purpose: string;
+  note?: string;
+}
+
+export type WalletTopupRequest = {
+  id: string;
+  privateKey: string;
+  fromCurrency: string;
+  amount: string;
+}
 
 declare type Transfer = {
   account: string;

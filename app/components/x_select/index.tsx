@@ -31,6 +31,7 @@ export default function XSelect({
           color: "black",
           py: 0,
         }}
+        disabled={disabled}
         inputProps={{
           MenuProps: {
             MenuListProps: {
