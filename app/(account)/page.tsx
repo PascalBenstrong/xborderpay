@@ -21,6 +21,7 @@ import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
 
 function GetData(headers:any) {
 
@@ -45,9 +46,8 @@ function GetData(headers:any) {
 
   return {
     transactions: data?.transactions,
-    wallets: [],
-    isLoading: true,
-    isError: false,
+    isLoading,
+    isError: error,
   };
 }
 
@@ -63,14 +63,14 @@ export default function HomePage() {
     authorization:
       `Bearer ${session?.token}`,
   };
-  const { transactions, wallets, isError } = GetData(_myHeaders);
+  const { transactions,isError,isLoading } = GetData(_myHeaders);
   //const { data, error, isLoading } = useSWRImmutable("https://my-json-server.typicode.com/typicode/demo/posts", fetcher, {refreshInterval: 60000,});
 
   //console.log("data: ", wallets);
 
   return (
-    <Container maxWidth="xl" sx={{ pt: 15, px: 200 }}>
-      <Stack direction="row" justifyContent="space-between">
+    <Container maxWidth="xl" sx={{ pt: 15,  }}>
+      <Stack direction={{sm: "row"}} justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
         </Typography>

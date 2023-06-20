@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
-export default function XSelect({ value, setValue, data, removeBorder, fullWidth, removeMargin}: any) {
+export default function XSelect({ value, setValue, data, removeBorder, fullWidth, removeMargin,disabled}: any) {
   const handleChange = (event: SelectChangeEvent) => {
     setValue(event.target.value);
   };
@@ -16,7 +16,8 @@ export default function XSelect({ value, setValue, data, removeBorder, fullWidth
         id="demo-select-small"
         value={value}
         onChange={handleChange}
-        sx={{ border: removeBorder ? "none" : "1px solid lightGrey", py: 0 }}
+        sx={{ border: removeBorder ? "none" : "1px solid lightGrey", bgcolor: "white", color: "black", py: 0 }}
+        disabled={disabled}
         inputProps={{
             MenuProps: {
                 MenuListProps: {
