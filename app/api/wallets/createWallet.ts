@@ -49,6 +49,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
       account: walletAccount,
       balance: 0,
       _id: id,
+      userId: new ObjectId(request.userId!),
     };
 
     const inserted = await wallets.insertOne(wallet);
@@ -59,6 +60,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
       );
 
     wallet.id = id.toString();
+    wallet.userId = wallet.userId.toString();
 
     delete wallet._id;
 
