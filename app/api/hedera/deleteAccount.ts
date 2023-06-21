@@ -16,7 +16,7 @@ declare type AccountDeleteRequest = {
 
 const deleteAccount = wrapInTryCatch<boolean, AccountDeleteRequest>(
   async (request) => {
-    const privateKey = PrivateKey.fromStringED25519(request.privateKey);
+    const privateKey = PrivateKey.fromString(request.privateKey);
 
     const balanceResponse = await new AccountBalanceQuery()
       .setAccountId(request.accountId)

@@ -8,6 +8,7 @@ export function wrapInTryCatch<Tout, Tin>(
     try {
       return await func(data);
     } catch (error) {
+      console.log(error);
       return Option.fromErrorAndMessage(error, "Something went wrong!");
     }
   };
