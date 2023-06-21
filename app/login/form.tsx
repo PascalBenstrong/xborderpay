@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import BootstrapInput from "@/components/entry/bootstrapInput";
 import { ValidationTextField } from "@/components/entry";
+import useLocalStorage from "@/utils/useStorage";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ export const LoginForm = () => {
     email: "",
     password: "",
   });
+  const [userAccount, setUserAccount] = useLocalStorage("account", "");
   const [error, setError] = useState("");
 
   const searchParams = useSearchParams();
@@ -45,7 +47,10 @@ export const LoginForm = () => {
       console.log("Data: ",res);
       if (!res?.error) {
         setFormValues({ email: "", password: "" });
-        //localStorage.setItem('token', JSON.stringify(res.data)); 
+        const _user = {
+          email: formValues.email
+        }
+        setUserAccount(JSON.stringify(_user))
         router.push(callbackUrl);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
