@@ -1,18 +1,21 @@
 import {
   Box,
   Checkbox,
+  Fade,
   FormControl,
   FormControlLabel,
   FormGroup,
   InputLabel,
+  LinearProgress,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ValidationTextField } from "../entry";
 import XSelect from "../x_select";
 import XAutocomplete from "../x_autocomplete";
 import BootstrapInput from "../entry/bootstrapInput";
 import { isValidEmail } from "@/utils";
+import RequiredField from "../requiredField";
 
 const customReturnAccounts = (arr: any[]) => {
   return arr
@@ -33,7 +36,7 @@ const customReturnPayees = (arr: any[]) => {
   return arr?.map((finalResult: any) => {
     return {
       value: finalResult.id,
-      label: `${finalResult.currency} Account (${finalResult.account.id})`,
+      label: `${finalResult.currency} Wallet (${finalResult.account.id})`,
     };
   });
 };
@@ -55,38 +58,17 @@ export default function SelectAccountPayee({
   const [accounts, setAccounts] = useState<any>();
   const [payees, setPayees] = useState<any>();
   const [payeeEmail, setPayeeEmail] = useState("");
+  const [isEmailFetching, setIsEmailFetching] = useState(false);
+  const [isEmailFound, setIsEmailFound] = useState("");
+  const [query, setQuery] = useState("idle");
+  const timerRef = useRef<number>();
 
-  const handleEmailLookup = (value:string) => {
-    setPayeeEmail(value);
-    console.log(payeeEmail);
-    if (!isValidEmail(value)) {
-      return;
-    }
-
-    console.log("Email is valid.");
-
-    var requestOptions: any = {
-      method: "GET",
-      headers: headers,
-      redirect: "follow",
-    };
-
-    fetch(`/api/accounts?email=${value}`, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result !== null) {
-          console.log("walles",result[0].wallets)
-          const _payees = customReturnPayees(result[0].wallets);
-          console.log("walles",_payees)
-          setPayees(_payees);
-          //setPayee(result[0]);
-    
-          if (_payees != null) setPayee(_payees[0].label);
-        }
-        console.log("result",result)
-      })
-      .catch((error) => console.log("error", error));
-  };
+  useEffect(
+    () => () => {
+      clearTimeout(timerRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     if (wallets != null) {
@@ -104,6 +86,70 @@ export default function SelectAccountPayee({
     } */
   }, [wallets]);
 
+  const handleEmailLookup = (value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      setQuery("idle");
+    }
+
+    setPayeeEmail(value);
+    console.log(payeeEmail);
+    if (!isValidEmail(value)) {
+      return;
+    }
+
+    /* if (query !== "idle") {
+      setQuery("idle");
+      return;
+    } */
+
+    setQuery("progress");
+
+    var requestOptions: any = {
+      method: "GET",
+      headers: headers,
+      redirect: "follow",
+    };
+
+    //reset the values
+    setIsEmailFetching(true);
+    setPayees(null);
+    setIsEmailFound("");
+    setPayee("");
+
+    timerRef.current = window.setTimeout(() => {
+      fetch(`/api/accounts?email=${value}`, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log("result", result);
+          if (result !== null && result.length > 0) {
+            setIsEmailFound("");
+            console.log("walles", result[0].wallets);
+            const _payees = customReturnPayees(result[0].wallets);
+            console.log("walles", _payees);
+            setPayees(_payees);
+            //setPayee(result[0]);
+
+            if (_payees != null) setPayee(_payees[0].label);
+          } else {
+            setIsEmailFound(
+              "No account found, please verify that you haven't mistyped the email. \n<strong>Note!</strong> Also be sure that the user you are trying to pay is registered with xBorderPay."
+            );
+
+            setQuery("error");
+          }
+          setIsEmailFetching(false);
+
+          setQuery("success");
+        })
+        .catch((error) => {
+          console.log("error: ", error);
+          setIsEmailFetching(false);
+          setQuery("error");
+        });
+    }, 1000);
+  };
+
   //console.log("payee: ", payee);
 
   return (
@@ -111,20 +157,28 @@ export default function SelectAccountPayee({
       <Typography variant="h6" mb={1}>
         Transfer from
       </Typography>
-      <Typography my={2}>Account</Typography>
+      <Typography my={2}>
+        Account
+        <RequiredField />
+      </Typography>
       {accounts && (
         <XAutocomplete
           id="accounts"
           value={account}
           setValue={setAccount}
+          disableClearable
           data={accounts}
+          mt={1}
         />
       )}
 
       <Typography variant="h6" mt={3}>
         To
       </Typography>
-      <Typography my={2}>Payee</Typography>
+      <Typography my={2}>
+        Payee
+        <RequiredField />
+      </Typography>
       <FormControl variant="standard" fullWidth>
         <InputLabel shrink sx={{ color: "lightGrey" }} htmlFor="email">
           Payee Email
@@ -148,16 +202,50 @@ export default function SelectAccountPayee({
           Look up the payee you wish to pay
         </Typography>
       </FormControl>
-      {payees && payees.length > 0 && (
-        <XAutocomplete
-          id="payees"
-          value={payee}
-          setValue={setPayee}
-          data={payees}
-        />
+      {isEmailFound && (
+        <Typography
+          sx={{ color: "#7676a7", fontSize: 12, whiteSpace: "pre-line", mt: 1 }}
+        >
+          {isEmailFound}
+        </Typography>
       )}
-      <Typography mb={2} mt={8}>
+      <Box sx={{ height: 40, mb: 4 }}>
+        {query === "success" ? (
+          payees &&
+          payees.length > 0 && (
+            <Fade
+              in={query === "success"}
+              style={{
+                transitionDelay: query === "success" ? "100ms" : "0ms",
+              }}
+              unmountOnExit
+            >
+              <XAutocomplete
+                id="payees"
+                value={payee}
+                setValue={setPayee}
+                disableClearable
+                data={payees}
+                mt={1}
+              />
+            </Fade>
+          )
+        ) : (
+          <Fade
+            in={query === "progress"}
+            style={{
+              transitionDelay: query === "progress" ? "100ms" : "0ms",
+            }}
+            unmountOnExit
+          >
+            <LinearProgress />
+          </Fade>
+        )}
+      </Box>
+
+      <Typography mb={0} mt={3}>
         Purpose of Transfer
+        <RequiredField />
       </Typography>
       {purposes && (
         <XAutocomplete
@@ -166,23 +254,9 @@ export default function SelectAccountPayee({
           value={purpose}
           setValue={setPurpose}
           data={purposes}
+          mt={1}
         />
       )}
-      <Typography my={2}>Note (Optional)</Typography>
-      <ValidationTextField
-        id="note"
-        fullWidth
-        multiline
-        rows={4}
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
-      <FormGroup sx={{ my: 2 }}>
-        <FormControlLabel
-          control={<Checkbox defaultChecked />}
-          label="Send money on behalf of myself and not on behalf of a third party"
-        />
-      </FormGroup>
     </Box>
   );
 }
