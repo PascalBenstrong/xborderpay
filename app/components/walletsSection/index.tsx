@@ -170,6 +170,7 @@ export default function WalletsSection({ headers }: any) {
         wallet={selectedWallet}
         onClose={handleWalletDetailsClose}
         onUpdate={handleUpdate}
+        headers={headers}
       />
 
       {valueToCopy && (

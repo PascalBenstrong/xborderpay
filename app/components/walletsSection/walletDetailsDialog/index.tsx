@@ -38,6 +38,7 @@ export interface SimpleDialogProps {
   wallet: Wallet | null;
   onClose: (value: string) => void;
   onUpdate?: (value: Wallet) => void;
+  headers: Headers
 }
 
 enum AccountState {
@@ -52,6 +53,7 @@ export default function WalletDetailsDialog({
   open,
   wallet,
   onUpdate,
+  headers
 }: SimpleDialogProps) {
   const router = useRouter();
   const theme = useTheme();
@@ -205,7 +207,7 @@ export default function WalletDetailsDialog({
         )}
 
         {accountView == AccountState.topup && wallet && (
-          <AccountTopup wallet={wallet} updateChange={handleTopupUpdate} />
+          <AccountTopup headers={headers} wallet={wallet} updateChange={handleTopupUpdate} />
         )}
         <AlertDialog
           title={isError.title}

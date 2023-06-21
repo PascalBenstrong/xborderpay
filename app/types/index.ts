@@ -92,7 +92,7 @@ export type ETransferRequest = {
 }
 
 export type WalletTopupRequest = {
-  toWalettId: string;
+  toWalletId: string;
   fromCurrency: Currency;
   amount: number;
 }
