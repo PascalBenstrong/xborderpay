@@ -1,7 +1,7 @@
 import { alpha, styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 
-const BootstrapInput = styled(InputBase)(({ theme }) => ({
+const BootstrapInput = styled(InputBase)(({ theme, error }) => ({
   'label + &': {
     marginTop: theme.spacing(3),
   },
@@ -9,7 +9,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
     borderRadius: 10,
     position: 'relative',
     backgroundColor: theme.palette.mode === 'light' ? 'transparent' : '#2b2b2b',
-    border: '1px solid #ced4da',
+    border: error ? '1px solid maroon' : '1px solid #ced4da',
     fontSize: 16,
     width: '100%',
     padding: '15px 12px',
