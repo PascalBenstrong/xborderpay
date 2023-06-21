@@ -18,11 +18,10 @@ export const getTransactionsHbar = wrapInTryCatch<
 >(async (request) => {
   let limit = IntSchema.parse(request.limit || 20);
 
-  //let query = `${testnetUrl}?limit=${limit}&order=${request.order}&account.id=${request.accountId}`;
+  if (!ObjectId.isValid(request.userId))
+    return Option.fromError(new Error("userId is not valid!"));
 
-  //let hederaResultTask = fetch(query).then((x) => x.json());
-
-  let findQuery: any = { userId: request.userId };
+  let findQuery: any = { userId: new ObjectId(request.userId) };
 
   if (request.after && request.before) {
     findQuery._id = {
