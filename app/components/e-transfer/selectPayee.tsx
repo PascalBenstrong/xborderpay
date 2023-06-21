@@ -73,12 +73,14 @@ export default function SelectAccountPayee({
     []
   );
   
-  useMemo(() => {
+  useEffect(() => {
     if (wallets != null) {
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      if (myWalletId != null || myWalletId.length <= 0)
+      console.log("Testing")
+
+      //if (myWalletId != null || myWalletId.length <= 0)
         setMyWalletId(_accounts[0].value);
     }
   }, [wallets]);

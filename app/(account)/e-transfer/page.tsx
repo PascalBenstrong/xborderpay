@@ -139,24 +139,31 @@ export default function ETransferPage() {
   });
   const [rate, setRate] = useState<Number>(19.08);
   const [isValidated, setIsValidated] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const validateFields = (step: number) => {
-    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0)
+    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
+      setErrorMessage("Please fill in all the fields with *");
       return false;
-    else if (isAnyNull([fromAmount]) && activeStep === 1) return false;
+    } else if (
+      (isAnyNull([fromAmount]) || fromAmount.amount <= 0) &&
+      activeStep === 1
+    ) {
+      setErrorMessage("Please fill in amount you wish to send");
+      return false;
+    }
 
     return true;
   };
 
   const handleNext = () => {
-
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
       return;
     }
 
-    if(activeStep < 1){
+    if (activeStep < 1) {
       setFromAmount({
         amount: fromAmount.amount,
         currency: getCurrencyFromWallet(myWalletId, userInfo?.wallets),
@@ -204,6 +211,7 @@ export default function ETransferPage() {
 
   const clearError = () => {
     setIsValidated(true);
+    setErrorMessage("");
   };
 
   return (
@@ -252,7 +260,7 @@ export default function ETransferPage() {
           <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
             <TransitionAlerts
               severity="error"
-              message="Please fill in all the fields with *"
+              message={errorMessage}
               open={!isValidated}
               onClose={clearError}
             />
@@ -296,7 +304,21 @@ export default function ETransferPage() {
                 payeeWallets={payee?.wallets}
               />
             )}
-            {activeStep == 2 && <Review />}
+            {activeStep == 2 && (
+              <Review
+                userInfo={userInfo}
+                myWalletId={myWalletId}
+                payee={payee}
+                toWalletId={toWalletId}
+                fromAmount={fromAmount}
+                setFromAmount={setFromAmount}
+                toAmount={toAmount}
+                setToAmount={setToAmount}
+                fees={fees}
+                exchangeRates={exchangeRates}
+                purpose={purpose}
+              />
+            )}
             {activeStep <= steps.length - 2 && (
               <Box sx={{ mb: 2, mt: 2 }}>
                 {activeStep > 0 && (
