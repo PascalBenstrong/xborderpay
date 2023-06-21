@@ -80,9 +80,9 @@ export type ETransferRequest = {
 }
 
 export type WalletTopupRequest = {
-  id: string;
-  fromCurrency: string;
-  amount: string;
+  toWalettId: string;
+  fromCurrency: Currency;
+  amount: number;
 }
 
 declare type Transfer = {
