@@ -80,6 +80,13 @@ export default function WalletDetailsDialog({
   };
 
   const handleCovertion = () => {};
+  const handleDelete = () => {
+    setIsError({
+      title: "Warning",
+      description: `You are about to delete your wallet.`,
+    });
+    setOpenAlert(true);
+  };
 
   const handleSend = () => {
     if (wallet && wallet?.balance <= 0) {
