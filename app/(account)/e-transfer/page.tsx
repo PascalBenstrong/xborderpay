@@ -117,7 +117,7 @@ export default function ETransferPage() {
     GetData(_myHeaders);
   const { exchangeRates } = GetRates();
   const [activeStep, setActiveStep] = useState(0);
-  const [account, setAccount] = useState("");
+  const [myWalletId, setMyWalletId] = useState("");
   const [payee, setPayee] = useState<any>();
   const [toWalletId, setToWalletId] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -138,15 +138,18 @@ export default function ETransferPage() {
   const [isValidated, setIsValidated] = useState(true);
 
   const validateFields = (step: number) => {
-    if (isAnyNull([account, payee, purpose]) && activeStep === 0) return false;
+    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) return false;
     else if (isAnyNull([fromAmount]) && activeStep === 1) return false;
 
     return true;
   };
 
   const handleNext = () => {
-    console.log("Account: ", account);
-    console.log("payee: ", payee);
+    //console.log("Account: ", account);
+    //console.log("payee: ", payee);
+    
+
+    clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
       return;
@@ -166,7 +169,7 @@ export default function ETransferPage() {
   const handleSubmit = () => {
 
     var payload: ETransferRequest = {
-      fromWalletId: "",
+      fromWalletId: myWalletId,
       privateKey: "",
       fromCurrency: fromAmount.currency,
       amount: fromAmount.amount,
@@ -248,8 +251,8 @@ export default function ETransferPage() {
             {activeStep == 0 && (
               <SelectAccountPayee
                 headers={_myHeaders}
-                account={account}
-                setAccount={setAccount}
+                myWalletId={myWalletId}
+                setMyWalletId={setMyWalletId}
                 wallets={wallets}
                 payee={payee}
                 setPayee={setPayee}
@@ -310,7 +313,7 @@ export default function ETransferPage() {
                     <Typography variant="h6" mb={1}>
                       From
                     </Typography>
-                    {userInfo && <UserInfoCard data={userInfo}  walletId={account}/>}
+                    {userInfo && <UserInfoCard data={userInfo}  walletId={myWalletId}/>}
                   </Grid>
                   <Grid xs={12} sm={6} lg={12}>
                     <Typography

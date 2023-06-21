@@ -47,8 +47,8 @@ const getLabelFromValue = (value: string, arr: any[]) => {
 };
 
 export default function SelectAccountPayee({
-  account,
-  setAccount,
+  myWalletId,
+  setMyWalletId,
   wallets,
   payee,
   setPayee,
@@ -80,7 +80,7 @@ export default function SelectAccountPayee({
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      if (account != null || account.length > 0) setAccount(_accounts[0].value);
+      if (myWalletId != null || myWalletId.length > 0) setMyWalletId(_accounts[0].value);
     }
   }, [wallets]);
 
@@ -151,7 +151,7 @@ export default function SelectAccountPayee({
   //get and set account id
   const handleAccountChange = (value: string) => {
     let _accountId = accounts.find((x: any) => x.label === value);
-    setAccount(_accountId.value);
+    setMyWalletId(_accountId.value);
   };
 
   //get and set payee account id
@@ -172,7 +172,7 @@ export default function SelectAccountPayee({
       {accounts && (
         <XAutocomplete
           id="accounts"
-          value={getLabelFromValue(account, accounts)}
+          value={getLabelFromValue(myWalletId, accounts)}
           setValue={handleAccountChange}
           disableClearable
           data={accounts}
@@ -230,7 +230,7 @@ export default function SelectAccountPayee({
             >
               <XAutocomplete
                 id="payeeWallets"
-                value={toWalletId}
+                value={getLabelFromValue(toWalletId, payeeWallets)}
                 setValue={handlePayeeChange}
                 disableClearable
                 data={payeeWallets}
