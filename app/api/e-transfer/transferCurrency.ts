@@ -112,7 +112,7 @@ const convertRates = async ({
 
 const fromHbarToTinyBar = (value: number) => {
   return Hbar.fromTinybars(HbarUnit.Hbar._tinybar.times(value).integerValue());
-}
+};
 
 const transferCurrency = wrapInTryCatch<
   TransferCurrencyResponse,
@@ -149,7 +149,11 @@ const transferCurrency = wrapInTryCatch<
     values.fromCurrency = fromWallet.currency;
 
     if (fromWallet.balance < values.amount)
-      return Option.fromError(new Error("You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"));
+      return Option.fromError(
+        new Error(
+          "You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"
+        )
+      );
   }
 
   const convertedAmountResult = await convertRates({
@@ -160,21 +164,22 @@ const transferCurrency = wrapInTryCatch<
 
   let hbarEquavalent = convertedAmountResult;
 
-  if(fromWallet)
-  {
-    hbarEquavalent = await convertRates({amount: values.amount, base: fromWallet.currency, walletCurrency: Currency.USD})
+  if (fromWallet) {
+    hbarEquavalent = await convertRates({
+      amount: values.amount,
+      base: fromWallet.currency,
+      walletCurrency: Currency.USD,
+    });
   }
 
-  console.log("convertedAmountResult:", convertedAmountResult)
-  console.log("hbarEquavalent:", hbarEquavalent)
+  console.log("convertedAmountResult:", convertedAmountResult);
+  console.log("hbarEquavalent:", hbarEquavalent);
   if (!convertedAmountResult.isSuccess)
     return Option.fromErrorOption(convertedAmountResult);
 
   const { amount, from, rate } = convertedAmountResult.value!;
 
-
   // transfer hbar
-
 
   const hbar = fromHbarToTinyBar(hbarEquavalent.value!.amount);
 
@@ -213,7 +218,7 @@ const transferCurrency = wrapInTryCatch<
     amount: values.amount,
     timestamp,
     transactionId,
-    userId: wallet.userId,
+    userId: new ObjectId(wallet.userId),
     rate,
     fees: { currency: Currency.USD, amount: 0.07 },
     reference: data.reference,
@@ -227,11 +232,21 @@ const transferCurrency = wrapInTryCatch<
 
   //update wallet balance, this can be computed from the transactions as well
 
-  const updates = [wallets.updateOne({ _id: new ObjectId(data.toWalletId) }, { $inc: { balance: amount } })];
+  const updates = [
+    wallets.updateOne(
+      { _id: new ObjectId(data.toWalletId) },
+      { $inc: { balance: amount } }
+    ),
+  ];
 
   if (fromWallet) {
     console.log("updating from wallet :", fromWallet.id);
-    updates.push(wallets.updateOne({ _id: new ObjectId(fromWallet.id)}, { $inc: { balance: -values.amount } }));
+    updates.push(
+      wallets.updateOne(
+        { _id: new ObjectId(fromWallet.id) },
+        { $inc: { balance: -values.amount } }
+      )
+    );
   }
 
   await Promise.all(updates);
