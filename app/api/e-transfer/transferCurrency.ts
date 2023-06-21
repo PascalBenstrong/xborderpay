@@ -195,7 +195,7 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     receivingCurrency: wallet.currency,
   });
 
-  console.log("convertedAmountResult:", convertedAmountResult);
+  //console.log("convertedAmountResult:", convertedAmountResult);
   if (!convertedAmountResult.isSuccess)
     return Option.fromErrorOption(convertedAmountResult);
 
@@ -227,7 +227,7 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     currency: sendingCurrency,
   };
   const receivingWallet = {
-    id: wallet.id,
+    id: new ObjectId(wallet.id),
     name: wallet.name,
     currency: wallet.currency,
   };
@@ -312,7 +312,7 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
       receivingCurrency: toWallet.currency,
     });
 
-    console.log("convertedAmountResult:", convertedAmountResult);
+    //console.log("convertedAmountResult:", convertedAmountResult);
     if (!convertedAmountResult.isSuccess)
       return Option.fromErrorOption(convertedAmountResult);
 
@@ -337,12 +337,12 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
     const transactionId = topUpResult.value!.id;
     const timestamp = Date.now();
     const senderWallet = {
-      id: fromWallet.id,
+      id: new ObjectId(fromWallet.id),
       name: fromWallet.name,
       currency: sendingCurrency,
     };
     const receivingWallet = {
-      id: toWallet.id,
+      id: new ObjectId(toWallet.id),
       name: toWallet.name,
       currency: toWallet.currency,
     };
