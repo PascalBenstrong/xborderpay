@@ -1,4 +1,6 @@
 "use client";
+import React, { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Container,
   Paper,
@@ -9,8 +11,9 @@ import {
   StepLabel,
   Stepper,
   Typography,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
-import React, { useState } from "react";
 import Title from "../../components/title";
 import EnterAmount from "../../components/e-transfer/enterAmount";
 import Review from "../../components/e-transfer/review";
@@ -105,6 +108,9 @@ function getCurrencyFromWallet(walletId: string, wallets: Wallet[]) {
 }
 
 export default function ETransferPage() {
+  const router = useRouter();
+
+  //get session
   const { data: session }: { data: any } = useSession({
     required: true,
     onUnauthenticated: () => {
@@ -114,14 +120,18 @@ export default function ETransferPage() {
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
+  //get data
   const { userInfo, wallets, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
+
+  //states
   const { exchangeRates } = GetRates();
   const [activeStep, setActiveStep] = useState(0);
   const [myWalletId, setMyWalletId] = useState("");
   const [payee, setPayee] = useState<any>();
   const [toWalletId, setToWalletId] = useState("");
   const [purpose, setPurpose] = useState("");
+  const [reference, setReference] = useState("");
   const [payeeEmail, setPayeeEmail] = useState("");
   const [payeeWallets, setPayeeWallets] = useState<any>();
   const [query, setQuery] = useState("idle");
@@ -140,6 +150,7 @@ export default function ETransferPage() {
   const [rate, setRate] = useState<Number>(19.08);
   const [isValidated, setIsValidated] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
 
   const validateFields = (step: number) => {
     if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
@@ -174,7 +185,16 @@ export default function ETransferPage() {
       });
     }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    //check if we must submit to server
+    if (activeStep == 2 && validateFields(activeStep)) {
+      /* window.setTimeout(() => {
+        setIsFetching(false);
+        setActiveStep(3);
+      }, 1000); */
+      handleSubmit();
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
@@ -183,9 +203,24 @@ export default function ETransferPage() {
 
   const handleReset = () => {
     setActiveStep(0);
+    setQuery("idle");
+    setFromAmount({
+      amount: 0,
+      currency: getCurrencyFromWallet(myWalletId, userInfo?.wallets),
+    });
+    setToAmount({
+      amount: 0,
+      currency: getCurrencyFromWallet(toWalletId, payee?.wallets),
+    });
+    setPayeeEmail("");
+    setToWalletId("");
+    setPurpose("");
+    setPayeeWallets(null);
+    router.refresh();
   };
 
   const handleSubmit = () => {
+    setIsFetching(true);
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
       fromPrivateKey: "",
@@ -205,8 +240,16 @@ export default function ETransferPage() {
 
     fetch("/api/e-transfer", requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        //setActiveStep(3);
+        console.log("result: ",result);
+        setReference("CAxxx723");
+        setIsFetching(false);
+      })
+      .catch((error) => {
+        setIsFetching(false);
+        console.log("error: ", error);
+      });
   };
 
   const clearError = () => {
@@ -265,7 +308,12 @@ export default function ETransferPage() {
               onClose={clearError}
             />
             {activeStep === steps.length - 1 && (
-              <ETransferSuccess handleReset={handleReset} />
+              <ETransferSuccess
+                fromAmount={fromAmount}
+                purpose={purpose}
+                reference={reference}
+                handleReset={handleReset}
+              />
             )}
             {activeStep == 0 && (
               <SelectAccountPayee
@@ -376,6 +424,13 @@ export default function ETransferPage() {
           )}
         </Grid>
       </Paper>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isFetching}
+        //onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Container>
   );
 }
