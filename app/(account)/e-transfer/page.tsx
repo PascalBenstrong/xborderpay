@@ -10,17 +10,19 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import React from "react";
-import TransactionCard from "../../components/transaction_card";
+import React, { useState } from "react";
 import Title from "../../components/title";
-import VerticalLinearStepper from "../../components/stepper";
 import EnterAmount from "../../components/e-transfer/enterAmount";
 import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
-import { useFetcher } from "../../utils";
-import { Currency } from "../../types";
+import { isAnyNull, useFetcher } from "../../utils";
+import { Currency, ETransferRequest } from "../../types";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import useSWRImmutable from "swr/immutable";
+import TransitionAlerts from "@/components/alert";
 
 const steps = [
   {
@@ -48,17 +50,41 @@ const steps = [
   },
 ];
 
-function GetData() {
-  const { data, isError, isLoading } = useFetcher(`/api/e-transfer`);
-  //console.log("E-transfer: ", data);
+function GetData(headers: any) {
+  var requestOptions: any = {
+    method: "GET",
+    headers: headers ?? {},
+    redirect: "follow",
+  };
+
+  const fetcher = (url: string) =>
+    fetch(url, requestOptions).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable(
+    "/api/e-transfer",
+    fetcher,
+    {
+      refreshInterval: 60000,
+    }
+  );
+
+  const userInfo:any = {
+    firstName: "Mark",
+    lastName: "Woods",
+    email: "mark.wood@gmail.com",
+    wallets: data?.accounts,
+  }
+
+  //console.log("data: ", data);
 
   return {
     //transactions: data?.data,
+    userInfo,
     wallets: data?.accounts,
     recentPayees: data?.recentPayees,
     purposes: data?.purposes,
     isLoading,
-    isError,
+    isError: error,
   };
 }
 
@@ -78,28 +104,57 @@ type Amount = {
 };
 
 export default function ETransferPage() {
-  const { wallets, recentPayees, purposes, isError, isLoading } = GetData();
+  const { data: session }: { data: any } = useSession({
+    required: true,
+    onUnauthenticated: () => {
+      redirect("/login");
+    },
+  });
+  const _myHeaders = {
+    authorization: `Bearer ${session?.token}`,
+  };
+  const {userInfo, wallets, recentPayees, purposes, isError, isLoading } =
+    GetData(_myHeaders);
   const { exchangeRates } = GetRates();
-  const [activeStep, setActiveStep] = React.useState(1);
-  const [account, setAccount] = React.useState("");
-  const [payee, setPayee] = React.useState("");
-  const [purpose, setPurpose] = React.useState("");
-  const [notes, setNotes] = React.useState("");
-  const [fromAmount, setFromAmount] = React.useState<Amount>({
+  const [activeStep, setActiveStep] = useState(1);
+  const [myWalletId, setMyWalletId] = useState("");
+  const [payee, setPayee] = useState<any>();
+  const [toWalletId, setToWalletId] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [notes, setNotes] = useState("");
+  const [fromAmount, setFromAmount] = useState<Amount>({
     amount: 0,
     currency: Currency.USD,
   });
-  const [toAmount, setToAmount] = React.useState<Amount>({
+  const [toAmount, setToAmount] = useState<Amount>({
     amount: 0,
     currency: Currency.ZAR,
   });
-  const [fees, setFees] = React.useState<Amount>({
-    amount: 0.05,
+  const [fees, setFees] = useState<Amount>({
+    amount: 0.07,
     currency: Currency.USD,
   });
-  const [rate, setRate] = React.useState<Number>(19.08);
+  const [rate, setRate] = useState<Number>(19.08);
+  const [isValidated, setIsValidated] = useState(true);
+
+  const validateFields = (step: number) => {
+    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) return false;
+    else if (isAnyNull([fromAmount]) && activeStep === 1) return false;
+
+    return true;
+  };
 
   const handleNext = () => {
+    //console.log("Account: ", account);
+    //console.log("payee: ", payee);
+    
+
+    clearError();
+    if (!validateFields(activeStep)) {
+      setIsValidated(false);
+      return;
+    }
+
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -111,9 +166,39 @@ export default function ETransferPage() {
     setActiveStep(0);
   };
 
+  const handleSubmit = () => {
+
+    var payload: ETransferRequest = {
+      fromWalletId: myWalletId,
+      fromPrivateKey: "",
+      fromCurrency: fromAmount.currency,
+      amount: fromAmount.amount,
+      toWalletId: toWalletId,
+      toCurrency: toAmount.currency,
+      reference: purpose,
+    };
+
+    var requestOptions: any = {
+      method: "POST",
+      headers: _myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    };
+
+    fetch("/api/e-transfer", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+  };
+
+  const clearError = () => {
+    setIsValidated(true);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
       <Paper
+        component="form"
         sx={{
           bgcolor: "secondary.main",
           p: 2,
@@ -122,6 +207,8 @@ export default function ETransferPage() {
           borderRadius: 3,
           height: "100%",
         }}
+        noValidate={isValidated}
+        autoComplete="off"
       >
         <Title title="Send e-Transfer" />
         <Grid container spacing={2}>
@@ -152,13 +239,20 @@ export default function ETransferPage() {
           </Grid>
 
           <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
+            <TransitionAlerts
+              severity="error"
+              message="Please fill in all the fields with *"
+              open={!isValidated}
+              onClose={clearError}
+            />
             {activeStep === steps.length - 1 && (
               <ETransferSuccess handleReset={handleReset} />
             )}
             {activeStep == 0 && (
               <SelectAccountPayee
-                account={account}
-                setAccount={setAccount}
+                headers={_myHeaders}
+                myWalletId={myWalletId}
+                setMyWalletId={setMyWalletId}
                 wallets={wallets}
                 payee={payee}
                 setPayee={setPayee}
@@ -166,8 +260,8 @@ export default function ETransferPage() {
                 purpose={purpose}
                 setPurpose={setPurpose}
                 purposes={purposes}
-                notes={notes}
-                setNotes={setNotes}
+                toWalletId={toWalletId}
+                setToWalletId={setToWalletId}
               />
             )}
             {activeStep == 1 && (
@@ -185,7 +279,7 @@ export default function ETransferPage() {
             )}
             {activeStep == 2 && <Review />}
             {activeStep <= steps.length - 2 && (
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2, mt: 2 }}>
                 {activeStep > 0 && (
                   <Button
                     variant="outlined"
@@ -206,14 +300,20 @@ export default function ETransferPage() {
             )}
           </Grid>
           {activeStep < 2 && (
-            <Grid xs={12} md={12} lg={3}>
+            <Grid
+              xs={false}
+              sm={12}
+              md={12}
+              lg={3}
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               <Box>
                 <Grid container>
                   <Grid xs={12} sm={6} lg={12}>
                     <Typography variant="h6" mb={1}>
                       From
                     </Typography>
-                    <UserInfoCard />
+                    {userInfo && <UserInfoCard data={userInfo}  walletId={myWalletId}/>}
                   </Grid>
                   <Grid xs={12} sm={6} lg={12}>
                     <Typography
@@ -223,7 +323,7 @@ export default function ETransferPage() {
                     >
                       To
                     </Typography>
-                    {payee && <UserInfoCard data={payee} />}
+                    {payee && <UserInfoCard data={payee} walletId={toWalletId}/>}
                   </Grid>
                 </Grid>
               </Box>

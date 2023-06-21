@@ -15,6 +15,7 @@ declare type OpenExchangeRatesResponse = {
 const newRates = wrapInTryCatchVoid<OpenExchangeRatesResponse>(async () => {
   let data = await fetch(ratesUrl).then((x) => x.json());
 
+  if(data.error) return Option.fromError(new Error("Unable to get rates at this time! Try again later."))
   delete data.disclaimer;
 
   return Option.fromValue(data as OpenExchangeRatesResponse);

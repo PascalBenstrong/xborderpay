@@ -1,14 +1,21 @@
 import {
   Box,
   Checkbox,
+  Fade,
+  FormControl,
   FormControlLabel,
   FormGroup,
+  InputLabel,
+  LinearProgress,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ValidationTextField } from "../entry";
 import XSelect from "../x_select";
 import XAutocomplete from "../x_autocomplete";
+import BootstrapInput from "../entry/bootstrapInput";
+import { isValidEmail } from "@/utils";
+import RequiredField from "../requiredField";
 
 const customReturnAccounts = (arr: any[]) => {
   return arr
@@ -29,15 +36,19 @@ const customReturnPayees = (arr: any[]) => {
   return arr?.map((finalResult: any) => {
     return {
       value: finalResult.id,
-      label: `${finalResult.firstName} ${finalResult.firstName} (${finalResult.email})`,
+      label: `${finalResult.currency} Wallet (${finalResult.account.id})`,
     };
   });
 };
 
-export default function SelectAccountPayee(
-  {
-  account,
-  setAccount,
+const getLabelFromValue = (value: string, arr: any[]) => {
+  const _arr = arr.find((x: any) => x.value === value);
+  return _arr?.label ?? "";
+};
+
+export default function SelectAccountPayee({
+  myWalletId,
+  setMyWalletId,
   wallets,
   payee,
   setPayee,
@@ -45,60 +56,215 @@ export default function SelectAccountPayee(
   purposes,
   purpose,
   setPurpose,
-  notes,
-  setNotes
+  toWalletId,
+  setToWalletId,
+  headers,
 }: any) {
   const [accounts, setAccounts] = useState<any>();
-  const [payees, setPayees] = useState<any>();
+  const [payeeWallets, setPayeeWallets] = useState<any>();
+  const [payeeEmail, setPayeeEmail] = useState("");
+  const [isEmailFetching, setIsEmailFetching] = useState(false);
+  const [isEmailFound, setIsEmailFound] = useState("");
+  const [query, setQuery] = useState("idle");
+  const timerRef = useRef<number>();
+
+  useEffect(
+    () => () => {
+      clearTimeout(timerRef.current);
+    },
+    []
+  );
+
   useEffect(() => {
     if (wallets != null) {
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      if (account != null || account.length > 0) setAccount(_accounts[0].value);
+      if (myWalletId != null || myWalletId.length > 0) setMyWalletId(_accounts[0].value);
+    }
+  }, [wallets]);
+
+  const handleEmailLookup = (value: string) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      setQuery("idle");
     }
 
-    if (recentPayees != null) {
-      const _payees = customReturnPayees(recentPayees);
-      setPayees(_payees);
-
-      if(_payees != null) setPayee(_payees[0].label);
+    setPayeeEmail(value);
+    if (!isValidEmail(value)) {
+      return;
     }
-  }, [wallets, recentPayees]);
 
-  //console.log("payee: ", payee);
+    /* if (query !== "idle") {
+      setQuery("idle");
+      return;
+    } */
+
+    setQuery("progress");
+
+    var requestOptions: any = {
+      method: "GET",
+      headers: headers,
+      redirect: "follow",
+    };
+
+    //reset the values
+    setIsEmailFetching(true);
+    setPayeeWallets(null);
+    setIsEmailFound("");
+    setPayee(null);
+    setToWalletId("");
+
+    timerRef.current = window.setTimeout(() => {
+      fetch(`/api/accounts?email=${value}`, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log("result", result);
+          if (result !== null && result.length > 0) {
+            setIsEmailFound("");
+            //console.log("walles", result[0].wallets);
+            const _payees = customReturnPayees(result[0].wallets);
+            //console.log("walles", _payees);
+            setPayeeWallets(_payees);
+            setPayee(result[0]);
+
+            if (_payees != null) setToWalletId(_payees[0].value);
+          } else {
+            setIsEmailFound(
+              "No account found, please verify that you haven't mistyped the email. \n<strong>Note!</strong> Also be sure that the user you are trying to pay is registered with xBorderPay."
+            );
+
+            setQuery("error");
+          }
+          setIsEmailFetching(false);
+
+          setQuery("success");
+        })
+        .catch((error) => {
+          console.log("error: ", error);
+          setIsEmailFetching(false);
+          setQuery("error");
+        });
+    }, 1000);
+  };
+
+  //get and set account id
+  const handleAccountChange = (value: string) => {
+    let _accountId = accounts.find((x: any) => x.label === value);
+    setMyWalletId(_accountId.value);
+  };
+
+  //get and set payee account id
+  const handlePayeeChange = (value: string) => {
+    let _accountId = accounts.find((x: any) => x.label === value);
+    setToWalletId(_accountId.value);
+  };
 
   return (
     <Box>
       <Typography variant="h6" mb={1}>
         Transfer from
       </Typography>
-      <Typography my={2}>Account</Typography>
-      {wallets && <XSelect value={account} setValue={setAccount} data={accounts} />}
+      <Typography my={2}>
+        Account
+        <RequiredField />
+      </Typography>
+      {accounts && (
+        <XAutocomplete
+          id="accounts"
+          value={getLabelFromValue(myWalletId, accounts)}
+          setValue={handleAccountChange}
+          disableClearable
+          data={accounts}
+          mt={1}
+        />
+      )}
+
       <Typography variant="h6" mt={3}>
         To
       </Typography>
-      <Typography my={2}>Payee</Typography>
-      {recentPayees && <XAutocomplete id="payees" value={payee} setValue={setPayee} data={payees}/>}
-      <Typography mb={2} mt={8}>
+      <Typography my={2}>
+        Payee
+        <RequiredField />
+      </Typography>
+      <FormControl variant="standard" fullWidth>
+        <InputLabel shrink sx={{ color: "lightGrey" }} htmlFor="email">
+          Payee Email
+        </InputLabel>
+        <BootstrapInput
+          placeholder="Please enter your email address"
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={payeeEmail}
+          onChange={(e) => handleEmailLookup(e.target.value)}
+          sx={{
+            color: "white",
+            "& .MuiInputBase-input": { backgroundColor: "tranparent" },
+          }}
+          autoFocus
+          required
+        />
+        <Typography sx={{ color: "lightGrey", fontSize: 10, mt: 1 }}>
+          Look up the payee you wish to pay
+        </Typography>
+      </FormControl>
+      {isEmailFound && (
+        <Typography
+          sx={{ color: "#7676a7", fontSize: 12, whiteSpace: "pre-line", mt: 1 }}
+        >
+          {isEmailFound}
+        </Typography>
+      )}
+      <Box sx={{ height: 40, mb: 4 }}>
+        {query === "success" ? (
+          payeeWallets &&
+          payeeWallets.length > 0 && (
+            <Fade
+              in={query === "success"}
+              style={{
+                transitionDelay: query === "success" ? "100ms" : "0ms",
+              }}
+              unmountOnExit
+            >
+              <XAutocomplete
+                id="payeeWallets"
+                value={getLabelFromValue(toWalletId, payeeWallets)}
+                setValue={handlePayeeChange}
+                disableClearable
+                data={payeeWallets}
+                mt={1}
+              />
+            </Fade>
+          )
+        ) : (
+          <Fade
+            in={query === "progress"}
+            style={{
+              transitionDelay: query === "progress" ? "100ms" : "0ms",
+            }}
+            unmountOnExit
+          >
+            <LinearProgress />
+          </Fade>
+        )}
+      </Box>
+
+      <Typography mb={0} mt={3}>
         Purpose of Transfer
+        <RequiredField />
       </Typography>
       {purposes && (
         <XAutocomplete
           id="puroseOfTransfer"
+          freeSolo
           value={purpose}
           setValue={setPurpose}
           data={purposes}
+          mt={1}
         />
       )}
-      <Typography my={2}>Note (Optional)</Typography>
-      <ValidationTextField id="note" fullWidth multiline rows={4} value={notes} onChange={(e)=>setNotes(e.target.value)}/>
-      <FormGroup sx={{ my: 2 }}>
-        <FormControlLabel
-          control={<Checkbox defaultChecked />}
-          label="Send money on behalf of myself and not on behalf of a third party"
-        />
-      </FormGroup>
     </Box>
   );
 }

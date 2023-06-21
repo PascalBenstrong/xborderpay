@@ -33,7 +33,7 @@ export function useFetcher(url: string, dataKey?: string, onSuccess?: (data: any
         }
     });
 
-    console.log("SWRData: ", data)
+    //console.log("SWRData: ", data)
 
     return {
         data,

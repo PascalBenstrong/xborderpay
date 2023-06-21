@@ -6,33 +6,39 @@ export default function XAutocomplete({
   mt,
   data,
   id,
+  freeSolo,
+  disableClearable
 }: {
   value?: any;
   setValue?: any;
   mt?: number;
   data: any;
   id?: string;
+  freeSolo?: boolean;
+  disableClearable?: boolean;
 }) {
   const handleChange = (
     event: any,
     value: string,
     reason: any
   ) => {
-    console.log("selected: ", value);
+    //console.log("selected: ", value);
     setValue(value);
   };
 
   return (
     <Autocomplete
       id={id}
+      freeSolo={freeSolo}
       fullWidth
       sx={{
         mt: mt ? mt : 3,
       }}
       options={data}
       size="medium"
-      clearOnBlur
+      disableClearable={disableClearable}
       inputValue={value}
+      defaultValue={value}
       onInputChange={handleChange}
       getOptionLabel={(option: any) =>
         option?.label?.length > 0 ? option.label : option
