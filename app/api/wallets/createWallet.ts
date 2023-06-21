@@ -1,4 +1,5 @@
 import wallets from "./wallets.db";
+import { validate } from "../wallets/validations";
 import { Currency, Option, Wallet, WalletAccount } from "@/types";
 import { wrapInTryCatch } from "@/utils/errorHandling";
 import createAccount from "../hedera/createAccount";
@@ -16,6 +17,19 @@ export declare type WalletCreateResponse = {
 };
 const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
   async (request) => {
+    if (!ObjectId.isValid(request.userId))
+      return Option.fromError(new Error("Invalid userId!"));
+
+    const validationResult = validate({
+      name: request.name,
+      currency: request.currency,
+    });
+
+    if (!validationResult.isSuccess)
+      return Option.fromErrorAndMessage(
+        validationResult.error,
+        validationResult.message!
+      );
     // create a new hedera account for this user
 
     const createAccountResult = await createAccount();
@@ -35,7 +49,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
 
     let wallet: any = await wallets.findOne({
       currency: request.currency,
-      userId: request.userId,
+      userId: new ObjectId(request.userId),
     });
 
     if (wallet)
