@@ -63,7 +63,7 @@ export default function TransactionsPage() {
               key={index}
               to={item.receivingWallet.id}
               type={item.type}
-              currency={item.receivingWallet.currency}
+              currency={item.senderWallet.currency}
               amount={item.amount}
               wallet={item.receivingWallet.name}
               timestamp={item.timestamp}

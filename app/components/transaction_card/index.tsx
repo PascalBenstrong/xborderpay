@@ -3,8 +3,8 @@ import { Stack, Avatar, Box, Typography } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import SentTransferIcon from "@mui/icons-material/East";
 import { TransactionType } from "@/types";
-import TopupIcon from '@mui/icons-material/AccountBalanceWallet';
-import ReceivedTransferIcon from '@mui/icons-material/West';
+import TopupIcon from "@mui/icons-material/AccountBalanceWallet";
+import ReceivedTransferIcon from "@mui/icons-material/West";
 
 type Transaction = {
   type: string;
@@ -54,13 +54,25 @@ export default function TransactionCard({
         p: 0.5,
       }}
     >
-      <Avatar sx={{ bgcolor: "primary.main", width: 30,height: 30 }} aria-label="currency">
-        {type === TransactionType.Transfer && <SentTransferIcon/> }
-        {type === TransactionType.Deposit && <TopupIcon/> }
+      <Avatar
+        sx={{ bgcolor: "primary.main", width: 30, height: 30 }}
+        aria-label="currency"
+      >
+        {type === TransactionType.Transfer && <SentTransferIcon />}
+        {type === TransactionType.Deposit && <TopupIcon />}
       </Avatar>
       <Box sx={{ flexGrow: 1 }}>
-        <Typography variant="body2" fontSize={{xs: 12, md: 15}} fontWeight={600} mb={0}>
-          {typeHandler(type)} {to && `${to.slice(0,2)}****${to.slice(20,24)}`}
+        <Typography
+          variant="body2"
+          fontSize={{ xs: 12, md: 15 }}
+          fontWeight={600}
+          mb={0}
+        >
+          {typeHandler(type)}{" "}
+          {type !== TransactionType.Deposit &&
+            to &&
+            `${to.slice(0, 2)}****${to.slice(20, 24)}`}
+          {to && `${to.slice(0, 2)}****${to.slice(20, 24)}`}
         </Typography>
         <Typography variant="body2" color="lightGrey" mt={0}>
           {wallet}
