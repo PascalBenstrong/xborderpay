@@ -1,24 +1,14 @@
 import {
   Box,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  FormGroup,
-  Unstable_Grid2 as Grid,
-  InputAdornment,
-  MenuItem,
-  Select,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { ValidationTextField } from "../entry";
-import UserInfoCard from "./userInfoCard";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import convertCurrency, { getRate } from "../../utils/currencyConverter";
 import { Currency } from "../../types";
 import XSelect from "../x_select";
+import BootstrapInput from "../entry/bootstrapInput";
+import { parseNumber } from "@/utils/parseNumber";
 
 export default function EnterAmount({
   fromAmount,
@@ -26,20 +16,15 @@ export default function EnterAmount({
   toAmount,
   setToAmount,
   fees,
-  setFees,
   rate,
-  setRate,
   exchangeRates,
 }: any) {
-  const [convertedAmount, setConvertedAmount] = useState<any>();
-
-  //console.log("exchangeRates: ", exchangeRates);
-
   const handleFromAmount = async (value: string) => {
-    let _amount = parseFloat(value);
+    let _amount = parseNumber(value);
+    //console.log("from _amount: ", _amount, " \n value: ",value);
     setFromAmount({
       currency: fromAmount.currency,
-      amount: value,
+      amount: _amount,
     });
     const converted = await convertCurrency(
       _amount,
@@ -47,7 +32,7 @@ export default function EnterAmount({
       toAmount.currency,
       exchangeRates
     );
-    console.log("converted: ", converted);
+    //console.log("from amount: ", converted);
     setToAmount({ currency: toAmount.currency, amount: converted });
   };
 
@@ -62,22 +47,23 @@ export default function EnterAmount({
       toAmount.currency,
       exchangeRates
     );
-    console.log("from currency: ", converted);
+    //console.log("from currency: ", converted);
     setToAmount({ currency: toAmount.currency, amount: converted });
   };
 
   const handleToAmount = async (value: any) => {
+    let _amount = parseNumber(value);
     setToAmount({
       currency: toAmount.currency,
-      amount: value,
+      amount: _amount,
     });
     const converted = await convertCurrency(
-      value,
+      _amount,
       toAmount.currency,
       fromAmount.currency,
       exchangeRates
     );
-    console.log("converted: ", converted);
+    //console.log("converted: ", converted);
     setFromAmount({ currency: fromAmount.currency, amount: converted });
   };
 
@@ -92,7 +78,6 @@ export default function EnterAmount({
       fromAmount.currency,
       exchangeRates
     );
-    console.log("To currency: ", converted);
     setFromAmount({ currency: fromAmount.currency, amount: converted });
   };
 
@@ -113,13 +98,17 @@ export default function EnterAmount({
           data={Object.values(Currency)}
           removeBorder={true}
           removeMargin={true}
+          disabled
         />
-        <ValidationTextField
+        <BootstrapInput
           id="fromCurrency"
-          type="number"
+          name="fromCurrency"
+          type="text"
           value={fromAmount.amount}
           onChange={(e) => handleFromAmount(e.target.value)}
-          sx={{ p: 0, borderRadius: 0 }}
+          sx={{ color: "white", bgcolor: "transparent" }}
+          autoFocus
+          required
         />
       </Stack>
       <Box sx={{ borderLeft: "1px solid lightGrey", pl: 2, py: 3, ml: 5 }}>
@@ -140,13 +129,16 @@ export default function EnterAmount({
           data={Object.values(Currency)}
           removeBorder={true}
           removeMargin={true}
+          disabled
         />
-        <ValidationTextField
-          id="fromCurrency"
-          type="number"
+        <BootstrapInput
+          id="toCurrency"
+          name="toCurrency"
+          type="text"
           value={toAmount.amount}
           onChange={(e) => handleToAmount(e.target.value)}
-          sx={{ p: 0, borderRadius: 0 }}
+          sx={{ color: "white", bgcolor: "transparent" }}
+          required
         />
       </Stack>
       <Typography mb={2} mt={4}>
