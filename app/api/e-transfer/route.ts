@@ -61,12 +61,14 @@ export async function GET(request: Request) {
 
 export const POST = auth(async (request, tokenPayload) => {
     try {
-        const { sub } = tokenPayload as JwtPayload;
         const data = await request.json();
 
         const eTransferRequest = {
-            ...data,
-            toUserId: sub!,
+            fromWalletId: data.fromWalletId,
+            fromPrivateKey: data.fromPrivateKey,
+            amount: data.amount,
+            toWalletId: data.toWalletId,
+            reference: data.reference,
             type: TransactionType.Transfer,
         };
         const eTransferResult = await transferCurrency(eTransferRequest);

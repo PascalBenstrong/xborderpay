@@ -17,7 +17,7 @@ import { wrapInTryCatch } from "@/utils/errorHandling";
 import transactions from "../transactions/transactions.db";
 
 const fixed = (value: number) => Math.floor(value * 100) / 100;
-const maxTopUpAmount = 100;
+const maxTopUpAmount = 5000;
 const minTopUpAmount = 1;
 const requiredStringSchema = zod.string().min(1);
 const amountSchema = zod
@@ -110,8 +110,7 @@ const convertRates = async ({
   return Option.fromValue({ amount, rate, from: base });
 };
 
-const fromHbarToTinyBar = (value: number) => 
-{
+const fromHbarToTinyBar = (value: number) => {
   return Hbar.fromTinybars(HbarUnit.Hbar._tinybar.times(value).integerValue());
 }
 
@@ -128,20 +127,20 @@ const transferCurrency = wrapInTryCatch<
   const walletResult = await getWalletById(values.toWalletId);
 
   //console.log("walletResult:",walletResult)
-  
+
   if (!walletResult.isSuccess) return Option.fromErrorOption(walletResult);
-  
+
   const wallet = walletResult.value!;
-  
+
   if (data.toUserId && data.toUserId !== wallet.userId)
-  return Option.fromError(new Error("wallet does not belong to this user!"));
-  
+    return Option.fromError(new Error("wallet does not belong to this user!"));
+
   //console.log("wallet:",wallet)
   let fromWallet: Wallet | undefined;
-  
+
   if (data.fromWalletId) {
     const fromWalletResult = await getWalletById(data.fromWalletId);
-    
+
     if (!fromWalletResult.isSuccess)
       return Option.fromErrorOption(fromWalletResult);
 
@@ -150,27 +149,35 @@ const transferCurrency = wrapInTryCatch<
     values.fromCurrency = fromWallet.currency;
 
     if (fromWallet.balance < values.amount)
-    return Option.fromError(new Error("You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"));
+      return Option.fromError(new Error("You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"));
   }
-  
+
   const convertedAmountResult = await convertRates({
     amount: values.amount,
     base: values.fromCurrency ?? wallet.currency,
     walletCurrency: wallet.currency,
   });
-  
-  console.log("convertedAmountResult:",convertedAmountResult)
+
+  let hbarEquavalent = convertedAmountResult;
+
+  if(fromWallet)
+  {
+    hbarEquavalent = await convertRates({amount: values.amount, base: fromWallet.currency, walletCurrency: Currency.USD})
+  }
+
+  console.log("convertedAmountResult:", convertedAmountResult)
+  console.log("hbarEquavalent:", hbarEquavalent)
   if (!convertedAmountResult.isSuccess)
     return Option.fromErrorOption(convertedAmountResult);
 
   const { amount, from, rate } = convertedAmountResult.value!;
 
-  
+
   // transfer hbar
 
 
-  const hbar = fromHbarToTinyBar(amount);
-  
+  const hbar = fromHbarToTinyBar(hbarEquavalent.value!.amount);
+
   const fromAccountId = fromWallet?.account.id ?? values.fromAccountId!;
 
   const topUpResult = await transferHbar({
@@ -220,11 +227,11 @@ const transferCurrency = wrapInTryCatch<
 
   //update wallet balance, this can be computed from the transactions as well
 
-  const updates = [wallets.updateOne({_id: new ObjectId(data.toWalletId)}, {$inc: {balance: amount}} )];
+  const updates = [wallets.updateOne({ _id: new ObjectId(data.toWalletId) }, { $inc: { balance: amount } })];
 
-  if(fromWallet)
-  {
-    updates.push(wallets.updateOne({_id: new ObjectId(values.fromWalletId!)}, {$inc: {balance: -values.amount}}));
+  if (fromWallet) {
+    console.log("updating from wallet :", fromWallet.id);
+    updates.push(wallets.updateOne({ _id: new ObjectId(fromWallet.id)}, { $inc: { balance: -values.amount } }));
   }
 
   await Promise.all(updates);

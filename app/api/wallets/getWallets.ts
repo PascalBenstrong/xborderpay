@@ -34,7 +34,7 @@ export const getWalletById = wrapInTryCatch<Wallet, string>(async (id) => {
     _id: new ObjectId(id),
   });
 
-  _wallet.id = _wallet._id;
+  _wallet.id = _wallet._id.toString();
   _wallet.userId = _wallet.userId.toString();
   delete _wallet._id;
 
