@@ -1,6 +1,6 @@
 import client from "./client";
 import { PrivateKey, Hbar, TransferTransaction, Status } from "@hashgraph/sdk";
-import { Currency, Option } from "@/types";
+import { Option } from "@/types";
 
 import { wrapInTryCatch } from "@/utils/errorHandling";
 
@@ -9,7 +9,6 @@ declare type TransferHbarRequest = {
   fromAccountId: string;
   fromAccountPrivateKey: string;
   toAccountId: string;
-  currency: Currency;
 };
 declare type TransferHBarRequestResponse = { id: string };
 export const transferHbar = wrapInTryCatch<

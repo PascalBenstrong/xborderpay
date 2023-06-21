@@ -8,21 +8,32 @@ export enum Currency {
 }
 
 declare type TransactionWallet = {
-  name: string;
-  id: string;
+  name: string | "xborderpay";
+  id: string | "xborderpay";
   currency: Currency;
+};
+
+export enum TransactionType {
+  Transfer = "Transfer",
+  Deposit = "Deposit",
+}
+
+declare type Fee = {
+  currency: Currency;
+  amount: number;
 };
 export type Transaction = {
   id: string;
-  type: string;
-  to?: string;
+  type: TransactionType;
   senderWallet: TransactionWallet;
   receivingWallet: TransactionWallet;
-  exchangeRate: number;
   amount: number;
   timestamp: number;
   transactionId: string;
   userId: string;
+  rate: number;
+  fees?: Fee;
+  reference?: string;
 };
 
 export type AccountType = "hedera";
@@ -158,6 +169,9 @@ export class Option<T> {
   }
   static fromError<T>(error: Error | zod.ZodError | any) {
     return new Option<T>(undefined, error, undefined);
+  }
+  static fromErrorOption<T>(option: Option<any>) {
+    return new Option<T>(undefined, option.error, option.message);
   }
   static fromErrorAndMessage<T>(
     error: Error | zod.ZodError | any,
