@@ -24,8 +24,7 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
 
-function GetData(headers:any) {
-
+function GetData(headers: any) {
   var requestOptions: any = {
     method: "GET",
     headers: headers ?? {},
@@ -37,13 +36,9 @@ function GetData(headers:any) {
 
   const { data, error, isLoading } = useSWRImmutable(
     "/api/transactions",
-    fetcher,
+    fetcher
     /* { refreshInterval: 60000 } */
   );
-
-  //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
-
-  //console.log("data: ", data);
 
   return {
     transactions: data?.transactions,
@@ -53,22 +48,20 @@ function GetData(headers:any) {
 }
 
 export default function HomePage() {
-  
   const { data: session }: { data: any } = useSession({
     required: true,
     onUnauthenticated: () => {
-      redirect("/login")
+      redirect("/login");
     },
   });
   const _myHeaders = {
-    authorization:
-      `Bearer ${session?.token}`,
+    authorization: `Bearer ${session?.token}`,
   };
-  const { transactions,isError,isLoading } = GetData(_myHeaders);
+  const { transactions, isError, isLoading } = GetData(_myHeaders);
 
   return (
-    <Container maxWidth="xl" sx={{ pt: 15,  }}>
-      <Stack direction={{sm: "row"}} justifyContent="space-between">
+    <Container maxWidth="xl" sx={{pt: {xs: 10,md: 15} }}>
+      <Stack direction={{ sm: "row" }} justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
         </Typography>
@@ -81,7 +74,7 @@ export default function HomePage() {
           Send Money
         </Button>
       </Stack>
-        <WalletsSection headers={_myHeaders}/>
+      <WalletsSection headers={_myHeaders} />
       <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12} lg={9}>
           <Title title="Activities" />
@@ -89,32 +82,40 @@ export default function HomePage() {
             sx={{
               bgcolor: "secondary.main",
               p: 2,
-              height: {xs: 430,md: 430, lg: 420},
+              height: { xs: 430, md: 430, lg: 420 },
               maxHeight: 600,
               borderRadius: 3,
               overflow: "auto",
             }}
           >
             {transactions?.length > 0 ? (
-              transactions.slice(0,7).map((item: any, index: number) => (
-                <TransactionCard
-                  key={index}
-                  to={item.receivingWallet.id}
-                  type={item.type}
-                  currency={item.receivingWallet.currency}
-                  amount={item.amount}
-                  wallet={item.receivingWallet.name}
-                  timestamp={item.timestamp}
-                />
-              ))
+              transactions
+                .slice(0, 7)
+                .map((item: any, index: number) => (
+                  <TransactionCard
+                    key={index}
+                    to={item.receivingWallet.id}
+                    type={item.type}
+                    currency={item.receivingWallet.currency}
+                    amount={item.amount}
+                    wallet={item.receivingWallet.name}
+                    timestamp={item.timestamp}
+                  />
+                ))
             ) : (
               <EmptyList
                 title="No Transactions"
                 subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
               />
             )}
-            <Divider/>
-            <Button LinkComponent={Link} href="/e-transfer" sx={{width: "100%"}}>View More Activies</Button>
+            <Divider />
+            <Button
+              LinkComponent={Link}
+              href="/e-transfer"
+              sx={{ width: "100%" }}
+            >
+              View More Activies
+            </Button>
           </Paper>
         </Grid>
         <Grid xs={12} md={6} lg={3}>

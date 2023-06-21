@@ -9,8 +9,7 @@ import useSWRImmutable from "swr/immutable";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-function GetData(headers:any) {
-
+function GetData(headers: any) {
   var requestOptions: any = {
     method: "GET",
     headers: headers ?? {},
@@ -22,11 +21,9 @@ function GetData(headers:any) {
 
   const { data, error, isLoading } = useSWRImmutable(
     "/api/transactions",
-    fetcher,
+    fetcher
     /* { refreshInterval: 60000 } */
   );
-
-  //console.log("data: ", data);
 
   return {
     transactions: data?.transactions,
@@ -39,40 +36,45 @@ export default function TransactionsPage() {
   const { data: session }: { data: any } = useSession({
     required: true,
     onUnauthenticated: () => {
-      redirect("/login")
+      redirect("/login");
     },
   });
   const _myHeaders = {
-    authorization:
-      `Bearer ${session?.token}`,
+    authorization: `Bearer ${session?.token}`,
   };
   const { transactions, isError, isLoading } = GetData(_myHeaders);
 
   return (
-    <Container maxWidth="lg" sx={{ pt: 15, px: 200 }}>
+    <Container maxWidth="lg" sx={{ pt: {xs: 10,md: 15}}}>
       <Title title="Activities" />
       <Paper
         sx={{
           bgcolor: "secondary.main",
           p: 2,
           pb: 4,
-          maxHeight: 600,
+          height: "80vh",
           borderRadius: 3,
           overflow: "auto",
         }}
       >
-        {transactions ?
+        {transactions ? (
           transactions.map((item: any, index: number) => (
             <TransactionCard
               key={index}
-              to={item.to}
+              to={item.receivingWallet.id}
               type={item.type}
-              currency={item.currency}
+              currency={item.receivingWallet.currency}
               amount={item.amount}
-              wallet={item.wallet}
+              wallet={item.receivingWallet.name}
               timestamp={item.timestamp}
             />
-          )) : <EmptyList title="No Transactions" subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"/>}
+          ))
+        ) : (
+          <EmptyList
+            title="No Transactions"
+            subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
+          />
+        )}
       </Paper>
     </Container>
   );
