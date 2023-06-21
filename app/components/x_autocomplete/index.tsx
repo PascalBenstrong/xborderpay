@@ -6,7 +6,8 @@ export default function XAutocomplete({
   mt,
   data,
   id,
-  freeSolo
+  freeSolo,
+  disableClearable
 }: {
   value?: any;
   setValue?: any;
@@ -14,6 +15,7 @@ export default function XAutocomplete({
   data: any;
   id?: string;
   freeSolo?: boolean;
+  disableClearable?: boolean;
 }) {
   const handleChange = (
     event: any,
@@ -34,6 +36,7 @@ export default function XAutocomplete({
       }}
       options={data}
       size="medium"
+      disableClearable={disableClearable}
       inputValue={value}
       defaultValue={value}
       onInputChange={handleChange}
