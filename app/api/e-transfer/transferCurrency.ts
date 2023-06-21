@@ -38,34 +38,63 @@ declare type TransferCurrencyRequest = {
   type: TransactionType;
 };
 
-declare type TransferCurrencyResponse = {};
+declare type TransferRequest = {
+  fromPrivateKey: string;
+  fromWalletId: string;
+  amount: number;
+  toWalletId: string;
+  reference?: string;
+};
 
-const validateRequest = (
-  request: TransferCurrencyRequest
-): Option<TransferCurrencyRequest> => {
+const validateTransferRequest = (
+  request: TransferRequest
+): Option<TransferRequest> => {
   if (!ObjectId.isValid(request.toWalletId))
     return Option.fromError(new Error("Invalid wallet id!"));
 
-  if (request.toUserId && !ObjectId.isValid(request.toUserId))
-    return Option.fromError(new Error("Invalid toUserId!"));
-
-  if (request.fromWalletId && !ObjectId.isValid(request.fromWalletId))
+  if (!ObjectId.isValid(request.fromWalletId))
     return Option.fromError(new Error("Invalid fromWalletId!"));
 
   if (!requiredStringSchema.safeParse(request.fromPrivateKey).success)
     return Option.fromError(new Error("Invalid privateKey!"));
 
-  if (
-    !request.fromWalletId &&
-    !requiredStringSchema.safeParse(request.fromAccountId).success
-  )
+  const amountValidation = amountSchema.safeParse(request.amount);
+
+  if (!amountValidation.success)
     return Option.fromError(
       new Error(
-        "Invalid accountId! accountId is required when not providing fromWalletId."
+        `Invalid amount, amount should be at least ${minTopUpAmount} and at most ${maxTopUpAmount}!`
       )
     );
 
-  if (request.fromCurrency) {
+  return Option.fromValue({ ...request, amount: amountValidation.data });
+};
+
+declare type TopUpRequest = {
+  fromPrivateKey: string;
+  fromAccountId: string;
+  fromCurrency?: Currency;
+  amount: number;
+  toWalletId: string;
+  toUserId: string;
+};
+
+const validateTopUpRequest = (request: TopUpRequest): Option<TopUpRequest> => {
+  if (!ObjectId.isValid(request.toWalletId))
+    return Option.fromError(new Error("Invalid wallet id!"));
+
+  if (!ObjectId.isValid(request.toUserId))
+    return Option.fromError(new Error("Invalid toUserId!"));
+
+  if (!requiredStringSchema.safeParse(request.fromPrivateKey).success)
+    return Option.fromError(new Error("Invalid privateKey!"));
+
+  if (!requiredStringSchema.safeParse(request.fromAccountId).success)
+    return Option.fromError(
+      new Error("Invalid accountId! accountId is required when topping up.")
+    );
+
+  if (request.fromCurrency !== undefined) {
     const currencyValidationResult = validateCurrency(request.fromCurrency);
     if (!currencyValidationResult.isSuccess)
       return Option.fromErrorOption(currencyValidationResult);
@@ -75,56 +104,79 @@ const validateRequest = (
 
   if (!amountValidation.success)
     return Option.fromError(
-      new Error("Invalid amount, amount should be at least 1 and at most 100!")
+      new Error(
+        `Invalid amount, amount should be at least ${minTopUpAmount} and at most ${maxTopUpAmount}!`
+      )
     );
 
   return Option.fromValue({ ...request, amount: amountValidation.data });
 };
 
 declare type ConvertAmountToWalletCurrency = {
-  amount: number;
-  base: Currency;
-  walletCurrency: Currency;
+  sendingAmount: number;
+  sendingCurrency: Currency;
+  receivingCurrency: Currency;
 };
 
 declare type ConvertedAmount = {
-  amount: number;
-  from: Currency;
+  receivingAmount: number;
+  sendingCurrency: Currency;
+  sendingHbars: Hbar;
   rate: number;
 };
 const convertRates = async ({
-  amount,
-  base,
-  walletCurrency,
+  sendingAmount,
+  sendingCurrency,
+  receivingCurrency,
 }: ConvertAmountToWalletCurrency): Promise<Option<ConvertedAmount>> => {
-  if (base == undefined || base === walletCurrency)
-    return Option.fromValue({ amount: amount, rate: 1, from: base });
-
-  const ratesResult = await getRates(base);
+  const ratesResult = await getRates(sendingCurrency);
 
   if (!ratesResult.isSuccess) return Option.fromErrorOption(ratesResult);
 
   const { rates } = ratesResult.value!;
-  const rate = rates[walletCurrency];
-  amount = amount * rate;
-  return Option.fromValue({ amount, rate, from: base });
+
+  const convertToUSDFromBase = (base: Currency, amount: number) => {
+    const rate = rates[Currency.USD] / rates[base];
+    return amount * rate;
+  };
+
+  const sendingHbars = fromHbarToTinyBar(
+    convertToUSDFromBase(sendingCurrency, sendingAmount)
+  );
+
+  if (sendingCurrency === receivingCurrency) {
+    return Option.fromValue({
+      receivingAmount: sendingAmount,
+      sendingCurrency: sendingCurrency,
+      sendingHbars,
+      rate: 1,
+    });
+  }
+
+  const rate = rates[receivingCurrency];
+  const receivingAmount = rate * sendingAmount;
+
+  return Option.fromValue({
+    receivingAmount,
+    sendingCurrency,
+    sendingHbars,
+    rate,
+  });
 };
 
 const fromHbarToTinyBar = (value: number) => {
   return Hbar.fromTinybars(HbarUnit.Hbar._tinybar.times(value).integerValue());
 };
 
-const transferCurrency = wrapInTryCatch<
-  TransferCurrencyResponse,
-  TransferCurrencyRequest
->(async (data) => {
-  const validationResult = validateRequest(data);
+const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
+  const validationResult = validateTopUpRequest(data);
 
   if (!validationResult.isSuccess)
     return Option.fromErrorOption(validationResult);
 
   const values = validationResult.value!;
-  const walletResult = await getWalletById(values.toWalletId);
+
+  const walletResult = await getWalletById(data.toWalletId);
 
   //console.log("walletResult:",walletResult)
 
@@ -132,61 +184,30 @@ const transferCurrency = wrapInTryCatch<
 
   const wallet = walletResult.value!;
 
-  if (data.toUserId && data.toUserId !== wallet.userId)
+  if (data.toUserId !== wallet.userId)
     return Option.fromError(new Error("wallet does not belong to this user!"));
 
   //console.log("wallet:",wallet)
-  let fromWallet: Wallet | undefined;
-
-  if (data.fromWalletId) {
-    const fromWalletResult = await getWalletById(data.fromWalletId);
-
-    if (!fromWalletResult.isSuccess)
-      return Option.fromErrorOption(fromWalletResult);
-
-    fromWallet = fromWalletResult.value!;
-
-    values.fromCurrency = fromWallet.currency;
-
-    if (fromWallet.balance < values.amount)
-      return Option.fromError(
-        new Error(
-          "You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"
-        )
-      );
-  }
 
   const convertedAmountResult = await convertRates({
-    amount: values.amount,
-    base: values.fromCurrency ?? wallet.currency,
-    walletCurrency: wallet.currency,
+    sendingAmount: values.amount,
+    sendingCurrency: values.fromCurrency ?? wallet.currency,
+    receivingCurrency: wallet.currency,
   });
 
-  let hbarEquavalent = convertedAmountResult;
-
-  if (fromWallet) {
-    hbarEquavalent = await convertRates({
-      amount: values.amount,
-      base: fromWallet.currency,
-      walletCurrency: Currency.USD,
-    });
-  }
-
   console.log("convertedAmountResult:", convertedAmountResult);
-  console.log("hbarEquavalent:", hbarEquavalent);
   if (!convertedAmountResult.isSuccess)
     return Option.fromErrorOption(convertedAmountResult);
 
-  const { amount, from, rate } = convertedAmountResult.value!;
+  const { receivingAmount, sendingCurrency, sendingHbars, rate } =
+    convertedAmountResult.value!;
 
   // transfer hbar
 
-  const hbar = fromHbarToTinyBar(hbarEquavalent.value!.amount);
-
-  const fromAccountId = fromWallet?.account.id ?? values.fromAccountId!;
+  const fromAccountId = values.fromAccountId;
 
   const topUpResult = await transferHbar({
-    amount: hbar,
+    amount: sendingHbars,
     toAccountId: wallet.account.id,
     fromAccountId,
     fromAccountPrivateKey: values.fromPrivateKey,
@@ -198,13 +219,12 @@ const transferCurrency = wrapInTryCatch<
 
   const id = new ObjectId();
 
-  const currency = from != undefined ? from : wallet.currency;
   const transactionId = topUpResult.value!.id;
   const timestamp = Date.now();
   const senderWallet = {
-    id: fromWallet?.id ?? "xborderpay",
-    name: fromWallet?.name ?? "xborderpay",
-    currency: currency,
+    id: "xborderpay",
+    name: "xborderpay",
+    currency: sendingCurrency,
   };
   const receivingWallet = {
     id: wallet.id,
@@ -212,7 +232,7 @@ const transferCurrency = wrapInTryCatch<
     currency: wallet.currency,
   };
   let trans: Transaction | any = {
-    type: data.type,
+    type: TransactionType.Deposit,
     senderWallet,
     receivingWallet,
     amount: values.amount,
@@ -221,10 +241,9 @@ const transferCurrency = wrapInTryCatch<
     userId: new ObjectId(wallet.userId),
     rate,
     fees: { currency: Currency.USD, amount: 0.07 },
-    reference: data.reference,
+    reference: "top up",
   };
 
-  //console.log("inserting")
   const insertResult = await transactions.insertOne({ ...trans, _id: id });
 
   if (!insertResult.acknowledged)
@@ -232,28 +251,138 @@ const transferCurrency = wrapInTryCatch<
 
   //update wallet balance, this can be computed from the transactions as well
 
-  const updates = [
-    wallets.updateOne(
-      { _id: new ObjectId(data.toWalletId) },
-      { $inc: { balance: amount } }
-    ),
-  ];
-
-  if (fromWallet) {
-    console.log("updating from wallet :", fromWallet.id);
-    updates.push(
-      wallets.updateOne(
-        { _id: new ObjectId(fromWallet.id) },
-        { $inc: { balance: -values.amount } }
-      )
-    );
-  }
-
-  await Promise.all(updates);
+  await wallets.updateOne(
+    { _id: new ObjectId(data.toWalletId) },
+    { $inc: { balance: receivingAmount } }
+  );
 
   trans.id = id.toString();
 
   return Option.fromValue(trans);
 });
+
+const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
+  async (data) => {
+    if (data.type === TransactionType.Deposit) {
+      const topUpResult = await topUp({
+        ...data,
+        fromAccountId: data.fromAccountId!,
+        toUserId: data.toUserId!,
+      });
+
+      if (topUpResult.isSuccess) return Option.fromValue({});
+
+      return Option.fromErrorOption(topUpResult);
+    }
+
+    const validationResult = validateTransferRequest({
+      ...data,
+      fromWalletId: data.fromWalletId!,
+    });
+
+    if (!validationResult.isSuccess)
+      return Option.fromErrorOption(validationResult);
+
+    const values = validationResult.value!;
+    const walletResult = await getWalletById(values.toWalletId);
+
+    //console.log("walletResult:",walletResult)
+
+    if (!walletResult.isSuccess) return Option.fromErrorOption(walletResult);
+
+    const toWallet = walletResult.value!;
+
+    //console.log("wallet:",wallet)
+    const fromWalletResult = await getWalletById(data.fromWalletId!);
+    if (!fromWalletResult.isSuccess)
+      return Option.fromErrorOption(fromWalletResult);
+
+    const fromWallet = fromWalletResult.value!;
+
+    if (fromWallet.balance < values.amount)
+      return Option.fromError(
+        new Error(
+          "You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"
+        )
+      );
+
+    const convertedAmountResult = await convertRates({
+      sendingAmount: values.amount,
+      sendingCurrency: fromWallet.currency,
+      receivingCurrency: toWallet.currency,
+    });
+
+    console.log("convertedAmountResult:", convertedAmountResult);
+    if (!convertedAmountResult.isSuccess)
+      return Option.fromErrorOption(convertedAmountResult);
+
+    const { receivingAmount, sendingCurrency, sendingHbars, rate } =
+      convertedAmountResult.value!;
+
+    // transfer hbar
+
+    const topUpResult = await transferHbar({
+      amount: sendingHbars,
+      toAccountId: toWallet.account.id,
+      fromAccountId: fromWallet.account.id,
+      fromAccountPrivateKey: values.fromPrivateKey,
+    });
+
+    if (!topUpResult.isSuccess) return Option.fromErrorOption(topUpResult);
+
+    // store the transaction in db
+
+    const id = new ObjectId();
+
+    const transactionId = topUpResult.value!.id;
+    const timestamp = Date.now();
+    const senderWallet = {
+      id: fromWallet.id,
+      name: fromWallet.name,
+      currency: sendingCurrency,
+    };
+    const receivingWallet = {
+      id: toWallet.id,
+      name: toWallet.name,
+      currency: toWallet.currency,
+    };
+    let trans: Transaction | any = {
+      type: data.type,
+      senderWallet,
+      receivingWallet,
+      amount: values.amount,
+      timestamp,
+      transactionId,
+      userId: new ObjectId(toWallet.userId),
+      rate,
+      fees: { currency: Currency.USD, amount: 0.07 },
+      reference: data.reference,
+    };
+
+    //console.log("inserting")
+    const insertResult = await transactions.insertOne({ ...trans, _id: id });
+
+    if (!insertResult.acknowledged)
+      return Option.fromError(new Error("Something went wrong!"));
+
+    //update wallet balance, this can be computed from the transactions as well
+
+    const updates = [
+      wallets.updateOne(
+        { _id: new ObjectId(toWallet.id) },
+        { $inc: { balance: receivingAmount } }
+      ),
+      wallets.updateOne(
+        { _id: new ObjectId(fromWallet.id) },
+        { $inc: { balance: -values.amount } }
+      ),
+    ];
+    await Promise.all(updates);
+
+    trans.id = id.toString();
+
+    return Option.fromValue(trans);
+  }
+);
 
 export default transferCurrency;
