@@ -116,7 +116,7 @@ export default function ETransferPage() {
   const {userInfo, wallets, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
   const { exchangeRates } = GetRates();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [myWalletId, setMyWalletId] = useState("");
   const [payee, setPayee] = useState<any>();
   const [toWalletId, setToWalletId] = useState("");
@@ -170,7 +170,7 @@ export default function ETransferPage() {
 
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
-      privateKey: "",
+      fromPrivateKey: "",
       fromCurrency: fromAmount.currency,
       amount: fromAmount.amount,
       toWalletId: toWalletId,
