@@ -3,6 +3,7 @@ import React from "react";
 import {
   Button,
   Container,
+  Divider,
   Unstable_Grid2 as Grid,
   Paper,
   Stack,
@@ -64,9 +65,6 @@ export default function HomePage() {
       `Bearer ${session?.token}`,
   };
   const { transactions,isError,isLoading } = GetData(_myHeaders);
-  //const { data, error, isLoading } = useSWRImmutable("https://my-json-server.typicode.com/typicode/demo/posts", fetcher, {refreshInterval: 60000,});
-
-  //console.log("data: ", wallets);
 
   return (
     <Container maxWidth="xl" sx={{ pt: 15,  }}>
@@ -91,22 +89,21 @@ export default function HomePage() {
             sx={{
               bgcolor: "secondary.main",
               p: 2,
-              pb: 4,
-              height: 400,
+              height: {xs: 430,md: 430, lg: 420},
               maxHeight: 600,
               borderRadius: 3,
               overflow: "auto",
             }}
           >
             {transactions?.length > 0 ? (
-              transactions.map((item: any, index: number) => (
+              transactions.slice(0,7).map((item: any, index: number) => (
                 <TransactionCard
                   key={index}
-                  to={item.to}
+                  to={item.receivingWallet.id}
                   type={item.type}
-                  currency={item.currency}
+                  currency={item.receivingWallet.currency}
                   amount={item.amount}
-                  wallet={item.wallet}
+                  wallet={item.receivingWallet.name}
                   timestamp={item.timestamp}
                 />
               ))
@@ -116,6 +113,8 @@ export default function HomePage() {
                 subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
               />
             )}
+            <Divider/>
+            <Button LinkComponent={Link} href="/e-transfer" sx={{width: "100%"}}>View More Activies</Button>
           </Paper>
         </Grid>
         <Grid xs={12} md={6} lg={3}>

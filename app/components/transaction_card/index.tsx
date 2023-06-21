@@ -1,7 +1,10 @@
 import React from "react";
 import { Stack, Avatar, Box, Typography } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ReceivedIcon from "@mui/icons-material/East";
+import SentTransferIcon from "@mui/icons-material/East";
+import { TransactionType } from "@/types";
+import TopupIcon from '@mui/icons-material/AccountBalanceWallet';
+import ReceivedTransferIcon from '@mui/icons-material/West';
 
 type Transaction = {
   type: string;
@@ -15,9 +18,9 @@ type Transaction = {
 const typeHandler = (type: any) => {
   let _type = "Sent to ";
 
-  if (type === "deposit") _type = "Reload ";
-  else if (type === "withdrawal") _type = "Withdrawal ";
-  else if (type === "transfer") _type = "Sent To ";
+  if (type === TransactionType.Deposit) _type = "Reload ";
+  else if (type === TransactionType.WithDrawl) _type = "Withdrawal ";
+  else if (type === TransactionType.Transfer) _type = "Sent To ";
   else if (type === "received") _type = "Received from ";
 
   return _type;
@@ -48,25 +51,26 @@ export default function TransactionCard({
       spacing={2}
       sx={{
         borderBottom: "0.1px solid black",
-        p: 2,
+        p: 0.5,
       }}
     >
-      <Avatar sx={{ bgcolor: "primary.main" }} aria-label="currency">
-        <ReceivedIcon fontSize="medium" />
+      <Avatar sx={{ bgcolor: "primary.main", width: 30,height: 30 }} aria-label="currency">
+        {type === TransactionType.Transfer && <SentTransferIcon/> }
+        {type === TransactionType.Deposit && <TopupIcon/> }
       </Avatar>
       <Box sx={{ flexGrow: 1 }}>
-        <Typography variant="body2" fontWeight={600} mb={2}>
-          {typeHandler(type)} {to && to}
+        <Typography variant="body2" fontSize={{xs: 12, md: 15}} fontWeight={600} mb={0}>
+          {typeHandler(type)} {to && `${to.slice(0,2)}****${to.slice(20,24)}`}
         </Typography>
-        <Typography variant="body2" mt={2}>
+        <Typography variant="body2" color="lightGrey" mt={0}>
           {wallet}
         </Typography>
       </Box>
       <Box>
-        <Typography align="right" variant="body2" fontWeight={600} mb={2}>
+        <Typography align="right" variant="body2" fontWeight={600} mb={0}>
           {`${currency} ${amount}`}
         </Typography>
-        <Typography align="right" variant="body2" mt={2}>
+        <Typography align="right" color="lightGrey" variant="body2" mt={0}>
           {formattedDate}
         </Typography>
       </Box>

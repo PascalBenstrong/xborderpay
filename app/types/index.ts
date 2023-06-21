@@ -16,6 +16,7 @@ declare type TransactionWallet = {
 export enum TransactionType {
   Transfer = "Transfer",
   Deposit = "Deposit",
+  WithDrawl = "Withdrawal",
 }
 
 declare type Fee = {
