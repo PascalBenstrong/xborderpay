@@ -11,16 +11,14 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import TransactionCard from "../../components/transaction_card";
 import Title from "../../components/title";
-import VerticalLinearStepper from "../../components/stepper";
 import EnterAmount from "../../components/e-transfer/enterAmount";
 import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
 import { isAnyNull, useFetcher } from "../../utils";
-import { Currency } from "../../types";
+import { Currency, ETransferRequest } from "../../types";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
@@ -70,10 +68,18 @@ function GetData(headers: any) {
     }
   );
 
+  const userInfo:any = {
+    firstName: "Mark",
+    lastName: "Woods",
+    email: "mark.wood@gmail.com",
+    wallets: data?.accounts,
+  }
+
   //console.log("data: ", data);
 
   return {
     //transactions: data?.data,
+    userInfo,
     wallets: data?.accounts,
     recentPayees: data?.recentPayees,
     purposes: data?.purposes,
@@ -107,12 +113,13 @@ export default function ETransferPage() {
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
-  const { wallets, recentPayees, purposes, isError, isLoading } =
+  const {userInfo, wallets, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
   const { exchangeRates } = GetRates();
   const [activeStep, setActiveStep] = useState(0);
   const [account, setAccount] = useState("");
-  const [payee, setPayee] = useState("");
+  const [payee, setPayee] = useState<any>();
+  const [toWalletId, setToWalletId] = useState("");
   const [purpose, setPurpose] = useState("");
   const [notes, setNotes] = useState("");
   const [fromAmount, setFromAmount] = useState<Amount>({
@@ -124,20 +131,23 @@ export default function ETransferPage() {
     currency: Currency.ZAR,
   });
   const [fees, setFees] = useState<Amount>({
-    amount: 0.05,
+    amount: 0.07,
     currency: Currency.USD,
   });
   const [rate, setRate] = useState<Number>(19.08);
   const [isValidated, setIsValidated] = useState(true);
 
-  const validateFields = () => {
-    if (isAnyNull([account, payee, purpose, fromAmount])) return false;
+  const validateFields = (step: number) => {
+    if (isAnyNull([account, payee, purpose]) && activeStep === 0) return false;
+    else if (isAnyNull([fromAmount]) && activeStep === 1) return false;
 
     return true;
   };
 
   const handleNext = () => {
-    if (!validateFields() && activeStep === 0) {
+    console.log("Account: ", account);
+    console.log("payee: ", payee);
+    if (!validateFields(activeStep)) {
       setIsValidated(false);
       return;
     }
@@ -153,11 +163,34 @@ export default function ETransferPage() {
     setActiveStep(0);
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+
+    var payload: ETransferRequest = {
+      fromWalletId: "",
+      privateKey: "",
+      fromCurrency: fromAmount.currency,
+      amount: fromAmount.amount,
+      toWalletId: toWalletId,
+      toCurrency: toAmount.currency,
+      reference: purpose,
+    };
+
+    var requestOptions: any = {
+      method: "POST",
+      headers: _myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    };
+
+    fetch("/api/e-transfer", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+  };
 
   const clearError = () => {
-    setIsValidated(true)
-  }
+    setIsValidated(true);
+  };
 
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
@@ -203,7 +236,12 @@ export default function ETransferPage() {
           </Grid>
 
           <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
-            <TransitionAlerts severity="error"  message="Please fill in all the fields with *" open={!isValidated} onClose={clearError}/>
+            <TransitionAlerts
+              severity="error"
+              message="Please fill in all the fields with *"
+              open={!isValidated}
+              onClose={clearError}
+            />
             {activeStep === steps.length - 1 && (
               <ETransferSuccess handleReset={handleReset} />
             )}
@@ -219,6 +257,8 @@ export default function ETransferPage() {
                 purpose={purpose}
                 setPurpose={setPurpose}
                 purposes={purposes}
+                toWalletId={toWalletId}
+                setToWalletId={setToWalletId}
               />
             )}
             {activeStep == 1 && (
@@ -270,7 +310,7 @@ export default function ETransferPage() {
                     <Typography variant="h6" mb={1}>
                       From
                     </Typography>
-                    <UserInfoCard />
+                    {userInfo && <UserInfoCard data={userInfo}  walletId={account}/>}
                   </Grid>
                   <Grid xs={12} sm={6} lg={12}>
                     <Typography
@@ -280,7 +320,7 @@ export default function ETransferPage() {
                     >
                       To
                     </Typography>
-                    {payee && <UserInfoCard data={payee} />}
+                    {payee && <UserInfoCard data={payee} walletId={toWalletId}/>}
                   </Grid>
                 </Grid>
               </Box>

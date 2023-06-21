@@ -41,6 +41,11 @@ const customReturnPayees = (arr: any[]) => {
   });
 };
 
+const getLabelFromValue = (value: string, arr: any[]) => {
+  const _arr = arr.find((x: any) => x.value === value);
+  return _arr?.label ?? "";
+};
+
 export default function SelectAccountPayee({
   account,
   setAccount,
@@ -51,12 +56,12 @@ export default function SelectAccountPayee({
   purposes,
   purpose,
   setPurpose,
-  notes,
-  setNotes,
+  toWalletId,
+  setToWalletId,
   headers,
 }: any) {
   const [accounts, setAccounts] = useState<any>();
-  const [payees, setPayees] = useState<any>();
+  const [payeeWallets, setPayeeWallets] = useState<any>();
   const [payeeEmail, setPayeeEmail] = useState("");
   const [isEmailFetching, setIsEmailFetching] = useState(false);
   const [isEmailFound, setIsEmailFound] = useState("");
@@ -75,15 +80,8 @@ export default function SelectAccountPayee({
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      if (account != null || account.length > 0) setAccount(_accounts[0].label);
+      if (account != null || account.length > 0) setAccount(_accounts[0].value);
     }
-
-    /* if (recentPayees != null) {
-      const _payees = customReturnPayees(recentPayees);
-      setPayees(_payees);
-
-      if (_payees != null) setPayee(_payees[0].label);
-    } */
   }, [wallets]);
 
   const handleEmailLookup = (value: string) => {
@@ -93,7 +91,6 @@ export default function SelectAccountPayee({
     }
 
     setPayeeEmail(value);
-    console.log(payeeEmail);
     if (!isValidEmail(value)) {
       return;
     }
@@ -113,9 +110,10 @@ export default function SelectAccountPayee({
 
     //reset the values
     setIsEmailFetching(true);
-    setPayees(null);
+    setPayeeWallets(null);
     setIsEmailFound("");
-    setPayee("");
+    setPayee(null);
+    setToWalletId("");
 
     timerRef.current = window.setTimeout(() => {
       fetch(`/api/accounts?email=${value}`, requestOptions)
@@ -124,13 +122,13 @@ export default function SelectAccountPayee({
           console.log("result", result);
           if (result !== null && result.length > 0) {
             setIsEmailFound("");
-            console.log("walles", result[0].wallets);
+            //console.log("walles", result[0].wallets);
             const _payees = customReturnPayees(result[0].wallets);
-            console.log("walles", _payees);
-            setPayees(_payees);
-            //setPayee(result[0]);
+            //console.log("walles", _payees);
+            setPayeeWallets(_payees);
+            setPayee(result[0]);
 
-            if (_payees != null) setPayee(_payees[0].label);
+            if (_payees != null) setToWalletId(_payees[0].value);
           } else {
             setIsEmailFound(
               "No account found, please verify that you haven't mistyped the email. \n<strong>Note!</strong> Also be sure that the user you are trying to pay is registered with xBorderPay."
@@ -150,7 +148,17 @@ export default function SelectAccountPayee({
     }, 1000);
   };
 
-  //console.log("payee: ", payee);
+  //get and set account id
+  const handleAccountChange = (value: string) => {
+    let _accountId = accounts.find((x: any) => x.label === value);
+    setAccount(_accountId.value);
+  };
+
+  //get and set payee account id
+  const handlePayeeChange = (value: string) => {
+    let _accountId = accounts.find((x: any) => x.label === value);
+    setToWalletId(_accountId.value);
+  };
 
   return (
     <Box>
@@ -164,8 +172,8 @@ export default function SelectAccountPayee({
       {accounts && (
         <XAutocomplete
           id="accounts"
-          value={account}
-          setValue={setAccount}
+          value={getLabelFromValue(account, accounts)}
+          setValue={handleAccountChange}
           disableClearable
           data={accounts}
           mt={1}
@@ -211,8 +219,8 @@ export default function SelectAccountPayee({
       )}
       <Box sx={{ height: 40, mb: 4 }}>
         {query === "success" ? (
-          payees &&
-          payees.length > 0 && (
+          payeeWallets &&
+          payeeWallets.length > 0 && (
             <Fade
               in={query === "success"}
               style={{
@@ -221,11 +229,11 @@ export default function SelectAccountPayee({
               unmountOnExit
             >
               <XAutocomplete
-                id="payees"
-                value={payee}
-                setValue={setPayee}
+                id="payeeWallets"
+                value={toWalletId}
+                setValue={handlePayeeChange}
                 disableClearable
-                data={payees}
+                data={payeeWallets}
                 mt={1}
               />
             </Fade>

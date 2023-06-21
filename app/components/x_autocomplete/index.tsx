@@ -22,7 +22,7 @@ export default function XAutocomplete({
     value: string,
     reason: any
   ) => {
-    console.log("selected: ", value);
+    //console.log("selected: ", value);
     setValue(value);
   };
 
