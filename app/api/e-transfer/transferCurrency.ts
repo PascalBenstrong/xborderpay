@@ -195,7 +195,7 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     receivingCurrency: wallet.currency,
   });
 
-  console.log("convertedAmountResult:", convertedAmountResult);
+  //console.log("convertedAmountResult:", convertedAmountResult);
   if (!convertedAmountResult.isSuccess)
     return Option.fromErrorOption(convertedAmountResult);
 
@@ -224,12 +224,14 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
   const senderWallet = {
     id: "xborderpay",
     name: "xborderpay",
+    userId: "xborderpay",
     currency: sendingCurrency,
   };
   const receivingWallet = {
-    id: wallet.id,
+    id: new ObjectId(wallet.id),
     name: wallet.name,
     currency: wallet.currency,
+    userId: new ObjectId(wallet.userId),
   };
   let trans: Transaction | any = {
     type: TransactionType.Deposit,
@@ -238,7 +240,6 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     amount: values.amount,
     timestamp,
     transactionId,
-    userId: new ObjectId(wallet.userId),
     rate,
     fees: { currency: Currency.USD, amount: 0.07 },
     reference: "top up",
@@ -312,7 +313,7 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
       receivingCurrency: toWallet.currency,
     });
 
-    console.log("convertedAmountResult:", convertedAmountResult);
+    //console.log("convertedAmountResult:", convertedAmountResult);
     if (!convertedAmountResult.isSuccess)
       return Option.fromErrorOption(convertedAmountResult);
 
@@ -337,14 +338,16 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
     const transactionId = topUpResult.value!.id;
     const timestamp = Date.now();
     const senderWallet = {
-      id: fromWallet.id,
+      id: new ObjectId(fromWallet.id),
       name: fromWallet.name,
       currency: sendingCurrency,
+      userId: new ObjectId(fromWallet.userId),
     };
     const receivingWallet = {
-      id: toWallet.id,
+      id: new ObjectId(toWallet.id),
       name: toWallet.name,
       currency: toWallet.currency,
+      userId: new ObjectId(toWallet.userId),
     };
     let trans: Transaction | any = {
       type: data.type,
@@ -353,7 +356,6 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
       amount: values.amount,
       timestamp,
       transactionId,
-      userId: new ObjectId(toWallet.userId),
       rate,
       fees: { currency: Currency.USD, amount: 0.07 },
       reference: data.reference,

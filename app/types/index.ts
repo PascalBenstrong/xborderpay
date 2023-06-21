@@ -11,6 +11,7 @@ declare type TransactionWallet = {
   name: string | "xborderpay";
   id: string | "xborderpay";
   currency: Currency;
+  userId: string | "xborderpay";
 };
 
 export enum TransactionType {
@@ -31,7 +32,6 @@ export type Transaction = {
   amount: number;
   timestamp: number;
   transactionId: string;
-  userId: string;
   rate: number;
   fees?: Fee;
   reference?: string;
@@ -45,10 +45,10 @@ export type WalletAccount = {
   type: AccountType;
 };
 
-export type iWallet ={
+export type iWallet = {
   name: string;
   currency: Currency;
-}
+};
 
 export type Wallet = iWallet & {
   id: string;
@@ -89,13 +89,13 @@ export type ETransferRequest = {
   toWalletId: string;
   toCurrency: Currency;
   reference: string;
-}
+};
 
 export type WalletTopupRequest = {
   toWalletId: string;
   fromCurrency: Currency;
   amount: number;
-}
+};
 
 declare type Transfer = {
   account: string;
