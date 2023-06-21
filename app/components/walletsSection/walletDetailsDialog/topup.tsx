@@ -2,6 +2,7 @@ import TransitionAlerts from "@/components/alert";
 import BootstrapInput from "@/components/entry/bootstrapInput";
 import XSelect from "@/components/x_select";
 import { Currency, Wallet, WalletTopupRequest } from "@/types";
+import convertCurrency from "@/utils/currencyConverter";
 import { parseNumber } from "@/utils/parseNumber";
 import {
   Backdrop,
@@ -13,6 +14,21 @@ import {
   Typography,
 } from "@mui/material";
 import React, { ChangeEvent, useState } from "react";
+import useSWRImmutable from "swr/immutable";
+
+function GetRates() {
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable("/api/rates", fetcher, {
+    refreshInterval: 60000,
+  });
+  //console.log("MyRates: ", data?.rates)
+
+  return {
+    //transactions: data?.data,
+    exchangeRates: data?.rates,
+  };
+}
 
 export default function AccountTopup({
   wallet,
@@ -23,6 +39,7 @@ export default function AccountTopup({
   updateChange: (value: Wallet) => void;
   headers: Headers;
 }) {
+  const { exchangeRates } = GetRates();
   const [selectedCurrency, setCurrecy] = useState<Currency>(wallet.currency);
   const [amount, setAmount] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
@@ -55,7 +72,17 @@ export default function AccountTopup({
 
         if (response.ok) {
           console.log("sucess");
-          wallet.balance += amount;
+          if (wallet.currency === selectedCurrency) wallet.balance += amount;
+          else {
+            const converted = await convertCurrency(
+              amount,
+              selectedCurrency,
+              wallet.currency,
+              exchangeRates
+            );
+
+            wallet.balance += converted;
+          }
           setIsProcessing(false);
           updateChange(wallet);
         } else {
