@@ -159,10 +159,10 @@ export default function WalletsSection({ headers }: any) {
         </Grid>
       </Box>
       <CreateWallet
-        selectedValue={selectedValue}
         open={open}
         wallets={_wallets}
         onClose={handleClose}
+        headers={headers}
       />
 
       <WalletDetailsDialog
@@ -170,6 +170,7 @@ export default function WalletsSection({ headers }: any) {
         wallet={selectedWallet}
         onClose={handleWalletDetailsClose}
         onUpdate={handleUpdate}
+        headers={headers}
       />
 
       {valueToCopy && (

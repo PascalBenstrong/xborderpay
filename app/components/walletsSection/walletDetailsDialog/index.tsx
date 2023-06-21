@@ -32,12 +32,15 @@ import SendIcon from "@mui/icons-material/ArrowUpward";
 import AccountDetails from "./details";
 import AccountTopup from "./topup";
 import AlertDialog from "@/components/alertDialog";
+import useLocalStorage from "@/utils/useStorage";
+import { isAnyNull } from "@/utils";
 
 export interface SimpleDialogProps {
   open: boolean;
   wallet: Wallet | null;
   onClose: (value: string) => void;
   onUpdate?: (value: Wallet) => void;
+  headers: Headers;
 }
 
 enum AccountState {
@@ -52,10 +55,12 @@ export default function WalletDetailsDialog({
   open,
   wallet,
   onUpdate,
+  headers,
 }: SimpleDialogProps) {
   const router = useRouter();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const [userAccount, setUserAccount] = useLocalStorage("account", "");
 
   const [accountView, setAccountView] = useState(AccountState.topup);
   const [openAlert, setOpenAlert] = useState(false);
@@ -93,6 +98,15 @@ export default function WalletDetailsDialog({
   const handleTopupUpdate = (value: Wallet) => {
     onUpdate && onUpdate(value);
     handleClose();
+  };
+
+  const getAccountHolder = () => {
+    let _accountholder;
+    if (!isAnyNull([userAccount?.firstName, userAccount?.lastName]))
+      _accountholder = `${userAccount?.firstName} ${userAccount?.lastName}`;
+    else _accountholder = userAccount.email;
+
+    return _accountholder;
   };
 
   return (
@@ -201,17 +215,21 @@ export default function WalletDetailsDialog({
           </Box>
         )}
         {accountView == AccountState.details && wallet && (
-          <AccountDetails accountHolder="Benoit Tshiawu" wallet={wallet} />
+          <AccountDetails accountHolder={getAccountHolder()} wallet={wallet} />
         )}
 
         {accountView == AccountState.topup && wallet && (
-          <AccountTopup wallet={wallet} updateChange={handleTopupUpdate} />
+          <AccountTopup
+            headers={headers}
+            wallet={wallet}
+            updateChange={handleTopupUpdate}
+          />
         )}
         <AlertDialog
           title={isError.title}
           description={isError.description}
           open={openAlert}
-          onClose={()=>setOpenAlert(false)}
+          onClose={() => setOpenAlert(false)}
         />
       </DialogContent>
     </BootstrapDialog>

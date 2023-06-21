@@ -16,6 +16,7 @@ declare type TransactionWallet = {
 export enum TransactionType {
   Transfer = "Transfer",
   Deposit = "Deposit",
+  WithDrawl = "Withdrawal",
 }
 
 declare type Fee = {
@@ -91,7 +92,7 @@ export type ETransferRequest = {
 }
 
 export type WalletTopupRequest = {
-  toWalettId: string;
+  toWalletId: string;
   fromCurrency: Currency;
   amount: number;
 }

@@ -15,7 +15,7 @@ export default function TransitionAlerts({
   message,
 }: {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   severity?: AlertColor;
   message: string
 }) {
