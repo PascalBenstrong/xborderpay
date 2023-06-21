@@ -72,10 +72,10 @@ export type TransactionsRequest = {
 export type ETransferRequest = {
   id: string;
   privateKey: string;
-  fromCurrency: string;
-  fromAmount: string;
+  fromCurrency: Currency;
+  fromAmount: number;
   toWalletId: string;
-  toCurrency: string;
+  toCurrency: Currency;
   reference: string;
 }
 
