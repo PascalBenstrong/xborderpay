@@ -12,32 +12,74 @@ import {
   useTheme,
   Typography,
   Divider,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import {
   BootstrapDialog,
   BootstrapDialogTitle,
   DialogTransition,
 } from "../dialog";
+import useLocalStorage from "@/utils/useStorage";
+import TransitionAlerts from "../alert";
 
 export interface SimpleDialogProps {
   open: boolean;
-  selectedValue: iWallet | null;
   wallets?: iWallet[];
+  headers: Headers;
   onClose: (value: string | iWallet) => void;
 }
 
 export default function CreateWallet(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open, wallets } = props;
+  const { onClose, open, wallets, headers } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "");
 
   const handleClose = () => {
     onClose("close");
   };
 
-  const handleListItemClick = (value: string | iWallet) => {
-    onClose(value);
+  const handleListItemClick = (value: iWallet) => {
+    handleSubmit(value);
+  };
+
+  const handleSubmit = async (payload: iWallet) => {
+    try {
+      setIsProcessing(true);
+
+      var requestOptions: any = {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(payload),
+        redirect: "follow",
+      };
+
+      const response = await fetch("/api/wallets", requestOptions);
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data) {
+          setPkValue(data.privateKey);
+          console.log("sucess");
+          setIsProcessing(false);
+          onClose(data.wallet);
+        }
+      } else {
+        const error = await response.text();
+        console.log("error:", error);
+        setErrorMessage(error);
+        setIsProcessing(false);
+      }
+    } catch (ex) {
+      console.log("error", ex);
+      setErrorMessage("Something went wrong try again later!");
+      setIsProcessing(false);
+    }
   };
 
   // Array of currencies already used to create wallets
@@ -67,15 +109,20 @@ export default function CreateWallet(props: SimpleDialogProps) {
           height: "100%",
         }}
       >
+        <TransitionAlerts
+          severity="error"
+          message={errorMessage}
+          open={errorMessage.length > 0}
+        />
         <Typography
           gutterBottom
           align="left"
           color="lightgrey"
-          sx={{  lineHeight: 1.5, minWidth: 350 }}
+          sx={{ lineHeight: 1.5, minWidth: 350 }}
         >
           Choose currency for new wallet
         </Typography>
-        <Divider sx={{bgcolor: 'lightgrey'}}/>
+        <Divider sx={{ bgcolor: "lightgrey" }} />
         <List sx={{ pt: 0, minWidth: 250 }}>
           {remainCurrencies.map((wallet, index) => (
             <ListItem key={index} disableGutters>
@@ -93,6 +140,13 @@ export default function CreateWallet(props: SimpleDialogProps) {
             </ListItem>
           ))}
         </List>
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isProcessing}
+          //onClick={handleClose}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </DialogContent>
     </BootstrapDialog>
   );
