@@ -1,17 +1,12 @@
 import {
   Box,
-  Checkbox,
   Fade,
   FormControl,
-  FormControlLabel,
-  FormGroup,
   InputLabel,
   LinearProgress,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
-import { ValidationTextField } from "../entry";
-import XSelect from "../x_select";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import XAutocomplete from "../x_autocomplete";
 import BootstrapInput from "../entry/bootstrapInput";
 import { isValidEmail } from "@/utils";
@@ -59,13 +54,16 @@ export default function SelectAccountPayee({
   toWalletId,
   setToWalletId,
   headers,
+  payeeEmail,
+  setPayeeEmail,
+  payeeWallets,
+  setPayeeWallets,
+  query,
+  setQuery,
 }: any) {
   const [accounts, setAccounts] = useState<any>();
-  const [payeeWallets, setPayeeWallets] = useState<any>();
-  const [payeeEmail, setPayeeEmail] = useState("");
   const [isEmailFetching, setIsEmailFetching] = useState(false);
   const [isEmailFound, setIsEmailFound] = useState("");
-  const [query, setQuery] = useState("idle");
   const timerRef = useRef<number>();
 
   useEffect(
@@ -74,13 +72,14 @@ export default function SelectAccountPayee({
     },
     []
   );
-
-  useEffect(() => {
+  
+  useMemo(() => {
     if (wallets != null) {
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      if (myWalletId != null || myWalletId.length > 0) setMyWalletId(_accounts[0].value);
+      if (myWalletId != null || myWalletId.length <= 0)
+        setMyWalletId(_accounts[0].value);
     }
   }, [wallets]);
 
@@ -109,7 +108,6 @@ export default function SelectAccountPayee({
     };
 
     //reset the values
-    setIsEmailFetching(true);
     setPayeeWallets(null);
     setIsEmailFound("");
     setPayee(null);
@@ -136,13 +134,10 @@ export default function SelectAccountPayee({
 
             setQuery("error");
           }
-          setIsEmailFetching(false);
-
           setQuery("success");
         })
         .catch((error) => {
           console.log("error: ", error);
-          setIsEmailFetching(false);
           setQuery("error");
         });
     }, 1000);
@@ -151,7 +146,7 @@ export default function SelectAccountPayee({
   //get and set account id
   const handleAccountChange = (value: string) => {
     let _accountId = accounts.find((x: any) => x.label === value);
-    setMyWalletId(_accountId.value);
+    setMyWalletId(_accountId?.value);
   };
 
   //get and set payee account id
@@ -217,26 +212,18 @@ export default function SelectAccountPayee({
           {isEmailFound}
         </Typography>
       )}
-      <Box sx={{ height: 40, mb: 4 }}>
+      <Box>
         {query === "success" ? (
           payeeWallets &&
           payeeWallets.length > 0 && (
-            <Fade
-              in={query === "success"}
-              style={{
-                transitionDelay: query === "success" ? "100ms" : "0ms",
-              }}
-              unmountOnExit
-            >
-              <XAutocomplete
-                id="payeeWallets"
-                value={getLabelFromValue(toWalletId, payeeWallets)}
-                setValue={handlePayeeChange}
-                disableClearable
-                data={payeeWallets}
-                mt={1}
-              />
-            </Fade>
+            <XAutocomplete
+              id="payeeWallets"
+              value={getLabelFromValue(toWalletId, payeeWallets)}
+              setValue={handlePayeeChange}
+              disableClearable
+              data={payeeWallets}
+              mt={1}
+            />
           )
         ) : (
           <Fade

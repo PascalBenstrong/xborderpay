@@ -18,7 +18,7 @@ import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
 import { isAnyNull, useFetcher } from "../../utils";
-import { Currency, ETransferRequest } from "../../types";
+import { Currency, ETransferRequest, Wallet } from "../../types";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
@@ -68,18 +68,9 @@ function GetData(headers: any) {
     }
   );
 
-  const userInfo:any = {
-    firstName: "Mark",
-    lastName: "Woods",
-    email: "mark.wood@gmail.com",
-    wallets: data?.accounts,
-  }
-
-  //console.log("data: ", data);
-
   return {
     //transactions: data?.data,
-    userInfo,
+    userInfo: data?.user,
     wallets: data?.accounts,
     recentPayees: data?.recentPayees,
     purposes: data?.purposes,
@@ -89,7 +80,11 @@ function GetData(headers: any) {
 }
 
 function GetRates() {
-  const { data, isError, isLoading } = useFetcher(`/api/rates`);
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWRImmutable("/api/rates", fetcher, {
+    refreshInterval: 60000,
+  });
   //console.log("MyRates: ", data?.rates)
 
   return {
@@ -103,6 +98,12 @@ type Amount = {
   currency: Currency;
 };
 
+function getCurrencyFromWallet(walletId: string, wallets: Wallet[]) {
+  const _wallet = wallets?.find((x) => x.id === walletId);
+
+  return _wallet?.currency ?? Currency.USD;
+}
+
 export default function ETransferPage() {
   const { data: session }: { data: any } = useSession({
     required: true,
@@ -113,22 +114,24 @@ export default function ETransferPage() {
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
-  const {userInfo, wallets, recentPayees, purposes, isError, isLoading } =
+  const { userInfo, wallets, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
   const { exchangeRates } = GetRates();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [myWalletId, setMyWalletId] = useState("");
   const [payee, setPayee] = useState<any>();
   const [toWalletId, setToWalletId] = useState("");
   const [purpose, setPurpose] = useState("");
-  const [notes, setNotes] = useState("");
+  const [payeeEmail, setPayeeEmail] = useState("");
+  const [payeeWallets, setPayeeWallets] = useState<any>();
+  const [query, setQuery] = useState("idle");
   const [fromAmount, setFromAmount] = useState<Amount>({
     amount: 0,
-    currency: Currency.USD,
+    currency: getCurrencyFromWallet(myWalletId, userInfo?.wallets),
   });
   const [toAmount, setToAmount] = useState<Amount>({
     amount: 0,
-    currency: Currency.ZAR,
+    currency: getCurrencyFromWallet(toWalletId, payee?.wallets),
   });
   const [fees, setFees] = useState<Amount>({
     amount: 0.07,
@@ -138,21 +141,30 @@ export default function ETransferPage() {
   const [isValidated, setIsValidated] = useState(true);
 
   const validateFields = (step: number) => {
-    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) return false;
+    if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0)
+      return false;
     else if (isAnyNull([fromAmount]) && activeStep === 1) return false;
 
     return true;
   };
 
   const handleNext = () => {
-    //console.log("Account: ", account);
-    //console.log("payee: ", payee);
-    
 
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
       return;
+    }
+
+    if(activeStep < 1){
+      setFromAmount({
+        amount: fromAmount.amount,
+        currency: getCurrencyFromWallet(myWalletId, userInfo?.wallets),
+      });
+      setToAmount({
+        amount: toAmount.amount,
+        currency: getCurrencyFromWallet(toWalletId, payee?.wallets),
+      });
     }
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -167,7 +179,6 @@ export default function ETransferPage() {
   };
 
   const handleSubmit = () => {
-
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
       fromPrivateKey: "",
@@ -262,6 +273,12 @@ export default function ETransferPage() {
                 purposes={purposes}
                 toWalletId={toWalletId}
                 setToWalletId={setToWalletId}
+                payeeEmail={payeeEmail}
+                setPayeeEmail={setPayeeEmail}
+                payeeWallets={payeeWallets}
+                setPayeeWallets={setPayeeWallets}
+                query={query}
+                setQuery={setQuery}
               />
             )}
             {activeStep == 1 && (
@@ -275,6 +292,8 @@ export default function ETransferPage() {
                 rate={rate}
                 setRate={setRate}
                 exchangeRates={exchangeRates}
+                fromWallets={userInfo?.wallets}
+                payeeWallets={payee?.wallets}
               />
             )}
             {activeStep == 2 && <Review />}
@@ -313,7 +332,9 @@ export default function ETransferPage() {
                     <Typography variant="h6" mb={1}>
                       From
                     </Typography>
-                    {userInfo && <UserInfoCard data={userInfo}  walletId={myWalletId}/>}
+                    {userInfo && (
+                      <UserInfoCard data={userInfo} walletId={myWalletId} />
+                    )}
                   </Grid>
                   <Grid xs={12} sm={6} lg={12}>
                     <Typography
@@ -323,7 +344,9 @@ export default function ETransferPage() {
                     >
                       To
                     </Typography>
-                    {payee && <UserInfoCard data={payee} walletId={toWalletId}/>}
+                    {payee && (
+                      <UserInfoCard data={payee} walletId={toWalletId} />
+                    )}
                   </Grid>
                 </Grid>
               </Box>
