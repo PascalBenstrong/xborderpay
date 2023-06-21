@@ -224,12 +224,14 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
   const senderWallet = {
     id: "xborderpay",
     name: "xborderpay",
+    userId: "xborderpay",
     currency: sendingCurrency,
   };
   const receivingWallet = {
     id: new ObjectId(wallet.id),
     name: wallet.name,
     currency: wallet.currency,
+    userId: new ObjectId(wallet.userId),
   };
   let trans: Transaction | any = {
     type: TransactionType.Deposit,
@@ -238,7 +240,6 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     amount: values.amount,
     timestamp,
     transactionId,
-    userId: new ObjectId(wallet.userId),
     rate,
     fees: { currency: Currency.USD, amount: 0.07 },
     reference: "top up",
@@ -340,11 +341,13 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
       id: new ObjectId(fromWallet.id),
       name: fromWallet.name,
       currency: sendingCurrency,
+      userId: new ObjectId(fromWallet.userId),
     };
     const receivingWallet = {
       id: new ObjectId(toWallet.id),
       name: toWallet.name,
       currency: toWallet.currency,
+      userId: new ObjectId(toWallet.userId),
     };
     let trans: Transaction | any = {
       type: data.type,
@@ -353,7 +356,6 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
       amount: values.amount,
       timestamp,
       transactionId,
-      userId: new ObjectId(toWallet.userId),
       rate,
       fees: { currency: Currency.USD, amount: 0.07 },
       reference: data.reference,

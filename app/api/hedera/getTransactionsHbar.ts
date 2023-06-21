@@ -21,7 +21,12 @@ export const getTransactionsHbar = wrapInTryCatch<
   if (!ObjectId.isValid(request.userId))
     return Option.fromError(new Error("userId is not valid!"));
 
-  let findQuery: any = { userId: new ObjectId(request.userId) };
+  let findQuery: any = {
+    $or: [
+      { "senderWallet.userId": new ObjectId(request.userId) },
+      { "receivingWallet.userId": new ObjectId(request.userId) },
+    ],
+  };
 
   if (request.after && request.before) {
     findQuery._id = {
