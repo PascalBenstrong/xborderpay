@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { Currency, User, Wallet } from "../../types";
+import { Currency, ETransferRequest, TransactionType, User, Wallet } from "../../types";
+import transferCurrency from "./transferCurrency";
+import auth from "../auth";
+import { JwtPayload } from "jsonwebtoken";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -38,7 +41,6 @@ export async function GET(request: Request) {
         wallets: accounts,
     }
 
-
     const purposes: string[] = [
         "Software development services",
         "Infrastructure maintenance and support",
@@ -56,3 +58,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ ...data });
 
 }
+
+export const POST = auth(async (request, tokenPayload) => {
+    try {
+        const { sub } = tokenPayload as JwtPayload;
+        const data = await request.json();
+
+        const eTransferRequest = {
+            ...data,
+            toUserId: sub!,
+            type: TransactionType.Transfer,
+        };
+        const eTransferResult = await transferCurrency(eTransferRequest);
+
+        if (eTransferResult.isSuccess) return new Response("", { status: 200 });
+
+        return new Response(eTransferResult.getErrorOrMessage(), { status: 400 });
+    } catch (error) {
+        return new Response("Something went wrong!", { status: 500 });
+    }
+});

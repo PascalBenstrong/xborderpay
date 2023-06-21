@@ -119,14 +119,15 @@ const transferCurrency = wrapInTryCatch<
     return Option.fromErrorOption(validationResult);
 
   const values = validationResult.value!;
-  const walletResult = await getWalletById(values.toWalletId);
+  const _walletId = values.type === TransactionType.Transfer ? values.fromWalletId! : values.toWalletId;
+  const walletResult = await getWalletById(_walletId);
 
   if (!walletResult.isSuccess) return Option.fromErrorOption(walletResult);
 
   const wallet = walletResult.value!;
 
   if (data.toUserId !== wallet.userId)
-    return Option.fromError(new Error("wallet those not belong to this user!"));
+    return Option.fromError(new Error("wallet does not belong to this user!"));
 
   let fromWallet: Wallet | undefined;
 
@@ -139,6 +140,9 @@ const transferCurrency = wrapInTryCatch<
     fromWallet = fromWalletResult.value!;
 
     values.fromCurrency = fromWallet.currency;
+
+    if (fromWallet.balance < values.amount)
+      return Option.fromError(new Error("You have insufficient funds in your wallet to process this transfer, \nplease topup and try again later!"));
   }
 
   const convertedAmountResult = await convertRates({
@@ -163,6 +167,7 @@ const transferCurrency = wrapInTryCatch<
     fromAccountPrivateKey: values.fromPrivateKey,
   });
 
+  console.log("fromWallet1: ", topUpResult)
   if (!topUpResult.isSuccess) return Option.fromErrorOption(topUpResult);
 
   // store the transaction in db
