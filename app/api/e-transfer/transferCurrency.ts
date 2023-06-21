@@ -156,8 +156,9 @@ const transferCurrency = wrapInTryCatch<
 
   const { amount, from, rate } = convertedAmountResult.value!;
 
+  
   // transfer hbar
-
+  
   const fromAccountId = fromWallet?.account.id ?? values.fromAccountId!;
 
   const topUpResult = await transferHbar({
@@ -166,8 +167,8 @@ const transferCurrency = wrapInTryCatch<
     fromAccountId,
     fromAccountPrivateKey: values.fromPrivateKey,
   });
+  console.log("fromWallet1: ",fromAccountId)
 
-  console.log("fromWallet1: ", topUpResult)
   if (!topUpResult.isSuccess) return Option.fromErrorOption(topUpResult);
 
   // store the transaction in db

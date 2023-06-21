@@ -15,7 +15,9 @@ export const transferHbar = wrapInTryCatch<
   TransferHBarRequestResponse,
   TransferHbarRequest
 >(async (request) => {
-  const signed = await new TransferTransaction()
+
+  console.log(request)
+  const signed = new TransferTransaction()
     .addHbarTransfer(
       request.fromAccountId,
       request.amount.isNegative() ? request.amount : request.amount.negated()
@@ -25,9 +27,12 @@ export const transferHbar = wrapInTryCatch<
       request.amount.isNegative() ? request.amount.negated() : request.amount
     )
     .setMaxTransactionFee(new Hbar(100))
-    .sign(PrivateKey.fromStringED25519(request.fromAccountPrivateKey));
-
+    //.sign(PrivateKey.fromStringED25519(request.fromAccountPrivateKey));
+    
+    console.log("signed: ",signed)
   const transaction = await signed.execute(client);
+
+  console.log("transaction: ",transaction.toJSON())
 
   const receipt = await transaction.getReceipt(client);
 
