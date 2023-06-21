@@ -26,6 +26,7 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
 import TransitionAlerts from "@/components/alert";
+import useLocalStorage from "@/utils/useStorage";
 
 const steps = [
   {
@@ -151,6 +152,8 @@ export default function ETransferPage() {
   const [isValidated, setIsValidated] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
+  // Get the value from local storage if it exists
+  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "")
 
   const validateFields = (step: number) => {
     if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
@@ -168,6 +171,7 @@ export default function ETransferPage() {
   };
 
   const handleNext = () => {
+    //setPkValue("");
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
@@ -223,7 +227,7 @@ export default function ETransferPage() {
     setIsFetching(true);
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
-      fromPrivateKey: "",
+      fromPrivateKey: pkValue,
       fromCurrency: fromAmount.currency,
       amount: fromAmount.amount,
       toWalletId: toWalletId,
