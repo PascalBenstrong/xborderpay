@@ -70,7 +70,7 @@ export type TransactionsRequest = {
 };
 
 export type ETransferRequest = {
-  id: string;
+  fromWalletId: string;
   privateKey: string;
   fromCurrency: Currency;
   fromAmount: number;
