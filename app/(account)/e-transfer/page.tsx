@@ -10,7 +10,7 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import TransactionCard from "../../components/transaction_card";
 import Title from "../../components/title";
 import VerticalLinearStepper from "../../components/stepper";
@@ -19,11 +19,12 @@ import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
-import { useFetcher } from "../../utils";
+import { isAnyNull, useFetcher } from "../../utils";
 import { Currency } from "../../types";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
+import TransitionAlerts from "@/components/alert";
 
 const steps = [
   {
@@ -109,26 +110,38 @@ export default function ETransferPage() {
   const { wallets, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
   const { exchangeRates } = GetRates();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [account, setAccount] = React.useState("");
-  const [payee, setPayee] = React.useState("");
-  const [purpose, setPurpose] = React.useState("");
-  const [notes, setNotes] = React.useState("");
-  const [fromAmount, setFromAmount] = React.useState<Amount>({
+  const [activeStep, setActiveStep] = useState(0);
+  const [account, setAccount] = useState("");
+  const [payee, setPayee] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [notes, setNotes] = useState("");
+  const [fromAmount, setFromAmount] = useState<Amount>({
     amount: 0,
     currency: Currency.USD,
   });
-  const [toAmount, setToAmount] = React.useState<Amount>({
+  const [toAmount, setToAmount] = useState<Amount>({
     amount: 0,
     currency: Currency.ZAR,
   });
-  const [fees, setFees] = React.useState<Amount>({
+  const [fees, setFees] = useState<Amount>({
     amount: 0.05,
     currency: Currency.USD,
   });
-  const [rate, setRate] = React.useState<Number>(19.08);
+  const [rate, setRate] = useState<Number>(19.08);
+  const [isValidated, setIsValidated] = useState(true);
+
+  const validateFields = () => {
+    if (isAnyNull([account, payee, purpose, fromAmount])) return false;
+
+    return true;
+  };
 
   const handleNext = () => {
+    if (!validateFields() && activeStep === 0) {
+      setIsValidated(false);
+      return;
+    }
+
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -142,9 +155,14 @@ export default function ETransferPage() {
 
   const handleSubmit = () => {};
 
+  const clearError = () => {
+    setIsValidated(true)
+  }
+
   return (
     <Container maxWidth="lg" sx={{ pt: { xs: 10, md: 15 } }}>
       <Paper
+        component="form"
         sx={{
           bgcolor: "secondary.main",
           p: 2,
@@ -153,6 +171,8 @@ export default function ETransferPage() {
           borderRadius: 3,
           height: "100%",
         }}
+        noValidate={isValidated}
+        autoComplete="off"
       >
         <Title title="Send e-Transfer" />
         <Grid container spacing={2}>
@@ -183,6 +203,7 @@ export default function ETransferPage() {
           </Grid>
 
           <Grid xs={12} md={12} lg={activeStep > 1 ? 10 : 7}>
+            <TransitionAlerts severity="error"  message="Please fill in all the fields with *" open={!isValidated} onClose={clearError}/>
             {activeStep === steps.length - 1 && (
               <ETransferSuccess handleReset={handleReset} />
             )}
@@ -198,8 +219,6 @@ export default function ETransferPage() {
                 purpose={purpose}
                 setPurpose={setPurpose}
                 purposes={purposes}
-                notes={notes}
-                setNotes={setNotes}
               />
             )}
             {activeStep == 1 && (
@@ -217,7 +236,7 @@ export default function ETransferPage() {
             )}
             {activeStep == 2 && <Review />}
             {activeStep <= steps.length - 2 && (
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2, mt: 2 }}>
                 {activeStep > 0 && (
                   <Button
                     variant="outlined"
@@ -238,7 +257,13 @@ export default function ETransferPage() {
             )}
           </Grid>
           {activeStep < 2 && (
-            <Grid xs={12} md={12} lg={3}>
+            <Grid
+              xs={false}
+              sm={12}
+              md={12}
+              lg={3}
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               <Box>
                 <Grid container>
                   <Grid xs={12} sm={6} lg={12}>
