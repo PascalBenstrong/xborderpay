@@ -35,16 +35,17 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable(
+  const { data, error, isLoading,mutate } = useSWRImmutable(
     "/api/transactions",
-    fetcher
-    /* { refreshInterval: 60000 } */
+    fetcher,
+    { refreshInterval: 1000,revalidateOnFocus: true, }
   );
 
   return {
     transactions: data?.transactions,
     isLoading,
     isError: error,
+    mutate,
   };
 }
 
@@ -60,7 +61,9 @@ export default function HomePage() {
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
-  const { transactions, isError, isLoading } = GetData(_myHeaders);
+  const { transactions, isError, isLoading,mutate } = GetData(_myHeaders);
+
+  //mutate(transactions);
 
   useEffect(() => {
     if (session?.walletDetails !== null && session?.isNewUser) {
@@ -103,7 +106,7 @@ export default function HomePage() {
             sx={{
               bgcolor: "secondary.main",
               p: 2,
-              height: { xs: 430, md: 430, lg: 420 },
+              height: { xs: 430, md: 480, lg: 430 },
               maxHeight: 600,
               borderRadius: 3,
               overflow: "auto",

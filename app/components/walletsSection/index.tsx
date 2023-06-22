@@ -35,9 +35,11 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable("/api/wallets", fetcher, {
-    refreshInterval: 60000,
-  });
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    "/api/wallets",
+    fetcher,
+    { refreshInterval: 1000,revalidateOnFocus: true, }
+  );
 
   //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
@@ -49,11 +51,12 @@ function GetData(headers: any) {
     wallets,
     isLoading: true,
     isError: false,
+    mutate,
   };
 }
 
 export default function WalletsSection({ headers }: any) {
-  const { wallets, isError, isLoading } = GetData(headers);
+  const { wallets, isError, isLoading, mutate } = GetData(headers);
   const [open, setOpen] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [securityAlert, setSecurityAlert] = React.useState(false);
@@ -64,6 +67,8 @@ export default function WalletsSection({ headers }: any) {
   const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(
     null
   );
+
+  //mutate(wallets);
 
   const _wallets: Wallet[] = useMemo(() => {
     let myWallets = wallets;
@@ -146,7 +151,7 @@ export default function WalletsSection({ headers }: any) {
         onClose={handleClose}
         headers={headers}
         setValueToCopy={setValueToCopy}
-        showSecurityAlert={()=>setSecurityAlert(true)}
+        showSecurityAlert={() => setSecurityAlert(true)}
       />
 
       <WalletDetailsDialog

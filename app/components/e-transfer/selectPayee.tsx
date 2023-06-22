@@ -148,14 +148,14 @@ export default function SelectAccountPayee({
 
   //get and set account id
   const handleAccountChange = (value: string) => {
-    let _accountId = accounts.find((x: any) => x.label === value);
-    setMyWalletId(_accountId?.value);
+    let _wallet = accounts.find((x: any) => x.label === value);
+    setMyWalletId(_wallet?.value);
   };
 
   //get and set payee account id
   const handlePayeeChange = (value: string) => {
-    let _accountId = accounts.find((x: any) => x.label === value);
-    setToWalletId(_accountId.value);
+    let _wallet = payeeWallets.find((x: any) => x.label === value);
+    setToWalletId(_wallet?.value);
   };
 
   return (

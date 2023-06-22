@@ -64,21 +64,22 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable(
+  const { data, error, isLoading, mutate } = useSWRImmutable(
     "/api/accounts/me",
     fetcher,
     {
-      refreshInterval: 60000,
+      refreshInterval: 1000,
+      revalidateOnFocus: true,
     }
   );
 
   const purposes = [
     "Software development services",
-        "Infrastructure maintenance and support",
-        "Cloud hosting and storage",
-        "Software licensing and subscriptions",
-        "IT consulting and advisory"
-  ]
+    "Infrastructure maintenance and support",
+    "Cloud hosting and storage",
+    "Software licensing and subscriptions",
+    "IT consulting and advisory",
+  ];
 
   return {
     //transactions: data?.data,
@@ -87,6 +88,7 @@ function GetData(headers: any) {
     purposes: purposes,
     isLoading,
     isError: error,
+    mutate,
   };
 }
 
@@ -129,8 +131,10 @@ export default function ETransferPage() {
     authorization: `Bearer ${session?.token}`,
   };
   //get data
-  const { userInfo, recentPayees, purposes, isError, isLoading } =
+  const { userInfo, recentPayees, purposes, isError, isLoading, mutate } =
     GetData(_myHeaders);
+
+  mutate(userInfo);
 
   //states
   const { exchangeRates } = GetRates();
@@ -158,7 +162,7 @@ export default function ETransferPage() {
   const [rate, setRate] = useState<Number>(19.08);
   const [isValidated, setIsValidated] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsProcessing] = useState(false);
   const [showSecurityAlert, setShowSecurityAlert] = useState(false);
 
   const validateFields = (step: number) => {
@@ -224,9 +228,10 @@ export default function ETransferPage() {
     router.refresh();
   };
 
-  const handleSubmit = (pkValue: string) => {
-    setIsFetching(true);
-    //console.log("pkValue: ",pkValue)
+  const handleSubmit = async (pkValue: string) => {
+    setIsProcessing(true);
+    setShowSecurityAlert(false);
+    //console.log("pkValue: ", pkValue);
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
       fromPrivateKey: pkValue,
@@ -244,18 +249,26 @@ export default function ETransferPage() {
       redirect: "follow",
     };
 
-    fetch("/api/e-transfer", requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        //setActiveStep(3);
-        console.log("result: ", result);
+    try {
+      const response = await fetch("/api/e-transfer", requestOptions);
+
+      if (response.ok) {
+        setActiveStep(3);
         setReference("CAxxx723");
-        setIsFetching(false);
-      })
-      .catch((error) => {
-        setIsFetching(false);
-        console.log("error: ", error);
-      });
+        setIsProcessing(false);
+      } else {
+        const error = await response.text();
+        //console.log("error:", error);
+        setErrorMessage(error);
+        setIsProcessing(false);
+        setIsValidated(false);
+      }
+    } catch (ex) {
+      console.log("error", ex);
+      setErrorMessage("Something went wrong try again later!");
+      setIsProcessing(false);
+      setIsValidated(false);
+    }
   };
 
   const clearError = () => {

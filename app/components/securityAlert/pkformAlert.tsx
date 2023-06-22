@@ -36,34 +36,14 @@ export default function SecurityFormAlert({
       return;
     }
     setErrorMessage("");
-    onUpdate(pkValue);
-  };
-
-  const handleCloseSnack = (
-    event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
+    const _pkValue = pkValue;
+    onUpdate(_pkValue);
+    setPxValue("");
   };
 
   const handleClose = () => {
     onClose();
   };
-
-  const action = (
-    <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleCloseSnack}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
 
   return (
     <div>
