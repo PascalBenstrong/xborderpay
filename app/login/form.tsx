@@ -109,7 +109,7 @@ export const LoginForm = () => {
       </FormControl>
       <Grid container>
         <Grid xs>
-          <Link href="/portal/forgot-password">Create new acoount</Link>
+          <Link href="/signup">Create new acoount</Link>
         </Grid>
         <Grid>
           <Button

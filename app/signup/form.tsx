@@ -29,7 +29,7 @@ export const LoginForm = () => {
   const [error, setError] = useState("");
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/portal/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +48,6 @@ export const LoginForm = () => {
 
       setLoading(false);
 
-      console.log("Data: ", res);
       if (!res?.error) {
 
         //store userInfo
@@ -65,7 +64,7 @@ export const LoginForm = () => {
     } catch (error: any) {
       setLoading(false);
       setError(error);
-      console.log("error: ", error);
+      //console.log("error: ", error);
     }
   };
 
@@ -93,7 +92,7 @@ export const LoginForm = () => {
           autoComplete="firstName"
           value={formValues.firstName}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "white" }}
           autoFocus
           required
         />
@@ -110,7 +109,7 @@ export const LoginForm = () => {
           autoComplete="lastName"
           value={formValues.lastName}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "white" }}
           autoFocus
           required
         />
@@ -127,7 +126,7 @@ export const LoginForm = () => {
           autoComplete="email"
           value={formValues.email}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "white" }}
           autoFocus
           required
         />
@@ -143,7 +142,7 @@ export const LoginForm = () => {
           type="password"
           autoComplete="current-password"
           value={formValues.password}
-          sx={{ color: "black" }}
+          sx={{ color: "white" }}
           onChange={handleChange}
           required
         />

@@ -23,9 +23,7 @@ const deleteWallet = wrapInTryCatch<boolean, WalletDeleteRequest>(
       _id: new ObjectId(request.id),
       userId: new ObjectId(request.userId),
     });
-
-    //console.log("wallet: ",wallet, "\n request: ",request);
-
+    
     if (!wallet) return Option.fromValue(true);
 
     const deleteAccountResult = await deleteAccount({

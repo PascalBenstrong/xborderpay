@@ -23,6 +23,7 @@ import useSWRImmutable from "swr/immutable";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
+import SecurityAlert from "@/components/securityAlert";
 
 function GetData(headers: any) {
   var requestOptions: any = {
@@ -48,19 +49,39 @@ function GetData(headers: any) {
 }
 
 export default function HomePage() {
-  const { data: session }: { data: any } = useSession({
+  const { data: session, update }: any = useSession({
     required: true,
     onUnauthenticated: () => {
       redirect("/login");
     },
   });
+  const [securityAlert, setSecurityAlert] = React.useState(false);
+  const [valueToCopy, setValueToCopy] = React.useState("");
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
   const { transactions, isError, isLoading } = GetData(_myHeaders);
 
+  useEffect(() => {
+    if (session?.walletDetails !== null && session?.isNewUser) {
+      //setPkValue(data.privateKey);
+      setValueToCopy(session?.walletDetails?.privateKey);
+      setSecurityAlert(true);
+      
+      // Save the updated session object
+      // The changes will persist to the next session
+      // Replace 'session' with the actual name of your session object
+      // Save the updated session
+      update({isNewUser: false});
+    }
+  }, [session]);
+
+  const handleSecurityAlertClose = () => {
+    setSecurityAlert(false);
+  };
+
   return (
-    <Container maxWidth="xl" sx={{pt: {xs: 10,md: 15} }}>
+    <Container maxWidth="xl" sx={{ pt: { xs: 10, md: 15 } }}>
       <Stack direction={{ sm: "row" }} justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
@@ -122,6 +143,13 @@ export default function HomePage() {
           <CurrencyRates />
         </Grid>
       </Grid>
+      {valueToCopy && (
+        <SecurityAlert
+          valueToCopy={valueToCopy}
+          open={securityAlert}
+          onClose={handleSecurityAlertClose}
+        />
+      )}
     </Container>
   );
 }

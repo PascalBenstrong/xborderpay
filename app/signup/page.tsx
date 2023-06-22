@@ -21,29 +21,6 @@ import router from "next/router";
 import { LoginForm } from "./form";
 import Copyright from "@/components/copyrightFooter";
 
-//import "../../../styles/scss/theme/_loginFooter.scss";
-
-
-
-const theme = createTheme({
-  palette: {
-    background: {
-      //default: "#e7edeb",
-      default: "#fafafa",
-    },
-    primary: {
-      main: "#00383d",
-    },
-    secondary: {
-      main: "#ff0038",
-    },
-    text: {
-      primary: "#000",
-      secondary: "#018567",
-    },
-  },
-});
-
 export default async function SignUp() {
   return (
     <Box className="login-page">
