@@ -10,7 +10,7 @@ export const getWallets = wrapInTryCatch<Wallet[], WalletsRequest>(
   async (request) => {
     if (!ObjectId.isValid(request.userId))
       return Option.fromError(new Error("Invalid userId!"));
-    let _wallets: Array<any> = await wallets
+    let _wallets: Array<any> = await wallets()
       .find({
         userId: new ObjectId(request.userId),
       })
@@ -30,7 +30,7 @@ export const getWallets = wrapInTryCatch<Wallet[], WalletsRequest>(
 export const getWalletById = wrapInTryCatch<Wallet, string>(async (id) => {
   if (!ObjectId.isValid(id))
     return Option.fromError(new Error("Invalid wallet id!"));
-  let _wallet: any = await wallets.findOne({
+  let _wallet: any = await wallets().findOne({
     _id: new ObjectId(id),
   });
 

@@ -37,7 +37,7 @@ export const GET = auth(async (request,tokenPayload) => {
       },
     ];
 
-    let userWallets: any[] = await accounts.aggregate(agg).toArray();
+    let userWallets: any[] = await accounts().aggregate(agg).toArray();
 
     userWallets = userWallets.map((x) => {
       x.id = x._id.toString();
