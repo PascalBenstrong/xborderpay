@@ -38,7 +38,7 @@ export const getTransactionsHbar = wrapInTryCatch<
   } else if (request.before) {
     findQuery._id = { lt: new ObjectId(request.before) };
   }
-  const transQuery = transactions
+  const transQuery = transactions()
     .find(findQuery)
     .limit(Math.min(limit, 101))
     .sort({ _id: request.order || "desc" })
