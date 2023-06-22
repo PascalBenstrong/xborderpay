@@ -11,7 +11,7 @@ import {
 import React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
-import Link from "next/Link";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TemporaryDrawer from "./drawer";
 
