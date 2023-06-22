@@ -27,6 +27,7 @@ import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
 import TransitionAlerts from "@/components/alert";
 import useLocalStorage from "@/utils/useStorage";
+import SecurityFormAlert from "@/components/securityAlert/pkformAlert";
 
 const steps = [
   {
@@ -152,8 +153,9 @@ export default function ETransferPage() {
   const [isValidated, setIsValidated] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
+  const [showSecurityAlert, setShowSecurityAlert] = useState(false);
   // Get the value from local storage if it exists
-  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "")
+  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "");
 
   const validateFields = (step: number) => {
     if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
@@ -172,6 +174,7 @@ export default function ETransferPage() {
 
   const handleNext = () => {
     //setPkValue("");
+    //setShowSecurityAlert(true);
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
@@ -191,11 +194,7 @@ export default function ETransferPage() {
 
     //check if we must submit to server
     if (activeStep == 2 && validateFields(activeStep)) {
-      /* window.setTimeout(() => {
-        setIsFetching(false);
-        setActiveStep(3);
-      }, 1000); */
-      handleSubmit();
+      setShowSecurityAlert(true);
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
@@ -223,8 +222,9 @@ export default function ETransferPage() {
     router.refresh();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (pkValue: string) => {
     setIsFetching(true);
+    //console.log("pkValue: ",pkValue)
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
       fromPrivateKey: pkValue,
@@ -246,7 +246,7 @@ export default function ETransferPage() {
       .then((response) => response.text())
       .then((result) => {
         //setActiveStep(3);
-        console.log("result: ",result);
+        console.log("result: ", result);
         setReference("CAxxx723");
         setIsFetching(false);
       })
@@ -259,6 +259,10 @@ export default function ETransferPage() {
   const clearError = () => {
     setIsValidated(true);
     setErrorMessage("");
+  };
+
+  const handleSecurityAlertClose = () => {
+    setShowSecurityAlert(false);
   };
 
   return (
@@ -435,6 +439,12 @@ export default function ETransferPage() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <SecurityFormAlert
+        walletCurrency={fromAmount.currency}
+        open={showSecurityAlert}
+        onUpdate={handleSubmit}
+        onClose={handleSecurityAlertClose}
+      />
     </Container>
   );
 }
