@@ -44,7 +44,7 @@ const theme = createTheme({
   },
 });
 
-export default async function SignIn() {
+export default async function SignUp() {
   return (
     <Box className="login-page">
       <Container

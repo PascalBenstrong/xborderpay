@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
             name: "credentials",
             id: 'credentials',
             credentials: {
-                authType: { label: "Auth" },
+                /* authType: { label: "Auth" },
                 firstName: {
                     label: "First Name",
                     type: "text",
@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
                     label: "Last Name",
                     type: "text",
                     placeholder: "Doe",
-                },
+                }, */
                 email: {
                     label: "Email",
                     type: "email",
@@ -61,27 +61,29 @@ export const authOptions: NextAuthOptions = {
                 },
                 password: { label: "Password", type: "password" },
             },
-            async authorize(credentials) {
+            async authorize(credentials,req) {
                 try {
+
+                    const request = req.body;
 
                     let result;
 
                     //console.log("raw: ", req.body)
-                    if (credentials?.authType == "login") {
+                    if (request?.authType == "login") {
                         if ((!credentials?.email || !credentials.password)) {
                             throw new Error('email and password are required!');
                         }
 
                         result = await login(credentials!.email, credentials!.password);
                         //console.log("result: ", result.value)
-                    } else if (credentials?.authType == "register") {
+                    } else if (request?.authType == "register") {
                         if ((!credentials?.email || !credentials.password)) {
                             throw new Error('email and password are required!');
                         }
 
                         let _user: MyUser = {
-                            firstName: credentials!.firstName,
-                            lastName: credentials!.lastName,
+                            firstName: request!.firstName,
+                            lastName: request!.lastName,
                             email: credentials!.email
                         }
 
@@ -100,14 +102,10 @@ export const authOptions: NextAuthOptions = {
 
                     // Return the user object and token to be stored in the session
                     // Return the user object without the token
-                    const token = result.value
-                    const user = {
-                        email: credentials!.email,
-                        ...token
-                    };
-
+                    const response:any = result.value
                     //console.log("Data: ", response)
-                    return Promise.resolve(token);
+                    //return Promise.resolve(token);
+                    return response;
 
                 } catch (error: any) {
                     throw new Error(error.message ? error.message : 'Authentication failed');

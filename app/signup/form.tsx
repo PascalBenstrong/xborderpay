@@ -13,9 +13,12 @@ import {
 //import BootstrapInput from "../../../components/BootstrapInput";
 import Link from "next/link";
 import BootstrapInput from "@/components/entry/bootstrapInput";
+import useLocalStorage from "@/utils/useStorage";
 
 export const LoginForm = () => {
   const router = useRouter();
+  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "");
+  const [userAccount, setUserAccount] = useLocalStorage("account", "");
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: "",
@@ -47,8 +50,15 @@ export const LoginForm = () => {
 
       console.log("Data: ", res);
       if (!res?.error) {
-        setFormValues({ firstName: "", lastName: "", email: "", password: "" });
+
+        //store userInfo
+        const _user = {
+          email: formValues.email
+        }
+        setUserAccount(JSON.stringify(_user))
+
         router.push(callbackUrl);
+        setFormValues({ firstName: "", lastName: "", email: "", password: "" });
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
       }

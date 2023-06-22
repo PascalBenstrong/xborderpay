@@ -7,13 +7,13 @@ import useSWRImmutable from "swr/immutable"
 export const fetcher = (url: string) => {
     const requestOptions: any = {
         method: 'Get',
-        headers: authHeader(),
+        headers: AuthHeader(),
     };
 
     return fetch(url, requestOptions).then((res) => res.json());
 }
 
-export function authHeader() {
+export function AuthHeader() {
 
     const { data: session }: { data: any } = useSession();
 

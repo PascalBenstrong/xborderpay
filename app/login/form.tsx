@@ -46,12 +46,12 @@ export const LoginForm = () => {
 
       console.log("Data: ",res);
       if (!res?.error) {
-        setFormValues({ email: "", password: "" });
         const _user = {
           email: formValues.email
         }
         setUserAccount(JSON.stringify(_user))
         router.push(callbackUrl);
+        setFormValues({ email: "", password: "" });
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
       }
