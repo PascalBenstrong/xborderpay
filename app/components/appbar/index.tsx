@@ -15,30 +15,27 @@ import Link from "next/Link";
 import { usePathname } from "next/navigation";
 import TemporaryDrawer from "./drawer";
 
-const getValue = (pathname:string) => {
-  if(pathname === "/e-transfer")
-  return 1;
-  else if(pathname === "/transactions")
-  return 2
-  else{
-    return 0
+const getValue = (pathname: string) => {
+  if (pathname === "/e-transfer") return 1;
+  else if (pathname === "/transactions") return 2;
+  else {
+    return 0;
   }
-    
-}
+};
 const MenuLinks = [
   {
     label: "Home",
-    slug: "/"
+    slug: "/",
   },
   {
     label: "Instant Transfer",
-    slug: "/e-transfer"
+    slug: "/e-transfer",
   },
   {
     label: "Transactions",
-    slug: "/transactions"
+    slug: "/transactions",
   },
-]
+];
 function AppBarTabs() {
   const pathname = usePathname();
   const [value, setValue] = React.useState(getValue(pathname));
@@ -50,12 +47,15 @@ function AppBarTabs() {
   return (
     <Box sx={{ mx: 2, display: { xs: "none", md: "flex" } }}>
       <Tabs value={value} onChange={handleChange}>
-        {MenuLinks.map((item, index)=><Tab
-          LinkComponent={Link}
-          href={item.slug}
-          label={item.label}
-          sx={{ fontWeight: value == 0 ? 700 : "normal" }}
-        />)}
+        {MenuLinks.map((item, index) => (
+          <Tab
+            key={index}
+            LinkComponent={Link}
+            href={item.slug}
+            label={item.label}
+            sx={{ fontWeight: value == 0 ? 700 : "normal" }}
+          />
+        ))}
       </Tabs>
     </Box>
   );
@@ -74,7 +74,7 @@ export default function XBPAppBar() {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
-              onClick={()=>setOpen(true)}
+              onClick={() => setOpen(true)}
             >
               <MenuIcon />
             </IconButton>
@@ -91,7 +91,11 @@ export default function XBPAppBar() {
               </Button> */}
           </Toolbar>
         </Container>
-      <TemporaryDrawer menuLinks={MenuLinks}  open={open} handleClose={()=>setOpen(false)}/>
+        <TemporaryDrawer
+          menuLinks={MenuLinks}
+          open={open}
+          handleClose={() => setOpen(false)}
+        />
       </AppBar>
     </Box>
   );
