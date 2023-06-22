@@ -46,7 +46,7 @@ export const LoginForm = () => {
         callbackUrl,
       });
 
-      setLoading(false);
+      //setLoading(false);
 
       if (!res?.error) {
 
@@ -58,8 +58,10 @@ export const LoginForm = () => {
 
         router.push(callbackUrl);
         setFormValues({ firstName: "", lastName: "", email: "", password: "" });
+        setLoading(false);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
+        setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
@@ -92,7 +94,10 @@ export const LoginForm = () => {
           autoComplete="firstName"
           value={formValues.firstName}
           onChange={handleChange}
-          sx={{ color: "white" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -109,7 +114,10 @@ export const LoginForm = () => {
           autoComplete="lastName"
           value={formValues.lastName}
           onChange={handleChange}
-          sx={{ color: "white" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -126,7 +134,10 @@ export const LoginForm = () => {
           autoComplete="email"
           value={formValues.email}
           onChange={handleChange}
-          sx={{ color: "white" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -142,7 +153,10 @@ export const LoginForm = () => {
           type="password"
           autoComplete="current-password"
           value={formValues.password}
-          sx={{ color: "white" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           onChange={handleChange}
           required
         />
@@ -160,7 +174,7 @@ export const LoginForm = () => {
             variant="contained"
             disabled={loading}
           >
-            {loading ? "loading..." : "Sign In"}
+            {loading ? "loading..." : "Sign Up"}
           </Button>
         </Grid>
       </Grid>

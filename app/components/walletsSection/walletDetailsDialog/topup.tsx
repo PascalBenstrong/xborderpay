@@ -123,12 +123,15 @@ export default function AccountTopup({
           autoComplete="email"
           value={amount}
           onChange={handleChange}
-          sx={{ color: "black", bgcolor: "transparent" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          }, }}
           autoFocus
           required
         />
         <Typography sx={{ color: "lightGrey", fontSize: 10, mt: 1 }}>
-          You have {wallet.balance} {wallet.currency} in your balance.
+          You have {wallet.balance.toFixed(2)} {wallet.currency} in your balance.
         </Typography>
       </FormControl>
       <FormControl variant="standard" fullWidth sx={{ mt: 3 }}>

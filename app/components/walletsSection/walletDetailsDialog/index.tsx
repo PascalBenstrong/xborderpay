@@ -62,7 +62,7 @@ export default function WalletDetailsDialog({
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [userAccount, setUserAccount] = useLocalStorage("account", "");
 
-  const [accountView, setAccountView] = useState(AccountState.topup);
+  const [accountView, setAccountView] = useState(AccountState.balance);
   const [openAlert, setOpenAlert] = useState(false);
   const [isError, setIsError] = useState({
     title: "",

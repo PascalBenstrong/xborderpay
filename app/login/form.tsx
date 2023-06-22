@@ -42,18 +42,18 @@ export const LoginForm = () => {
         callbackUrl,
       });
 
-      setLoading(false);
-
-      console.log("Data: ",res);
+      //console.log("Data: ", res);
       if (!res?.error) {
         const _user = {
-          email: formValues.email
-        }
-        setUserAccount(JSON.stringify(_user))
+          email: formValues.email,
+        };
+        setUserAccount(JSON.stringify(_user));
         router.push(callbackUrl);
         setFormValues({ email: "", password: "" });
+        setLoading(false);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
+        setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
@@ -86,7 +86,10 @@ export const LoginForm = () => {
           autoComplete="email"
           value={formValues.email}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -102,7 +105,12 @@ export const LoginForm = () => {
           type="password"
           autoComplete="current-password"
           value={formValues.password}
-          sx={{  color: "black" }}
+          sx={{
+            color: "black",
+            "& .MuiInputBase-input": {
+              backgroundColor: "white",
+            },
+          }}
           onChange={handleChange}
           required
         />
@@ -119,7 +127,7 @@ export const LoginForm = () => {
             fullWidth
             variant="contained"
             disabled={loading}
-            sx={{width:"100%"}}
+            sx={{ width: "100%" }}
           >
             {loading ? "loading..." : "Sign In"}
           </Button>

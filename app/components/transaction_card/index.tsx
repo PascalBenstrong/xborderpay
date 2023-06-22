@@ -72,7 +72,6 @@ export default function TransactionCard({
           {type !== TransactionType.Deposit &&
             to &&
             `${to.slice(0, 2)}****${to.slice(20, 24)}`}
-          {to && `${to.slice(0, 2)}****${to.slice(20, 24)}`}
         </Typography>
         <Typography variant="body2" color="lightGrey" mt={0}>
           {wallet}
