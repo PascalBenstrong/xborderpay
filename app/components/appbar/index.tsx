@@ -13,6 +13,7 @@ import { styled, alpha } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/Link";
 import { usePathname } from "next/navigation";
+import TemporaryDrawer from "./drawer";
 
 const getValue = (pathname:string) => {
   if(pathname === "/e-transfer")
@@ -24,6 +25,20 @@ const getValue = (pathname:string) => {
   }
     
 }
+const MenuLinks = [
+  {
+    label: "Home",
+    slug: "/"
+  },
+  {
+    label: "Instant Transfer",
+    slug: "/e-transfer"
+  },
+  {
+    label: "Transactions",
+    slug: "/transactions"
+  },
+]
 function AppBarTabs() {
   const pathname = usePathname();
   const [value, setValue] = React.useState(getValue(pathname));
@@ -32,35 +47,22 @@ function AppBarTabs() {
     setValue(newValue);
   };
 
-  //console.log("pathname: ",pathname)
-
   return (
     <Box sx={{ mx: 2, display: { xs: "none", md: "flex" } }}>
       <Tabs value={value} onChange={handleChange}>
-        <Tab
+        {MenuLinks.map((item, index)=><Tab
           LinkComponent={Link}
-          href="/"
-          label="Home"
+          href={item.slug}
+          label={item.label}
           sx={{ fontWeight: value == 0 ? 700 : "normal" }}
-        />
-        <Tab
-          LinkComponent={Link}
-          href="/e-transfer"
-          label="Instant Transfer"
-          sx={{ fontWeight: value == 1 ? 700 : "normal" }}
-        />
-        <Tab
-          LinkComponent={Link}
-          href="/transactions"
-          label="Transactions"
-          sx={{ fontWeight: value == 2 ? 700 : "normal" }}
-        />
+        />)}
       </Tabs>
     </Box>
   );
 }
 
-export default function XBPAppBar({ isProduct }: any) {
+export default function XBPAppBar() {
+  const [open, setOpen] = React.useState(false);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" color="secondary">
@@ -72,6 +74,7 @@ export default function XBPAppBar({ isProduct }: any) {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
+              onClick={()=>setOpen(true)}
             >
               <MenuIcon />
             </IconButton>
@@ -88,6 +91,7 @@ export default function XBPAppBar({ isProduct }: any) {
               </Button> */}
           </Toolbar>
         </Container>
+      <TemporaryDrawer menuLinks={MenuLinks}  open={open} handleClose={()=>setOpen(false)}/>
       </AppBar>
     </Box>
   );

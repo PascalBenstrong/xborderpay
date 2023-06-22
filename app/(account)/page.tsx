@@ -81,7 +81,7 @@ export default function HomePage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ pt: { xs: 10, md: 15 } }}>
+    <Container maxWidth="xl" sx={{ pt: { xs: 10, md: 15 }, minHeight: "70vh" }}>
       <Stack direction={{ sm: "row" }} justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
