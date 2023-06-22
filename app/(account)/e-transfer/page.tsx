@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Container,
   Paper,
@@ -20,13 +20,12 @@ import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
-import { isAnyNull, useFetcher } from "../../utils";
+import { isAnyNull } from "../../utils";
 import { Currency, ETransferRequest, Wallet } from "../../types";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
 import TransitionAlerts from "@/components/alert";
-import useLocalStorage from "@/utils/useStorage";
 import SecurityFormAlert from "@/components/securityAlert/pkformAlert";
 
 const steps = [
@@ -66,19 +65,26 @@ function GetData(headers: any) {
     fetch(url, requestOptions).then((res) => res.json());
 
   const { data, error, isLoading } = useSWRImmutable(
-    "/api/e-transfer",
+    "/api/accounts/me",
     fetcher,
     {
       refreshInterval: 60000,
     }
   );
 
+  const purposes = [
+    "Software development services",
+        "Infrastructure maintenance and support",
+        "Cloud hosting and storage",
+        "Software licensing and subscriptions",
+        "IT consulting and advisory"
+  ]
+
   return {
     //transactions: data?.data,
-    userInfo: data?.user,
-    wallets: data?.accounts,
+    userInfo: data,
     recentPayees: data?.recentPayees,
-    purposes: data?.purposes,
+    purposes: purposes,
     isLoading,
     isError: error,
   };
@@ -123,7 +129,7 @@ export default function ETransferPage() {
     authorization: `Bearer ${session?.token}`,
   };
   //get data
-  const { userInfo, wallets, recentPayees, purposes, isError, isLoading } =
+  const { userInfo, recentPayees, purposes, isError, isLoading } =
     GetData(_myHeaders);
 
   //states
@@ -154,8 +160,6 @@ export default function ETransferPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [showSecurityAlert, setShowSecurityAlert] = useState(false);
-  // Get the value from local storage if it exists
-  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "");
 
   const validateFields = (step: number) => {
     if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
@@ -173,8 +177,6 @@ export default function ETransferPage() {
   };
 
   const handleNext = () => {
-    //setPkValue("");
-    //setShowSecurityAlert(true);
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
@@ -328,7 +330,7 @@ export default function ETransferPage() {
                 headers={_myHeaders}
                 myWalletId={myWalletId}
                 setMyWalletId={setMyWalletId}
-                wallets={wallets}
+                wallets={userInfo?.wallets}
                 payee={payee}
                 setPayee={setPayee}
                 recentPayees={recentPayees}
