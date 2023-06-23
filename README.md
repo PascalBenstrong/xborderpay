@@ -6,7 +6,7 @@ Our project aims to leverage the speed, efficiency, and reliability of Hedera's 
 
 ## Demo!
 
-visit: https://xborderpay.vercel.app/
+visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderpay.vercel.app/</a>
 
 !["xBorderPay Preview"](https://github.com/PascalBenstrong/xborderpay/blob/main/screenshots/home-preview.png?raw=true "Home Page Preview")
 
