@@ -30,6 +30,15 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
         validationResult.error,
         validationResult.message!
       );
+    let wallet: any = await wallets().findOne({
+      currency: request.currency,
+      userId: new ObjectId(request.userId),
+    });
+
+    if (wallet)
+      return Option.fromError(
+        new Error("Wallet for this currency already exists!")
+      );
     // create a new hedera account for this user
 
     const createAccountResult = await createAccount();
@@ -46,16 +55,6 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
       publicKey: account.publicKey,
       type: "hedera",
     };
-
-    let wallet: any = await wallets().findOne({
-      currency: request.currency,
-      userId: new ObjectId(request.userId),
-    });
-
-    if (wallet)
-      return Option.fromError(
-        new Error("Wallet for this currency already exists!")
-      );
 
     const id = new ObjectId();
     wallet = {
