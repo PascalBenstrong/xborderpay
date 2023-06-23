@@ -19,13 +19,11 @@ const deleteWallet = wrapInTryCatch<boolean, WalletDeleteRequest>(
     if (!ObjectId.isValid(request.userId))
       return Option.fromError(new Error("userId is not valid!"));
 
-    const wallet = await wallets.findOne({
+    const wallet = await wallets().findOne({
       _id: new ObjectId(request.id),
       userId: new ObjectId(request.userId),
     });
-
-    //console.log("wallet: ",wallet, "\n request: ",request);
-
+    
     if (!wallet) return Option.fromValue(true);
 
     const deleteAccountResult = await deleteAccount({
@@ -35,7 +33,7 @@ const deleteWallet = wrapInTryCatch<boolean, WalletDeleteRequest>(
 
     if (!deleteAccountResult.isSuccess) return deleteAccountResult;
 
-    const deleteResult = await wallets.deleteOne({ _id: wallet._id });
+    const deleteResult = await wallets().deleteOne({ _id: wallet._id });
 
     if (deleteResult.acknowledged && deleteResult.deletedCount === 1)
       return Option.fromValue(true);

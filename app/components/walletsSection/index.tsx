@@ -35,9 +35,11 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable("/api/wallets", fetcher, {
-    refreshInterval: 60000,
-  });
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    "/api/wallets",
+    fetcher,
+    { refreshInterval: 1000,revalidateOnFocus: true, }
+  );
 
   //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
 
@@ -49,11 +51,12 @@ function GetData(headers: any) {
     wallets,
     isLoading: true,
     isError: false,
+    mutate,
   };
 }
 
 export default function WalletsSection({ headers }: any) {
-  const { wallets, isError, isLoading } = GetData(headers);
+  const { wallets, isError, isLoading, mutate } = GetData(headers);
   const [open, setOpen] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [securityAlert, setSecurityAlert] = React.useState(false);
@@ -65,26 +68,10 @@ export default function WalletsSection({ headers }: any) {
     null
   );
 
+  //mutate(wallets);
+
   const _wallets: Wallet[] = useMemo(() => {
     let myWallets = wallets;
-
-    if (selectedValue !== null) {
-      const wallet = {
-        userId: "648f2dc74469b5d1e702451e",
-        name: "EUR Wallet",
-        currency: "EUR",
-        account: {
-          id: "0.0.14827473",
-          publicKey:
-            "302a300506032b65700321004f256f5baa993fcaf5dc623a2d4f98ec4e477cb8cfe1d77fd95280225abdfcca",
-          type: "hedera",
-        },
-        balance: 0,
-        id: "648f9ea5ef1d4e69bf3d7dbd",
-      };
-
-      myWallets?.push(wallet);
-    }
 
     return myWallets;
   }, [wallets, selectedValue]);
@@ -163,6 +150,8 @@ export default function WalletsSection({ headers }: any) {
         wallets={_wallets}
         onClose={handleClose}
         headers={headers}
+        setValueToCopy={setValueToCopy}
+        showSecurityAlert={() => setSecurityAlert(true)}
       />
 
       <WalletDetailsDialog

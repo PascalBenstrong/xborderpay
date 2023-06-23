@@ -1,17 +1,17 @@
+import auth from "@/api/auth";
 import { NextResponse } from "next/server";
-import auth from "../auth";
-import accounts from "./accounts.db";
+import accounts from "../accounts.db";
+import { JwtPayload } from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
-export const GET = auth(async (request) => {
+export const GET = auth(async (request,tokenPayload) => {
   try {
-    const { searchParams } = new URL(request.url);
-    if (!searchParams.get("email"))
-      return new Response("Invalid email", { status: 400 });
+    const { sub } = tokenPayload as JwtPayload;
 
     let agg = [
       {
         $match: {
-          email: searchParams.get("email"),
+          _id: new ObjectId(sub!),
         },
       },
       {
@@ -28,17 +28,12 @@ export const GET = auth(async (request) => {
                 },
               },
             },
-            {
-              $project: {
-                balance: 0,
-              },
-            },
           ],
           as: "wallets",
         },
       },
       {
-        $unset: ["password", "wallets$.balance"],
+        $unset: ["password"],
       },
     ];
 
@@ -56,7 +51,7 @@ export const GET = auth(async (request) => {
 
       return x;
     });
-    return NextResponse.json(userWallets);
+    return NextResponse.json(userWallets[0]);
   } catch (error) {
     return new Response("Something went wrong!", { status: 500 });
   }

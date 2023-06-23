@@ -12,8 +12,8 @@ const client = new MongoClient(process.env.MONGO_URL!, {
   authMechanism: AuthMechanism.MONGODB_DEFAULT,
 });
 
-const db = client.db(process.env.MONGO_DB!);
+const db  = () => client.db(process.env.MONGO_DB!)
 
-export const collection = (name: string) => db.collection(name);
+export const collection = (name: string) => db().collection(name);
 
 export default db;

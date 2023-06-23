@@ -4,6 +4,28 @@ xBorderPay (Cross Border Payment) is a cross-border payment platform built on He
 
 Our project aims to leverage the speed, efficiency, and reliability of Hedera's Hashgraph to revolutionize international payments, catering to the needs of individuals and businesses in the rapidly evolving fintech industry.
 
+## Demo!
+
+visit: https://xborderpay.vercel.app/
+
+!["xBorderPay Preview"](https://github.com/PascalBenstrong/xborderpay/blob/main/screenshots/home-preview.png?raw=true "Home Page Preview")
+
+### Features
+
+- **Instant Cross-Border Payments:** xBorderPay provide near-instantaneous settlement of cross-border transactions. Leveraging Hedera's fast and secure DLT, we offer a reliable payment infrastructure that eliminates the delays and complexities associated with traditional banking systems.
+- **Seamless User Experience:** xBorderPay prioritize a seamless user experience by offering a user-friendly interface and intuitive payment flow. Users can easily initiate and track transactions, view transaction history, and manage their digital wallets.
+- **Scalability and Interoperability:** Built on Hedera's scalable DLT technology, xBorderPay can handle high transaction volumes with minimal latency.
+
+###Benefits and Impact:
+
+- **Speed and Efficiency:** xBorderPay utilization of Hedera's trusted DLT technology ensures fast and efficient cross-border payments, reducing settlement times from days to seconds.
+- **Cost Reduction:** By optimizing payment routing and minimizing fees and foreign exchange costs, xBorderPay offers significant cost savings for individuals and businesses conducting international transactions.
+- **Global Accessibility:** xBorderPay enables financial inclusion by providing individuals and businesses worldwide with access to fast and reliable cross-border payment services, regardless of their geographical location or banking infrastructure.
+- **Trust and Security:** Leveraging Hedera's robust DLT technology, xBorderPay ensures secure and tamper-proof transactions, maintaining the integrity and privacy of user data.
+- **Industry Adoption:** With Hedera's DLT technology trusted by major fintech companies around the world, xBorderPay has the potential to gain significant adoption and become a preferred choice for cross-border payment solutions.
+
+xBorderPay aims to disrupt the cross-border payment industry by leveraging the power of Hedera's trusted DLT technology. By providing a fast, efficient, and secure platform, we enable individuals and businesses to conduct seamless international transactions, fostering financial inclusion, and driving innovation in the fintech landscape.
+
 ## Getting Started
 
 First, run the development server:

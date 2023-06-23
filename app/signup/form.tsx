@@ -13,9 +13,12 @@ import {
 //import BootstrapInput from "../../../components/BootstrapInput";
 import Link from "next/link";
 import BootstrapInput from "@/components/entry/bootstrapInput";
+import useLocalStorage from "@/utils/useStorage";
 
 export const LoginForm = () => {
   const router = useRouter();
+  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "");
+  const [userAccount, setUserAccount] = useLocalStorage("account", "");
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: "",
@@ -26,7 +29,7 @@ export const LoginForm = () => {
   const [error, setError] = useState("");
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/portal/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,19 +46,27 @@ export const LoginForm = () => {
         callbackUrl,
       });
 
-      setLoading(false);
+      //setLoading(false);
 
-      console.log("Data: ", res);
       if (!res?.error) {
-        setFormValues({ firstName: "", lastName: "", email: "", password: "" });
+
+        //store userInfo
+        const _user = {
+          email: formValues.email
+        }
+        setUserAccount(JSON.stringify(_user))
+
         router.push(callbackUrl);
+        setFormValues({ firstName: "", lastName: "", email: "", password: "" });
+        setLoading(false);
       } else {
         setError(res?.error ? res?.error : "invalid email or password");
+        setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
       setError(error);
-      console.log("error: ", error);
+      //console.log("error: ", error);
     }
   };
 
@@ -83,7 +94,10 @@ export const LoginForm = () => {
           autoComplete="firstName"
           value={formValues.firstName}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -100,7 +114,10 @@ export const LoginForm = () => {
           autoComplete="lastName"
           value={formValues.lastName}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -117,7 +134,10 @@ export const LoginForm = () => {
           autoComplete="email"
           value={formValues.email}
           onChange={handleChange}
-          sx={{ color: "black" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           autoFocus
           required
         />
@@ -133,7 +153,10 @@ export const LoginForm = () => {
           type="password"
           autoComplete="current-password"
           value={formValues.password}
-          sx={{ color: "black" }}
+          sx={{ color: "black",
+          "& .MuiInputBase-input": {
+            backgroundColor: "white",
+          },}}
           onChange={handleChange}
           required
         />
@@ -151,7 +174,7 @@ export const LoginForm = () => {
             variant="contained"
             disabled={loading}
           >
-            {loading ? "loading..." : "Sign In"}
+            {loading ? "loading..." : "Sign Up"}
           </Button>
         </Grid>
       </Grid>

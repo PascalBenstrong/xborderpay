@@ -31,7 +31,7 @@ export const getRates = wrapInTryCatch<OpenExchangeRatesResponse, Currency>(
       );
 
     const twoHourAgo = Date.now() - 1000 * 60 * 60 * 2;
-    const records = await rates
+    const records = await rates()
       .find({})
       .sort({ _id: "desc" })
       .limit(1)
@@ -66,7 +66,7 @@ export const getRates = wrapInTryCatch<OpenExchangeRatesResponse, Currency>(
           new Error("Error getting echange rates! Try again later.")
         );
 
-      await rates.insertOne(ratesResult.value!);
+      await rates().insertOne(ratesResult.value!);
 
       record = ratesResult.value;
     }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Container,
   Paper,
@@ -20,13 +20,13 @@ import Review from "../../components/e-transfer/review";
 import SelectAccountPayee from "../../components/e-transfer/selectPayee";
 import ETransferSuccess from "../../components/e-transfer/success";
 import UserInfoCard from "../../components/e-transfer/userInfoCard";
-import { isAnyNull, useFetcher } from "../../utils";
+import { isAnyNull } from "../../utils";
 import { Currency, ETransferRequest, Wallet } from "../../types";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import useSWRImmutable from "swr/immutable";
 import TransitionAlerts from "@/components/alert";
-import useLocalStorage from "@/utils/useStorage";
+import SecurityFormAlert from "@/components/securityAlert/pkformAlert";
 
 const steps = [
   {
@@ -64,22 +64,31 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable(
-    "/api/e-transfer",
+  const { data, error, isLoading, mutate } = useSWRImmutable(
+    "/api/accounts/me",
     fetcher,
     {
-      refreshInterval: 60000,
+      refreshInterval: 1000,
+      revalidateOnFocus: true,
     }
   );
 
+  const purposes = [
+    "Software development services",
+    "Infrastructure maintenance and support",
+    "Cloud hosting and storage",
+    "Software licensing and subscriptions",
+    "IT consulting and advisory",
+  ];
+
   return {
     //transactions: data?.data,
-    userInfo: data?.user,
-    wallets: data?.accounts,
+    userInfo: data,
     recentPayees: data?.recentPayees,
-    purposes: data?.purposes,
+    purposes: purposes,
     isLoading,
     isError: error,
+    mutate,
   };
 }
 
@@ -122,8 +131,10 @@ export default function ETransferPage() {
     authorization: `Bearer ${session?.token}`,
   };
   //get data
-  const { userInfo, wallets, recentPayees, purposes, isError, isLoading } =
+  const { userInfo, recentPayees, purposes, isError, isLoading, mutate } =
     GetData(_myHeaders);
+
+  mutate(userInfo);
 
   //states
   const { exchangeRates } = GetRates();
@@ -151,9 +162,8 @@ export default function ETransferPage() {
   const [rate, setRate] = useState<Number>(19.08);
   const [isValidated, setIsValidated] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  // Get the value from local storage if it exists
-  const [pkValue, setPkValue] = useLocalStorage("shouldRequestKey", "")
+  const [isFetching, setIsProcessing] = useState(false);
+  const [showSecurityAlert, setShowSecurityAlert] = useState(false);
 
   const validateFields = (step: number) => {
     if (isAnyNull([myWalletId, payee, purpose]) && activeStep === 0) {
@@ -171,7 +181,6 @@ export default function ETransferPage() {
   };
 
   const handleNext = () => {
-    //setPkValue("");
     clearError();
     if (!validateFields(activeStep)) {
       setIsValidated(false);
@@ -191,11 +200,7 @@ export default function ETransferPage() {
 
     //check if we must submit to server
     if (activeStep == 2 && validateFields(activeStep)) {
-      /* window.setTimeout(() => {
-        setIsFetching(false);
-        setActiveStep(3);
-      }, 1000); */
-      handleSubmit();
+      setShowSecurityAlert(true);
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
@@ -223,8 +228,10 @@ export default function ETransferPage() {
     router.refresh();
   };
 
-  const handleSubmit = () => {
-    setIsFetching(true);
+  const handleSubmit = async (pkValue: string) => {
+    setIsProcessing(true);
+    setShowSecurityAlert(false);
+    //console.log("pkValue: ", pkValue);
     var payload: ETransferRequest = {
       fromWalletId: myWalletId,
       fromPrivateKey: pkValue,
@@ -242,23 +249,35 @@ export default function ETransferPage() {
       redirect: "follow",
     };
 
-    fetch("/api/e-transfer", requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        //setActiveStep(3);
-        console.log("result: ",result);
+    try {
+      const response = await fetch("/api/e-transfer", requestOptions);
+
+      if (response.ok) {
+        setActiveStep(3);
         setReference("CAxxx723");
-        setIsFetching(false);
-      })
-      .catch((error) => {
-        setIsFetching(false);
-        console.log("error: ", error);
-      });
+        setIsProcessing(false);
+      } else {
+        const error = await response.text();
+        //console.log("error:", error);
+        setErrorMessage(error);
+        setIsProcessing(false);
+        setIsValidated(false);
+      }
+    } catch (ex) {
+      console.log("error", ex);
+      setErrorMessage("Something went wrong try again later!");
+      setIsProcessing(false);
+      setIsValidated(false);
+    }
   };
 
   const clearError = () => {
     setIsValidated(true);
     setErrorMessage("");
+  };
+
+  const handleSecurityAlertClose = () => {
+    setShowSecurityAlert(false);
   };
 
   return (
@@ -324,7 +343,7 @@ export default function ETransferPage() {
                 headers={_myHeaders}
                 myWalletId={myWalletId}
                 setMyWalletId={setMyWalletId}
-                wallets={wallets}
+                wallets={userInfo?.wallets}
                 payee={payee}
                 setPayee={setPayee}
                 recentPayees={recentPayees}
@@ -435,6 +454,12 @@ export default function ETransferPage() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <SecurityFormAlert
+        walletCurrency={fromAmount.currency}
+        open={showSecurityAlert}
+        onUpdate={handleSubmit}
+        onClose={handleSecurityAlertClose}
+      />
     </Container>
   );
 }

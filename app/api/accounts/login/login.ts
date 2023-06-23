@@ -17,7 +17,7 @@ export const login = async (
   if (!emailValidationResult.isSuccess)
     return Option.fromError(emailValidationResult.error);
 
-  const found = await db.findOne({ email: email });
+  const found = await db().findOne({ email: email });
 
   if (!found)
     return Option.fromError(new Error("No account with those credentials!"));

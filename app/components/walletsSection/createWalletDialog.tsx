@@ -28,11 +28,13 @@ export interface SimpleDialogProps {
   open: boolean;
   wallets?: iWallet[];
   headers: Headers;
+  setValueToCopy: any;
   onClose: (value: string | iWallet) => void;
+  showSecurityAlert: () => void;
 }
 
 export default function CreateWallet(props: SimpleDialogProps) {
-  const { onClose, open, wallets, headers } = props;
+  const { onClose, open, wallets, headers,setValueToCopy,showSecurityAlert } = props;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [errorMessage, setErrorMessage] = useState("");
@@ -65,9 +67,11 @@ export default function CreateWallet(props: SimpleDialogProps) {
 
         if (data) {
           setPkValue(data.privateKey);
-          console.log("sucess");
+          setValueToCopy(data.privateKey);
+          console.log("sucess: ", data);
           setIsProcessing(false);
           onClose(data.wallet);
+          showSecurityAlert();
         }
       } else {
         const error = await response.text();
@@ -109,11 +113,11 @@ export default function CreateWallet(props: SimpleDialogProps) {
           height: "100%",
         }}
       >
-        <TransitionAlerts
+        {errorMessage && <TransitionAlerts
           severity="error"
           message={errorMessage}
           open={errorMessage.length > 0}
-        />
+        />}
         <Typography
           gutterBottom
           align="left"

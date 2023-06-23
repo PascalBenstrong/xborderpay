@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Container,
@@ -23,6 +23,7 @@ import useSWRImmutable from "swr/immutable";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
+import SecurityAlert from "@/components/securityAlert";
 
 function GetData(headers: any) {
   var requestOptions: any = {
@@ -34,33 +35,56 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading } = useSWRImmutable(
+  const { data, error, isLoading,mutate } = useSWRImmutable(
     "/api/transactions",
-    fetcher
-    /* { refreshInterval: 60000 } */
+    fetcher,
+    { refreshInterval: 1000,revalidateOnFocus: true, }
   );
 
   return {
     transactions: data?.transactions,
     isLoading,
     isError: error,
+    mutate,
   };
 }
 
 export default function HomePage() {
-  const { data: session }: { data: any } = useSession({
+  const { data: session, update }: any = useSession({
     required: true,
     onUnauthenticated: () => {
       redirect("/login");
     },
   });
+  const [securityAlert, setSecurityAlert] = React.useState(false);
+  const [valueToCopy, setValueToCopy] = React.useState("");
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
-  const { transactions, isError, isLoading } = GetData(_myHeaders);
+  const { transactions, isError, isLoading,mutate } = GetData(_myHeaders);
+
+  //mutate(transactions);
+
+  useEffect(() => {
+    if (session?.walletDetails !== null && session?.isNewUser) {
+      //setPkValue(data.privateKey);
+      setValueToCopy(session?.walletDetails?.privateKey);
+      setSecurityAlert(true);
+      
+      // Save the updated session object
+      // The changes will persist to the next session
+      // Replace 'session' with the actual name of your session object
+      // Save the updated session
+      update({isNewUser: false});
+    }
+  }, [session]);
+
+  const handleSecurityAlertClose = () => {
+    setSecurityAlert(false);
+  };
 
   return (
-    <Container maxWidth="xl" sx={{pt: {xs: 10,md: 15} }}>
+    <Container maxWidth="xl" sx={{ pt: { xs: 10, md: 15 }, minHeight: "70vh" }}>
       <Stack direction={{ sm: "row" }} justifyContent="space-between">
         <Typography variant="h5" fontWeight={700}>
           Welcome to the unbank
@@ -82,7 +106,7 @@ export default function HomePage() {
             sx={{
               bgcolor: "secondary.main",
               p: 2,
-              height: { xs: 430, md: 430, lg: 420 },
+              height: { xs: 430, md: 480, lg: 430 },
               maxHeight: 600,
               borderRadius: 3,
               overflow: "auto",
@@ -96,7 +120,7 @@ export default function HomePage() {
                     key={index}
                     to={item.receivingWallet.id}
                     type={item.type}
-                    currency={item.receivingWallet.currency}
+                    currency={item.senderWallet.currency}
                     amount={item.amount}
                     wallet={item.receivingWallet.name}
                     timestamp={item.timestamp}
@@ -122,6 +146,13 @@ export default function HomePage() {
           <CurrencyRates />
         </Grid>
       </Grid>
+      {valueToCopy && (
+        <SecurityAlert
+          valueToCopy={valueToCopy}
+          open={securityAlert}
+          onClose={handleSecurityAlertClose}
+        />
+      )}
     </Container>
   );
 }

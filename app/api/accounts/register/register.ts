@@ -24,7 +24,7 @@ export const register = async (
   if (!passwordValidationResult.isSuccess)
     return Option.fromError(passwordValidationResult.error);
 
-  const found = await db.findOne({ email: user.email });
+  const found = await db().findOne({ email: user.email });
 
   if (found) return Option.fromError(new Error("user already exists!"));
 
@@ -32,7 +32,7 @@ export const register = async (
 
   const token = signJwt({ sub: id.toString() });
 
-  const userInsertResult = await db.insertOne({
+  const userInsertResult = await db().insertOne({
     ...user,
     _id: id,
     password: passwordValidationResult.value,

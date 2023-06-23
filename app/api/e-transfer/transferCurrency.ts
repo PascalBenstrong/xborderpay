@@ -245,14 +245,14 @@ const topUp = wrapInTryCatch<Transaction, TopUpRequest>(async (data) => {
     reference: "top up",
   };
 
-  const insertResult = await transactions.insertOne({ ...trans, _id: id });
+  const insertResult = await transactions().insertOne({ ...trans, _id: id });
 
   if (!insertResult.acknowledged)
     return Option.fromError(new Error("Something went wrong!"));
 
   //update wallet balance, this can be computed from the transactions as well
 
-  await wallets.updateOne(
+  await wallets().updateOne(
     { _id: new ObjectId(data.toWalletId) },
     { $inc: { balance: receivingAmount } }
   );
@@ -362,7 +362,7 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
     };
 
     //console.log("inserting")
-    const insertResult = await transactions.insertOne({ ...trans, _id: id });
+    const insertResult = await transactions().insertOne({ ...trans, _id: id });
 
     if (!insertResult.acknowledged)
       return Option.fromError(new Error("Something went wrong!"));
@@ -370,11 +370,11 @@ const transferCurrency = wrapInTryCatch<Transaction, TransferCurrencyRequest>(
     //update wallet balance, this can be computed from the transactions as well
 
     const updates = [
-      wallets.updateOne(
+      wallets().updateOne(
         { _id: new ObjectId(toWallet.id) },
         { $inc: { balance: receivingAmount } }
       ),
-      wallets.updateOne(
+      wallets().updateOne(
         { _id: new ObjectId(fromWallet.id) },
         { $inc: { balance: -values.amount } }
       ),

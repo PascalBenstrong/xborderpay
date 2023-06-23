@@ -11,19 +11,31 @@ import {
 import React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
-import Link from "next/Link";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import TemporaryDrawer from "./drawer";
 
-const getValue = (pathname:string) => {
-  if(pathname === "/e-transfer")
-  return 1;
-  else if(pathname === "/transactions")
-  return 2
-  else{
-    return 0
+const getValue = (pathname: string) => {
+  if (pathname === "/e-transfer") return 1;
+  else if (pathname === "/transactions") return 2;
+  else {
+    return 0;
   }
-    
-}
+};
+const MenuLinks = [
+  {
+    label: "Home",
+    slug: "/",
+  },
+  {
+    label: "Instant Transfer",
+    slug: "/e-transfer",
+  },
+  {
+    label: "Transactions",
+    slug: "/transactions",
+  },
+];
 function AppBarTabs() {
   const pathname = usePathname();
   const [value, setValue] = React.useState(getValue(pathname));
@@ -32,35 +44,25 @@ function AppBarTabs() {
     setValue(newValue);
   };
 
-  //console.log("pathname: ",pathname)
-
   return (
     <Box sx={{ mx: 2, display: { xs: "none", md: "flex" } }}>
       <Tabs value={value} onChange={handleChange}>
-        <Tab
-          LinkComponent={Link}
-          href="/"
-          label="Home"
-          sx={{ fontWeight: value == 0 ? 700 : "normal" }}
-        />
-        <Tab
-          LinkComponent={Link}
-          href="/e-transfer"
-          label="Instant Transfer"
-          sx={{ fontWeight: value == 1 ? 700 : "normal" }}
-        />
-        <Tab
-          LinkComponent={Link}
-          href="/transactions"
-          label="Transactions"
-          sx={{ fontWeight: value == 2 ? 700 : "normal" }}
-        />
+        {MenuLinks.map((item, index) => (
+          <Tab
+            key={index}
+            LinkComponent={Link}
+            href={item.slug}
+            label={item.label}
+            sx={{ fontWeight: value == 0 ? 700 : "normal" }}
+          />
+        ))}
       </Tabs>
     </Box>
   );
 }
 
-export default function XBPAppBar({ isProduct }: any) {
+export default function XBPAppBar() {
+  const [open, setOpen] = React.useState(false);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" color="secondary">
@@ -72,6 +74,7 @@ export default function XBPAppBar({ isProduct }: any) {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
+              onClick={() => setOpen(true)}
             >
               <MenuIcon />
             </IconButton>
@@ -88,6 +91,11 @@ export default function XBPAppBar({ isProduct }: any) {
               </Button> */}
           </Toolbar>
         </Container>
+        <TemporaryDrawer
+          menuLinks={MenuLinks}
+          open={open}
+          handleClose={() => setOpen(false)}
+        />
       </AppBar>
     </Box>
   );

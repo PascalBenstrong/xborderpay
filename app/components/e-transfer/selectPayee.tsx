@@ -15,12 +15,12 @@ import RequiredField from "../requiredField";
 const customReturnAccounts = (arr: any[]) => {
   return arr
     ?.filter((obj: any) => {
-      return obj.balance > 0;
+      return obj.balance >= 0;
     })
     .map((finalResult: any) => {
       return {
         value: finalResult.id,
-        label: `${finalResult.currency} Wallet xxxxxxx555 - ${
+        label: `${finalResult.currency} Wallet ${finalResult.account.id} - ${
           finalResult.currency
         } ${finalResult.balance.toFixed(2)}`,
       };
@@ -78,9 +78,10 @@ export default function SelectAccountPayee({
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      console.log("Testing")
+      console.log("Testing: ",wallets)
+      console.log("_accounts: ",_accounts)
 
-      //if (myWalletId != null || myWalletId.length <= 0)
+      if (_accounts.length > 0)
         setMyWalletId(_accounts[0].value);
     }
   }, [wallets]);
@@ -147,14 +148,14 @@ export default function SelectAccountPayee({
 
   //get and set account id
   const handleAccountChange = (value: string) => {
-    let _accountId = accounts.find((x: any) => x.label === value);
-    setMyWalletId(_accountId?.value);
+    let _wallet = accounts.find((x: any) => x.label === value);
+    setMyWalletId(_wallet?.value);
   };
 
   //get and set payee account id
   const handlePayeeChange = (value: string) => {
-    let _accountId = accounts.find((x: any) => x.label === value);
-    setToWalletId(_accountId.value);
+    let _wallet = payeeWallets.find((x: any) => x.label === value);
+    setToWalletId(_wallet?.value);
   };
 
   return (

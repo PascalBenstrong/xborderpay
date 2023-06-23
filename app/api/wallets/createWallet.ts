@@ -30,7 +30,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
         validationResult.error,
         validationResult.message!
       );
-    let wallet: any = await wallets.findOne({
+    let wallet: any = await wallets().findOne({
       currency: request.currency,
       userId: new ObjectId(request.userId),
     });
@@ -65,7 +65,7 @@ const createWallet = wrapInTryCatch<WalletCreateResponse, WalletCreateRequest>(
       userId: new ObjectId(request.userId!),
     };
 
-    const inserted = await wallets.insertOne(wallet);
+    const inserted = await wallets().insertOne(wallet);
 
     if (!inserted.acknowledged)
       return Option.fromError(
