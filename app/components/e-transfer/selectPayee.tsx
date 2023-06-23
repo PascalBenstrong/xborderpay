@@ -84,7 +84,7 @@ export default function SelectAccountPayee({
       if (_accounts.length > 0)
         setMyWalletId(_accounts[0].value);
     }
-  }, [wallets]);
+  }, [wallets,setMyWalletId]);
 
   const handleEmailLookup = (value: string) => {
     if (timerRef.current) {

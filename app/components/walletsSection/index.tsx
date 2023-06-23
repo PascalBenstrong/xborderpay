@@ -74,7 +74,7 @@ export default function WalletsSection({ headers }: any) {
     let myWallets = wallets;
 
     return myWallets;
-  }, [wallets, selectedValue]);
+  }, [wallets]);
 
   const handleClickOpen = () => {
     setOpen(true);

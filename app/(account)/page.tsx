@@ -9,20 +9,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Title from "../components/title";
 import TransactionCard from "../components/transaction_card";
-import { useFetcher } from "../utils";
 import CurrencyRates from "../components/rates";
-import WalletCard from "../components/wallet_card";
 import EmptyList from "@/components/empty";
 import WalletsSection from "@/components/walletsSection";
 import Link from "next/link";
-import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import WalletDetailsDialog from "@/components/walletsSection/walletDetailsDialog";
 import SecurityAlert from "@/components/securityAlert";
 
 function GetData(headers: any) {
@@ -77,7 +72,7 @@ export default function HomePage() {
       // Save the updated session
       update({isNewUser: false});
     }
-  }, [session]);
+  }, [session,update,setValueToCopy,setSecurityAlert]);
 
   const handleSecurityAlertClose = () => {
     setSecurityAlert(false);
