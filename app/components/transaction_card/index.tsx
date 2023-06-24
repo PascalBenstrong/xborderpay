@@ -37,10 +37,10 @@ export default function TransactionCard({
   isLoading,
 }: Transaction) {
   // Convert the timestamp to milliseconds by multiplying it by 1000
-  const date = new Date(timestamp * 1000);
+  const date = new Date(timestamp);
 
   // Format the date to "MMM d" format
-  const formattedDate = date.toLocaleString("en-US", {
+  const formattedDate = date.toLocaleString("en", {
     month: "short",
     day: "numeric",
   });
