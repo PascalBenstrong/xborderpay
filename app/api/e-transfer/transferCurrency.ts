@@ -21,6 +21,7 @@ const maxTopUpAmount = 5000;
 const minTopUpAmount = 1;
 const requiredStringSchema = zod.string().min(1);
 const amountSchema = zod
+  .coerce
   .number()
   .min(minTopUpAmount)
   .max(maxTopUpAmount)
