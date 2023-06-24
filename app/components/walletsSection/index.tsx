@@ -109,7 +109,7 @@ export default function WalletsSection({ headers }: any) {
     <div>
       <Box sx={{ mt: 4, mb: 5 }}>
         <Grid container spacing={2}>
-          {Array.from(_wallets?.slice(1, 4) ?? new Array(4)).map((item: Wallet, index: number) => (
+          {Array.from(_wallets?.slice(0, 4) ?? new Array(4)).map((item: Wallet, index: number) => (
               <Grid xs={6} sm={3} key={index}>
                 <WalletCard
                   name={item?.name}
