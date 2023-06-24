@@ -4,6 +4,7 @@ import {
   FormControl,
   InputLabel,
   LinearProgress,
+  Skeleton,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -60,6 +61,7 @@ export default function SelectAccountPayee({
   setPayeeWallets,
   query,
   setQuery,
+  isLoading,
 }: any) {
   const [accounts, setAccounts] = useState<any>();
   const [isEmailFetching, setIsEmailFetching] = useState(false);
@@ -72,19 +74,15 @@ export default function SelectAccountPayee({
     },
     []
   );
-  
+
   useEffect(() => {
     if (wallets != null) {
       const _accounts = customReturnAccounts(wallets);
       setAccounts(_accounts);
 
-      console.log("Testing: ",wallets)
-      console.log("_accounts: ",_accounts)
-
-      if (_accounts.length > 0)
-        setMyWalletId(_accounts[0].value);
+      if (_accounts.length > 0) setMyWalletId(_accounts[0].value);
     }
-  }, [wallets,setMyWalletId]);
+  }, [wallets, setMyWalletId, setAccounts]);
 
   const handleEmailLookup = (value: string) => {
     if (timerRef.current) {
@@ -158,7 +156,23 @@ export default function SelectAccountPayee({
     setToWalletId(_wallet?.value);
   };
 
-  return (
+  const LoadingSkeleton = () => {
+    return (<>
+      <Skeleton variant="rectangular" width="30%" height={30} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="20%" height={20} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="100%" height={55} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="10%" height={30} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="20%" height={20} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="100%" height={55} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="40%" height={20} sx={{ mb: 2 }} />
+      <Skeleton variant="rectangular" width="100%" height={55} sx={{ mb: 1 }} />
+      <Skeleton variant="rectangular" width="40%" height={45} sx={{ mb: 2 }} />
+    </>)
+  }
+
+  return isLoading ? (
+    <LoadingSkeleton/>
+  ) : (
     <Box>
       <Typography variant="h6" mb={1}>
         Transfer from
@@ -167,7 +181,7 @@ export default function SelectAccountPayee({
         Account
         <RequiredField />
       </Typography>
-      {accounts && (
+      {accounts ? (
         <XAutocomplete
           id="accounts"
           value={getLabelFromValue(myWalletId, accounts)}
@@ -175,6 +189,13 @@ export default function SelectAccountPayee({
           disableClearable
           data={accounts}
           mt={1}
+        />
+      ) : (
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={55}
+          sx={{ mb: 1 }}
         />
       )}
 

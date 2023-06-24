@@ -264,7 +264,7 @@ export default function ETransferPage() {
         setIsValidated(false);
       }
     } catch (ex) {
-      console.log("error", ex);
+      //console.log("error", ex);
       setErrorMessage("Something went wrong try again later!");
       setIsProcessing(false);
       setIsValidated(false);
@@ -290,7 +290,7 @@ export default function ETransferPage() {
           px: 4,
           pb: 4,
           borderRadius: 3,
-          height: "100%",
+          minHeight: "80vh",
         }}
         noValidate={isValidated}
         autoComplete="off"
@@ -358,6 +358,7 @@ export default function ETransferPage() {
                 setPayeeWallets={setPayeeWallets}
                 query={query}
                 setQuery={setQuery}
+                isLoading={isLoading}
               />
             )}
             {activeStep == 1 && (
@@ -390,7 +391,7 @@ export default function ETransferPage() {
                 purpose={purpose}
               />
             )}
-            {activeStep <= steps.length - 2 && (
+            {!isLoading && activeStep <= steps.length - 2 && (
               <Box sx={{ mb: 2, mt: 2 }}>
                 {activeStep > 0 && (
                   <Button

@@ -30,10 +30,10 @@ function GetData(headers: any) {
   const fetcher = (url: string) =>
     fetch(url, requestOptions).then((res) => res.json());
 
-  const { data, error, isLoading,mutate } = useSWRImmutable(
+  const { data, error, isLoading, mutate } = useSWRImmutable(
     "/api/transactions",
     fetcher,
-    { refreshInterval: 1000,revalidateOnFocus: true, }
+    { refreshInterval: 1000, revalidateOnFocus: true }
   );
 
   return {
@@ -56,7 +56,7 @@ export default function HomePage() {
   const _myHeaders = {
     authorization: `Bearer ${session?.token}`,
   };
-  const { transactions, isError, isLoading,mutate } = GetData(_myHeaders);
+  const { transactions, isError, isLoading, mutate } = GetData(_myHeaders);
 
   //mutate(transactions);
 
@@ -65,14 +65,14 @@ export default function HomePage() {
       //setPkValue(data.privateKey);
       setValueToCopy(session?.walletDetails?.privateKey);
       setSecurityAlert(true);
-      
+
       // Save the updated session object
       // The changes will persist to the next session
       // Replace 'session' with the actual name of your session object
       // Save the updated session
-      update({isNewUser: false});
+      update({ isNewUser: false });
     }
-  }, [session,update,setValueToCopy,setSecurityAlert]);
+  }, [session, update, setValueToCopy, setSecurityAlert]);
 
   const handleSecurityAlertClose = () => {
     setSecurityAlert(false);
@@ -107,34 +107,37 @@ export default function HomePage() {
               overflow: "auto",
             }}
           >
-            {transactions?.length > 0 ? (
-              transactions
-                .slice(0, 7)
-                .map((item: any, index: number) => (
-                  <TransactionCard
-                    key={index}
-                    to={item.receivingWallet.id}
-                    type={item.type}
-                    currency={item.senderWallet.currency}
-                    amount={item.amount}
-                    wallet={item.receivingWallet.name}
-                    timestamp={item.timestamp}
-                  />
-                ))
-            ) : (
+            {Array.from(transactions?.slice(0, 7) ?? new Array(6)).map(
+              (item: any, index: number) => (
+                <TransactionCard
+                  key={index}
+                  to={item?.receivingWallet?.id}
+                  type={item?.type}
+                  currency={item?.senderWallet?.currency}
+                  amount={item?.amount}
+                  wallet={item?.receivingWallet?.name}
+                  timestamp={item?.timestamp}
+                  isLoading={isLoading}
+                />
+              )
+            )}
+
+            {!transactions && !isLoading && (
               <EmptyList
                 title="No Transactions"
                 subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
               />
             )}
             <Divider />
-            <Button
-              LinkComponent={Link}
-              href="/e-transfer"
-              sx={{ width: "100%" }}
-            >
-              View More Activies
-            </Button>
+            {transactions?.length > 7 && (
+              <Button
+                LinkComponent={Link}
+                href="/e-transfer"
+                sx={{ width: "100%" }}
+              >
+                View More Activies
+              </Button>
+            )}
           </Paper>
         </Grid>
         <Grid xs={12} md={6} lg={3}>

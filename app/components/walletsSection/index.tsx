@@ -38,7 +38,7 @@ function GetData(headers: any) {
   const { data, error, isLoading, mutate } = useSWRImmutable(
     "/api/wallets",
     fetcher,
-    { refreshInterval: 1000,revalidateOnFocus: true, }
+    { refreshInterval: 1000, revalidateOnFocus: true }
   );
 
   //const { data, isError, isLoading } = useFetcher(`/api/transactions`);
@@ -49,8 +49,8 @@ function GetData(headers: any) {
 
   return {
     wallets,
-    isLoading: true,
-    isError: false,
+    isLoading: isLoading,
+    isError: error,
     mutate,
   };
 }
@@ -67,8 +67,6 @@ export default function WalletsSection({ headers }: any) {
   const [selectedValue, setSelectedValue] = React.useState<iWallet | null>(
     null
   );
-
-  //mutate(wallets);
 
   const _wallets: Wallet[] = useMemo(() => {
     let myWallets = wallets;
@@ -111,18 +109,18 @@ export default function WalletsSection({ headers }: any) {
     <div>
       <Box sx={{ mt: 4, mb: 5 }}>
         <Grid container spacing={2}>
-          {_wallets &&
-            _wallets.map((item: Wallet, index: number) => (
+          {Array.from(_wallets?.slice(1, 4) ?? new Array(4)).map((item: Wallet, index: number) => (
               <Grid xs={6} sm={3} key={index}>
                 <WalletCard
-                  name={item.name}
-                  balance={item.balance}
-                  currency={item.currency}
-                  handlePreview={() => handleDetailsPreview(item)}
+                  name={item?.name}
+                  balance={item?.balance}
+                  currency={item?.currency}
+                  handlePreview={() => !isLoading && handleDetailsPreview(item)}
+                  isLoading={isLoading}
                 />
               </Grid>
             ))}
-          {_wallets?.length < 4 && (
+          {!isLoading && _wallets?.length < 4 && (
             <Grid xs={3}>
               <Paper
                 component={Button}

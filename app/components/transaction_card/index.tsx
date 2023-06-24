@@ -1,5 +1,5 @@
 import React from "react";
-import { Stack, Avatar, Box, Typography } from "@mui/material";
+import { Stack, Avatar, Box, Typography, Skeleton } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import SentTransferIcon from "@mui/icons-material/East";
 import { TransactionType } from "@/types";
@@ -13,6 +13,7 @@ type Transaction = {
   currency: string;
   amount: number;
   timestamp: number;
+  isLoading?: boolean;
 };
 
 const typeHandler = (type: any) => {
@@ -33,6 +34,7 @@ export default function TransactionCard({
   currency,
   amount,
   timestamp,
+  isLoading,
 }: Transaction) {
   // Convert the timestamp to milliseconds by multiplying it by 1000
   const date = new Date(timestamp * 1000);
@@ -42,6 +44,9 @@ export default function TransactionCard({
     month: "short",
     day: "numeric",
   });
+
+  if (isLoading)
+    return <Skeleton variant="rectangular" width="100%" height={55} sx={{mb: 1}} />;
 
   return (
     <Stack

@@ -19,10 +19,8 @@ export default function ETransferSuccess({
     }, 500);
   };
   useEffect(() => {
-    //clearTimeout(timerRef.current);
-    //setShowStatus(true);
     animateStatus();
-  }, []);
+  }, [animateStatus]);
 
   return (
     <>

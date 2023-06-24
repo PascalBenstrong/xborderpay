@@ -57,24 +57,27 @@ export default function TransactionsPage() {
           overflow: "auto",
         }}
       >
-        {transactions ? (
-          transactions.map((item: any, index: number) => (
-            <TransactionCard
-              key={index}
-              to={item.receivingWallet.id}
-              type={item.type}
-              currency={item.senderWallet.currency}
-              amount={item.amount}
-              wallet={item.receivingWallet.name}
-              timestamp={item.timestamp}
-            />
-          ))
-        ) : (
-          <EmptyList
-            title="No Transactions"
-            subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
-          />
-        )}
+        {Array.from(transactions ?? new Array(11)).map(
+              (item: any, index: number) => (
+                <TransactionCard
+                  key={index}
+                  to={item?.receivingWallet?.id}
+                  type={item?.type}
+                  currency={item?.senderWallet?.currency}
+                  amount={item?.amount}
+                  wallet={item?.receivingWallet?.name}
+                  timestamp={item?.timestamp}
+                  isLoading={isLoading}
+                />
+              )
+            )}
+
+            {!transactions && !isLoading && (
+              <EmptyList
+                title="No Transactions"
+                subtitle="Bucket feeling empty? Let's e-transfer now for a transaction thrill! 🛍️💸"
+              />
+            )}
       </Paper>
     </Container>
   );
