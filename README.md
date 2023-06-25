@@ -4,7 +4,7 @@ xBorderPay (Cross Border Payment) is a cross-border payment platform built on He
 
 Our project aims to leverage the speed, efficiency, and reliability of Hedera's Hashgraph to revolutionize international payments, catering to the needs of individuals and businesses in the rapidly evolving fintech industry.
 
-## Demo!
+## Demo! & Gallery
 
 visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderpay.vercel.app/</a>
 
