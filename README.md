@@ -12,6 +12,10 @@ visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderp
 
 ### Features
 
+- **Authentication:** user can register, login, signout
+- **Wallet Creation:** to add wallet in other currencies
+- **Wallet Topup:** to add funds to wallet
+- **Wallet Deletion:** to delete wallet
 - **Instant Cross-Border Payments:** xBorderPay provide near-instantaneous settlement of cross-border transactions. Leveraging Hedera's fast and secure DLT, we offer a reliable payment infrastructure that eliminates the delays and complexities associated with traditional banking systems.
 - **Seamless User Experience:** xBorderPay prioritize a seamless user experience by offering a user-friendly interface and intuitive payment flow. Users can easily initiate and track transactions, view transaction history, and manage their digital wallets.
 - **Scalability and Interoperability:** Built on Hedera's scalable DLT technology, xBorderPay can handle high transaction volumes with minimal latency.
