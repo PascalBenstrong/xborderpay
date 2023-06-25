@@ -85,7 +85,7 @@ You will need to however build an optimized production build using `pnpm build`,
 ## System Diagram
 | |                                                 |
 | -------------------- | ----------------------------------------------- |
-| Register            | <img src="./screenshots/diagrams/register.png" height="120">      |
-| Login            | <img src="./screenshots/diagrams/login.png" height="120">      |
-| Register            | <img src="./screenshots/diagrams/create-wallet.png" height="120">      |
-| Register            | <img src="./screenshots/diagrams/transfer-process.png" height="120">      |
+| Register            | <img src="./screenshots/system-diagrams/register.png" height="120">      |
+| Login            | <img src="./screenshots/system-diagrams/login.png" height="120">      |
+| Register            | <img src="./screenshots/system-diagrams/create-wallet.png" height="120">      |
+| Register            | <img src="./screenshots/system-diagrams/transfer-process.png" height="120">      |
