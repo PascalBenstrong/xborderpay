@@ -10,6 +10,17 @@ visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderp
 
 !["xBorderPay Preview"](https://github.com/PascalBenstrong/xborderpay/blob/main/screenshots/home-preview.png?raw=true "Home Page Preview")
 
+<table>
+  <tr>
+     <td><img src="./screenshots/home-preview.png" height="120"> </td>
+     <td> <img src="./screenshots/e-transfer.png" height="120"> </td>
+     <td> <img src="./screenshots/wallet-preview.png" height="120"> </td>
+     <td> <img src="./screenshots/login.png" height="120"> </td>
+  </tr>
+  
+
+</table>
+
 ### Features
 
 - **Authentication:** user can register, login, signout
@@ -70,3 +81,11 @@ The above command should start the project on port `3000` and the api and web in
 
 We have chosen to deploy the project on vercel. However, since the project is built using nodejs, it can be deployed in any environment nodejs is allowed to run.
 You will need to however build an optimized production build using `pnpm build`, after which you can use `pnpm start` to run the production build.
+
+## System Diagram
+| |                                                 |
+| -------------------- | ----------------------------------------------- |
+| Register            | <img src="./screenshots/diagrams/register.png" height="120">      |
+| Login            | <img src="./screenshots/diagrams/login.png" height="120">      |
+| Register            | <img src="./screenshots/diagrams/create-wallet.png" height="120">      |
+| Register            | <img src="./screenshots/diagrams/transfer-process.png" height="120">      |
