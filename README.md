@@ -83,9 +83,25 @@ We have chosen to deploy the project on vercel. However, since the project is bu
 You will need to however build an optimized production build using `pnpm build`, after which you can use `pnpm start` to run the production build.
 
 ## System Diagram
-| |                                                 |
-| -------------------- | ----------------------------------------------- |
-| Register            | <img src="./screenshots/system-diagrams/register.png" height="120">      |
-| Login            | <img src="./screenshots/system-diagrams/login.png" height="120">      |
-| Register            | <img src="./screenshots/system-diagrams/create-wallet.png" height="120">      |
-| Register            | <img src="./screenshots/system-diagrams/transfer-process.png" height="120">      |
+<table>
+  <tr>
+     <td>
+     <p>Register</p>
+     <img src="./screenshots/system-diagrams/register.png" height="120">
+    </td>
+     <td>
+     <p>Login</p>
+     <img src="./screenshots/system-diagrams/login.png" height="120">
+    </td>
+     <td>
+     <p>Create Wallet</p>
+     <img src="./screenshots/system-diagrams/create-wallet.png" height="120">
+    </td>
+     <td>
+     <p>Transfer Process</p>
+     <img src="./screenshots/system-diagrams/transfer-process.png" height="120">
+    </td>
+  </tr>
+  
+
+</table>
