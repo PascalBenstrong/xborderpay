@@ -16,7 +16,7 @@ visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderp
 - **Seamless User Experience:** xBorderPay prioritize a seamless user experience by offering a user-friendly interface and intuitive payment flow. Users can easily initiate and track transactions, view transaction history, and manage their digital wallets.
 - **Scalability and Interoperability:** Built on Hedera's scalable DLT technology, xBorderPay can handle high transaction volumes with minimal latency.
 
-###Benefits and Impact:
+### Benefits and Impact:
 
 - **Speed and Efficiency:** xBorderPay utilization of Hedera's trusted DLT technology ensures fast and efficient cross-border payments, reducing settlement times from days to seconds.
 - **Cost Reduction:** By optimizing payment routing and minimizing fees and foreign exchange costs, xBorderPay offers significant cost savings for individuals and businesses conducting international transactions.
@@ -27,33 +27,42 @@ visit: <a href="https://xborderpay.vercel.app/" target="_blank">https://xborderp
 xBorderPay aims to disrupt the cross-border payment industry by leveraging the power of Hedera's trusted DLT technology. By providing a fast, efficient, and secure platform, we enable individuals and businesses to conduct seamless international transactions, fostering financial inclusion, and driving innovation in the fintech landscape.
 
 ## Getting Started
+Before running the project we will need to prepare our environment with the following:
 
-First, run the development server:
+- [Nodejs](https://nodejs.org/en/download)
+- [pnpm](https://pnpm.io/installation)
+- A free [Open Exchange Rates](https://openexchangerates.org/) api key
+- a local [MongoDb](https://www.mongodb.com/docs/manual/installation/) instance or a cloud [MongoDb Atlas](https://www.mongodb.com/atlas) connection string
+- A [Hedera test net account](https://docs.hedera.com/hedera/getting-started/environment-set-up)
 
+Once you have setup the above, you can go ahead an rename [example.env](./example.env) in the repository to `.env`.
+
+| Environment variable |                                                 |
+| -------------------- | ----------------------------------------------- |
+| MONGO_URL            | mongodb url or atlas url/connection string      |
+| MONGO_USER           | database user that has access to the `MONGO_DB` |
+| MONGO_PASSWORD       | database user password                          |
+| MONGO_DB             | the name of the database to be used             |
+| JWT_SECRET           | secret used to sign jwt tokens                  |
+| JWT_ISSUER           | jwt issuer, default `xborderpay`                |
+| JWT_AUDIENCE         | jwt audience `xborderpay`                       |
+| RATES_API_KEY        | open change rates api key                       |
+| HEDERA_ACCOUNT_ID    | hedera test net account id                      |
+| HEDERA_PRIVATE_KEY   | hedera test net account private key             |
+
+
+First install the node modules
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+pnpm i
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then you can run the dev build with
+```bash
+pnpm dev
+```
+The above command should start the project on port `3000` and the api and web interface can be accessed on the url [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Deployment
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
+We have chosen to deploy the project on vercel. However, since the project is built using nodejs, it can be deployed in any environment nodejs is allowed to run.
+You will need to however build an optimized production build using `pnpm build`, after which you can use `pnpm start` to run the production build.
